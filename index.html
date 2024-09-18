@@ -1,258 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <style>
-    /* Reset básico */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background-color: #3a3a3a;
-      color: #FFF;
-    }
-
-    /* Tag h2 fixada no topo */
-    h2 {
-      position: fixed;                /* Fixa o h2 na posição especificada */
-      top: 0;                         /* Alinha o topo do h2 ao topo da página */
-      left: 0;                        /* Alinha o h2 à esquerda */
-      width: 100%;                    /* Faz com que o h2 ocupe toda a largura da página */
-      background-color: #2a2a2a;      /* Define uma cor de fundo */
-      color: #FFF;                    /* Define a cor do texto */
-      padding: 15px 0;                /* Adiciona espaçamento interno */
-      text-align: center;             /* Centraliza o texto */
-      z-index: 1000;                  /* Garante que o h2 fique acima de outros elementos */
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra para destaque */
-      margin: 0;                      /* Remove margens externas */
-    }
-
-    /* Conteúdo principal */
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 20px 20px 20px; /* Aumente o padding-top para dar espaço ao h2 fixo */
-    }
-
-    .flashcard {
-      border: 1px solid #81ce39;
-      padding: 15px;
-      margin: 10px;
-      text-align: justify;
-      background-color: #4a4a4a;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    #front-content, #back-content {
-      border: none;
-      color: #FFF;
-    }
-
-    hr {
-      width: 100%;
-      border: none;
-      height: 1px;
-      background-color: #81ce39; /* Cinza claro */
-      margin: 25px 0;
-    }
-
-    .flashcard .back {
-      display: none; /* Esconde a parte de trás inicialmente */
-      margin-top: 20px;
-    }
-
-    /* Footer com botões */
-    .footer {
-      background-color: #2a2a2a;
-      padding: 15px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: sticky;
-      bottom: 0;
-      width: 100%;
-    }
-
-    .buttons-container, .navigation-buttons {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      justify-content: center;
-      margin: 10px 0;
-    }
-
-    .buttons-container {
-      flex-direction: row;
-      justify-content: space-around;
-      margin-bottom: 10px;
-    }
-
-    .buttons-container button, .navigation-buttons button {
-      flex: 1;
-      margin: 0 5px;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .buttons-container button {
-      background-color: #81ce39;
-      color: #FFF;
-    }
-
-    .buttons-container button:hover {
-      background-color: #6da32e;
-    }
-
-    .navigation-buttons button {
-      background-color: #555;
-      color: #FFF;
-    }
-
-    .navigation-buttons button:hover {
-      background-color: #444;
-    }
-
-    /* Responsividade */
-    @media (min-width: 600px) {
-      .buttons-container, .navigation-buttons {
-        max-width: 600px;
-      }
-
-      .buttons-container button, .navigation-buttons button {
-        font-size: 18px;
-        padding: 12px;
-      }
-    }
-
-    @media (min-width: 900px) {
-      .flashcard {
-        padding: 20px;
-        max-width: 600px;
-      }
-
-      .buttons-container button, .navigation-buttons button {
-        font-size: 20px;
-        padding: 15px;
-      }
-    }
-  </style>
+  <!-- Link para o CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-  <!-- Tag h2 fixada no topo -->
+  <!-- Conteúdo da página -->
   <h2>DISCIPLINA</h2>
-
-  <div class="content">
-    <div class="flashcard" id="flashcard">
-      <!-- Parte da frente do flashcard -->
-      <div class="front" id="front-content">
-        <!-- Conteúdo inicial -->
-      </div>
-      
-      <hr>
-      
-      <!-- Parte de trás do flashcard -->
-      <div class="back" id="back-content">
-        <!-- Conteúdo inicial -->
-      </div>
-    </div>
+  <div class="flashcard" id="flashcard">
+    <!-- Conteúdo do Flashcard -->
   </div>
-
+  
+  <!-- Footer com Botões -->
   <div class="footer">
-    <!-- Contêiner dos botões "Mostrar" e "Ocultar" -->
     <div class="buttons-container">
       <button onclick="mostrarConteudo()">MOSTRAR</button>
       <button onclick="ocultarConteudo()">OCULTAR</button>
     </div>
-
-    <!-- Botões "Anterior" e "Próximo" -->
     <div class="navigation-buttons">
       <button onclick="flashcardAnterior()">ANTERIOR</button>
       <button onclick="flashcardProximo()">PRÓXIMO</button>
     </div>
   </div>
 
-  <script>
-    // Dados de exemplo para os flashcards
-    var flashcards = [
-      {
-        frente: "Adjetivo e substantivo de dois gêneros<br><br>1. que ou o que existe há pouco tempo; novo, jovem<br>2. que ou aquele que iniciou recentemente alguma atividade, função etc; principiante, iniciante.",
-        tras: "NOVEL"
-      },
-      {
-        frente: "Pessoa que expressa crença ou confiança<br><br>1. Aquele que acredita ou confia em algo ou alguém.",
-        tras: "CREDULO"
-      },
-      {
-        frente: "Sensação desagradável causada por uma dor física ou moral<br><br>1. Estado emocional caracterizado por um sofrimento prolongado.",
-        tras: "TRISTEZA"
-      }
-    ];
-    
-    var indiceAtual = 0; // Mantém o índice do flashcard atual
-
-    function mostrarConteudo() {
-      // Exibe a parte de trás do flashcard sem esconder a frente
-      document.getElementById('back-content').style.display = 'block';
-    }
-
-    function ocultarConteudo() {
-      // Esconde a parte de trás do flashcard e exibe a frente
-      document.getElementById('back-content').style.display = 'none';
-    }
-
-    function atualizarFlashcard() {
-      // Atualiza o conteúdo do flashcard com base no índice atual
-      document.getElementById('front-content').innerHTML = flashcards[indiceAtual].frente;
-      document.getElementById('back-content').innerHTML = flashcards[indiceAtual].tras;
-      document.getElementById('back-content').style.display = 'none'; // Esconde a parte de trás ao trocar
-    }
-
-    function flashcardProximo() {
-      // Vai para o próximo flashcard
-      if (indiceAtual < flashcards.length - 1) {
-        indiceAtual++;
-        atualizarFlashcard();
-      } else {
-        alert("Este é o último flashcard.");
-      }
-    }
-
-    function flashcardAnterior() {
-      // Volta para o flashcard anterior
-      if (indiceAtual > 0) {
-        indiceAtual--;
-        atualizarFlashcard();
-      } else {
-        alert("Este é o primeiro flashcard.");
-      }
-    }
-
-    // Inicializa o flashcard com o primeiro conteúdo
-    atualizarFlashcard();
-  </script>
-
+  <!-- Link para o JavaScript -->
+  <script src="scripts.js"></script>
 </body>
-
 </html>
