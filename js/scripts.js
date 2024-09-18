@@ -1,7 +1,7 @@
-  <script>
+<script>
 
 document.addEventListener("DOMContentLoaded", function() {
-  var scriptUrl = 'https://script.google.com/macros/s/AKfycbw7zzeH_b6Ux9p2cZS_wuuAzIpfIdLE4oMY1v6Jj-fX/dev'; // URL do web app do Google Apps Script
+  var scriptUrl = 'https://script.google.com/macros/s/AKfycbw3vgAPhUJCcHJu9rdooStfGgCY8cU1XIU_X81-ACpX-lvD2jEuaDkPmZlYV-RFqmAXcQ/exec'; // URL do web app do Google Apps Script
   
   function fetchFlashcards() {
     fetch(scriptUrl)
@@ -52,6 +52,4 @@ document.addEventListener("DOMContentLoaded", function() {
   fetchFlashcards(); // Inicializa o flashcard com dados da planilha
 });
 
-
-    
-  </script>
+</script>
