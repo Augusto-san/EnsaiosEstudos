@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
@@ -7,21 +8,38 @@
   
   <!-- Link para o CSS -->
   <link rel="stylesheet" href="css/styles.css">
+  
 </head>
+
 <body>
 
-  <!-- Conteúdo da página -->
+  <!-- Tag h2 fixada no topo -->
   <h2>DISCIPLINA</h2>
-  <div class="flashcard" id="flashcard">
-    <!-- Conteúdo do Flashcard -->
+
+  <div class="content">
+    <div class="flashcard" id="flashcard">
+      <!-- Parte da frente do flashcard -->
+      <div class="front" id="front-content">
+        <!-- Conteúdo inicial -->
+      </div>
+      
+      <hr>
+      
+      <!-- Parte de trás do flashcard -->
+      <div class="back" id="back-content">
+        <!-- Conteúdo inicial -->
+      </div>
+    </div>
   </div>
-  
-  <!-- Footer com Botões -->
+
   <div class="footer">
+    <!-- Contêiner dos botões "Mostrar" e "Ocultar" -->
     <div class="buttons-container">
       <button onclick="mostrarConteudo()">MOSTRAR</button>
       <button onclick="ocultarConteudo()">OCULTAR</button>
     </div>
+
+    <!-- Botões "Anterior" e "Próximo" -->
     <div class="navigation-buttons">
       <button onclick="flashcardAnterior()">ANTERIOR</button>
       <button onclick="flashcardProximo()">PRÓXIMO</button>
@@ -30,5 +48,7 @@
 
   <!-- Link para o JavaScript -->
   <script src="js/scripts.js"></script>
+  
 </body>
+
 </html>
