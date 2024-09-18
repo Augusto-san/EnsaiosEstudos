@@ -4,19 +4,15 @@
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Link para o CSS -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
-  <!-- Conteúdo da página -->
   <h2>DISCIPLINA</h2>
   <div class="flashcard" id="flashcard">
-    <!-- Conteúdo do Flashcard -->
+    <div class="front" id="front-content"></div>
+    <hr>
+    <div class="back" id="back-content"></div>
   </div>
-  
-  <!-- Footer com Botões -->
   <div class="footer">
     <div class="buttons-container">
       <button onclick="mostrarConteudo()">MOSTRAR</button>
@@ -27,8 +23,6 @@
       <button onclick="flashcardProximo()">PRÓXIMO</button>
     </div>
   </div>
-
-  <!-- Link para o JavaScript -->
-  <script src="scripts.js"></script>
+  <script src="js/scripts.js"></script>
 </body>
 </html>
