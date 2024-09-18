@@ -1,3 +1,5 @@
+<script>
+
 // Dados de exemplo para os flashcards
 var flashcards = [
   {
@@ -55,3 +57,5 @@ function flashcardAnterior() {
 
 // Inicializa o flashcard com o primeiro conteúdo
 atualizarFlashcard();
+
+</script>
