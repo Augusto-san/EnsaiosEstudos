@@ -32,14 +32,14 @@
     }
 
     /* Conteúdo principal */
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 20px 20px 20px; /* Aumente o padding-top para dar espaço ao h2 fixo */
-    }
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 20px 20px 20px; /* Ajuste o padding-top para acomodar o header fixo */
+}
 
     .flashcard {
       border: 1px solid #81ce39;
@@ -125,15 +125,17 @@
       background-color: #444;
     }
     
-    .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2a2a2a;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2a2a2a;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Mantém o header acima */
+  position: fixed; /* Fixa o header no topo */
+  width: 100%;
+}
 
   .header h2 {
     margin: 0;
@@ -141,15 +143,17 @@
     text-align: center;
   }
 
-  .header select {
-    margin-left: 10px;
-    padding: 5px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    color: #000;
-  }
+.header select {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #000;
+  z-index: 1010; /* Garante que os selects fiquem acima */
+  position: relative;
+}
 
     /* Responsividade */
     @media (min-width: 600px) {
