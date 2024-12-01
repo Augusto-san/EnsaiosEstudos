@@ -6,21 +6,239 @@
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
- <!-- Link para o CSS -->
- <link rel="stylesheet" href="css/styles.css">
 
+<!-- Link para o CSS  <link rel="stylesheet" href="css/styles.css">  -->
 
+  <style>
+    /* Reset básico */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #3a3a3a;
+      color: #FFF;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #2a2a2a;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      position: fixed;
+      width: 100%;
+    }
+
+    .header h2 {
+      margin: 0;
+      flex: 1;
+      text-align: center;
+    }
+
+    .menu-toggle {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 20px 20px 20px;
+    }
+
+    .flashcard {
+      border: 1px solid #81ce39;
+      padding: 15px;
+      margin: 10px;
+      text-align: justify;
+      background-color: #4a4a4a;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #front-content, #back-content {
+      border: none;
+      color: #FFF;
+    }
+
+    hr {
+      width: 100%;
+      border: none;
+      height: 1px;
+      background-color: #81ce39;
+      margin: 25px 0;
+    }
+
+    .flashcard .back {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .footer {
+      background-color: #2a2a2a;
+      padding: 15px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 200px;
+      margin-bottom: 10px;
+    }
+
+    .buttons-container button {
+      margin: 5px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #81ce39;
+      color: #FFF;
+      transition: background-color 0.3s;
+    }
+
+    .buttons-container button:hover {
+      background-color: #6da32e;
+    }
+
+    .navigation-buttons button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #555;
+      color: #FFF;
+    }
+
+    .navigation-buttons button:hover {
+      background-color: #444;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100%;
+      background-color: #2a2a2a;
+      color: #FFF;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+
+    .side-menu.open {
+      left: 0;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-header h3 {
+      margin: 0;
+    }
+
+    #close-menu {
+      font-size: 20px;
+      background: none;
+      border: none;
+      color: #FFF;
+      cursor: pointer;
+    }
+
+    .filters label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .filters select {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      color: #000;
+    }
+
+    #apply-filters {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #81ce39;
+      color: #FFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #apply-filters:hover {
+      background-color: #6da32e;
+    }
+  </style>
 </head>
 
 <body>
   <div class="header">
-    <h2>Filtros</h2>
-    <select id="disciplina-filter">
-      <option value="todos">DISCIPLINA</option>
-    </select>
-    <select id="conteudo-filter">
-      <option value="todos">CONTEÚDO</option>
-    </select>
+    <h2>WebApp de Revisões</h2>
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+  </div>
+
+  <div class="side-menu" id="side-menu">
+    <div class="menu-header">
+      <h3>Filtros</h3>
+      <button id="close-menu">✖</button>
+    </div>
+    <div class="filters">
+      <label for="disciplina-filter">Disciplina:</label>
+      <select id="disciplina-filter">
+        <option value="todos">Todos</option>
+      </select>
+      <label for="conteudo-filter">Conteúdo:</label>
+      <select id="conteudo-filter">
+        <option value="todos">Todos</option>
+      </select>
+      <label for="dificuldade-filter">Dificuldade:</label>
+      <select id="dificuldade-filter">
+        <option value="todos">Todos</option>
+      </select>
+      <button id="apply-filters">Aplicar Filtros</button>
+    </div>
   </div>
 
   <div class="content">
@@ -28,6 +246,12 @@
       <div class="front" id="front-content"></div>
       <hr>
       <div class="back" id="back-content"></div>
+    </div>
+
+    <div id="difficulty-buttons" class="buttons-container">
+      <button data-dificuldade="fácil">FÁCIL</button>
+      <button data-dificuldade="médio">MÉDIO</button>
+      <button data-dificuldade="difícil">DIFÍCIL</button>
     </div>
   </div>
 
@@ -43,134 +267,17 @@
   </div>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const menuToggle = document.getElementById("menu-toggle");
+      const sideMenu = document.getElementById("side-menu");
+      const closeMenu = document.getElementById("close-menu");
 
-
-document.addEventListener("DOMContentLoaded", function () {
-  let flashcards = [];
-  let indiceAtual = 0;
-  const disciplinasMapeadas = new Map();
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
-
-  function fetchFlashcards() {
-    fetch(scriptUrl)
-      .then(response => response.json())
-      .then(data => {
-        flashcards = data;
-        preencherFiltros();
-        atualizarFlashcard();
-      })
-      .catch(error => console.error('Erro ao buscar dados:', error));
-  }
-
-  function preencherFiltros() {
-    const disciplinas = new Set();
-
-    flashcards.forEach(card => {
-      if (!disciplinasMapeadas.has(card.disciplina)) {
-        disciplinasMapeadas.set(card.disciplina, new Set());
-      }
-      disciplinas.add(card.disciplina);
-      disciplinasMapeadas.get(card.disciplina).add(card.conteudo);
-    });
-
-    // Preencher o dropdown de disciplinas
-    const disciplinaFilter = document.getElementById('disciplina-filter');
-    disciplinas.forEach(d => {
-      const option = document.createElement('option');
-      option.value = d;
-      option.textContent = d;
-      disciplinaFilter.appendChild(option);
-    });
-  }
-
-  function atualizarConteudos() {
-    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-    const conteudoFilter = document.getElementById('conteudo-filter');
-
-    // Limpar os conteúdos anteriores
-    conteudoFilter.innerHTML = '<option value="todos">Todos</option>';
-
-    if (disciplinasMapeadas.has(disciplinaSelecionada)) {
-      disciplinasMapeadas.get(disciplinaSelecionada).forEach(conteudo => {
-        const option = document.createElement('option');
-        option.value = conteudo;
-        option.textContent = conteudo;
-        conteudoFilter.appendChild(option);
+      menuToggle.addEventListener("click", () => sideMenu.classList.add("open"));
+      closeMenu.addEventListener("click", () => sideMenu.classList.remove("open"));
+      document.getElementById("apply-filters").addEventListener("click", () => {
+        sideMenu.classList.remove("open");
       });
-    }
-  }
-
-  function aplicarFiltros() {
-    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-    const conteudoSelecionado = document.getElementById('conteudo-filter').value;
-
-    const flashcardsFiltrados = flashcards.filter(card => {
-      const disciplinaMatch = disciplinaSelecionada === 'todos' || card.disciplina === disciplinaSelecionada;
-      const conteudoMatch = conteudoSelecionado === 'todos' || card.conteudo === conteudoSelecionado;
-      return disciplinaMatch && conteudoMatch;
     });
-
-    if (flashcardsFiltrados.length > 0) {
-      flashcards = flashcardsFiltrados;
-      indiceAtual = 0;
-      atualizarFlashcard();
-    } else {
-      alert("Nenhum flashcard encontrado para os filtros aplicados.");
-    }
-  }
-
-  function atualizarFlashcard() {
-    if (flashcards.length === 0) {
-      alert("Nenhum flashcard disponível.");
-      return;
-    }
-
-    document.getElementById('front-content').innerHTML = flashcards[indiceAtual].frente;
-    document.getElementById('back-content').innerHTML = flashcards[indiceAtual].tras;
-    document.getElementById('back-content').style.display = 'none'; // Esconde a parte de trás inicialmente
-  }
-
-  // Alternar visibilidade da parte de trás do flashcard
-  document.getElementById('mostrar-btn').addEventListener('click', () => {
-    const backContent = document.getElementById('back-content');
-    backContent.style.display = backContent.style.display === 'none' ? 'block' : 'none';
-  });
-
-  document.getElementById('ocultar-btn').addEventListener('click', () => {
-    document.getElementById('back-content').style.display = 'none';
-  });
-
-  // Navegação entre flashcards
-  document.getElementById('anterior-btn').addEventListener('click', () => {
-    if (indiceAtual > 0) {
-      indiceAtual--;
-      atualizarFlashcard();
-    } else {
-      alert("Este é o primeiro flashcard.");
-    }
-  });
-
-  document.getElementById('proximo-btn').addEventListener('click', () => {
-    if (indiceAtual < flashcards.length - 1) {
-      indiceAtual++;
-      atualizarFlashcard();
-    } else {
-      alert("Este é o último flashcard.");
-    }
-  });
-
-  document.getElementById('disciplina-filter').addEventListener('change', () => {
-    atualizarConteudos();
-    aplicarFiltros();
-  });
-
-  document.getElementById('conteudo-filter').addEventListener('change', aplicarFiltros);
-
-  fetchFlashcards();
-});
-
-
-
   </script>
 </body>
 
