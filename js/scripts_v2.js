@@ -1,7 +1,7 @@
 <script>
 
 document.addEventListener("DOMContentLoaded", function() {
-  var scriptUrl = 'https://script.google.com/macros/s/AKfycbw3vgAPhUJCcHJu9rdooStfGgCY8cU1XIU_X81-ACpX-lvD2jEuaDkPmZlYV-RFqmAXcQ/exec'; // URL do web app do Google Apps Script
+  var scriptUrl = 'https://script.google.com/macros/s/AKfycbxogFO3-3H7ebnTIBXRxW6MEaxPHvTBXcLlUFVpuRQXzNYJrxrnxbME7GdFK41Jqaaa/exec'; // URL do web app do Google Apps Script
   
   function fetchFlashcards() {
     fetch(scriptUrl)
