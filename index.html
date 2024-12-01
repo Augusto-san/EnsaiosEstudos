@@ -6,8 +6,9 @@
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Link para o CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+ <!-- Link para o CSS -->
+ <link rel="stylesheet" href="css/styles.css">
+
 
 </head>
 
@@ -42,96 +43,134 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let flashcards = [];
-      let flashcardsFiltrados = [];
-      let indiceAtual = 0;
-      const disciplinasMapeadas = new Map();
-      const scriptUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
 
-      function fetchFlashcards() {
-        fetch(scriptUrl)
-          .then(response => response.json())
-          .then(data => {
-            flashcards = data;
-            flashcardsFiltrados = [...flashcards];
-            preencherFiltros();
-            atualizarFlashcard();
-          })
-          .catch(error => console.error('Erro ao buscar dados:', error));
-      }
 
-      function preencherFiltros() {
-        const disciplinas = new Set();
+document.addEventListener("DOMContentLoaded", function () {
+  let flashcards = [];
+  let indiceAtual = 0;
+  const disciplinasMapeadas = new Map();
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
 
-        flashcards.forEach(card => {
-          if (!disciplinasMapeadas.has(card.disciplina)) {
-            disciplinasMapeadas.set(card.disciplina, new Set());
-          }
-          disciplinas.add(card.disciplina);
-          disciplinasMapeadas.get(card.disciplina).add(card.conteudo);
-        });
-
-        const disciplinaFilter = document.getElementById('disciplina-filter');
-        disciplinas.forEach(d => {
-          const option = document.createElement('option');
-          option.value = d;
-          option.textContent = d;
-          disciplinaFilter.appendChild(option);
-        });
-
-        atualizarConteudos(); // Atualizar os conteúdos para a disciplina inicial
-      }
-
-      function atualizarConteudos() {
-        const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-        const conteudoFilter = document.getElementById('conteudo-filter');
-
-        conteudoFilter.innerHTML = '<option value="todos">Todos</option>';
-
-        if (disciplinasMapeadas.has(disciplinaSelecionada)) {
-          disciplinasMapeadas.get(disciplinaSelecionada).forEach(conteudo => {
-            const option = document.createElement('option');
-            option.value = conteudo;
-            option.textContent = conteudo;
-            conteudoFilter.appendChild(option);
-          });
-        }
-      }
-
-      function aplicarFiltros() {
-        const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-        const conteudoSelecionado = document.getElementById('conteudo-filter').value;
-
-        flashcardsFiltrados = flashcards.filter(card => {
-          const disciplinaMatch = disciplinaSelecionada === 'todos' || card.disciplina === disciplinaSelecionada;
-          const conteudoMatch = conteudoSelecionado === 'todos' || card.conteudo === conteudoSelecionado;
-          return disciplinaMatch && conteudoMatch;
-        });
-
-        indiceAtual = 0;
+  function fetchFlashcards() {
+    fetch(scriptUrl)
+      .then(response => response.json())
+      .then(data => {
+        flashcards = data;
+        preencherFiltros();
         atualizarFlashcard();
+      })
+      .catch(error => console.error('Erro ao buscar dados:', error));
+  }
+
+  function preencherFiltros() {
+    const disciplinas = new Set();
+
+    flashcards.forEach(card => {
+      if (!disciplinasMapeadas.has(card.disciplina)) {
+        disciplinasMapeadas.set(card.disciplina, new Set());
       }
-
-      function atualizarFlashcard() {
-        if (flashcardsFiltrados.length === 0) {
-          alert("Nenhum flashcard encontrado.");
-          return;
-        }
-        document.getElementById('front-content').innerHTML = flashcardsFiltrados[indiceAtual].frente;
-        document.getElementById('back-content').innerHTML = flashcardsFiltrados[indiceAtual].tras;
-        document.getElementById('back-content').style.display = 'none';
-      }
-
-      document.getElementById('disciplina-filter').addEventListener('change', () => {
-        atualizarConteudos();
-        aplicarFiltros();
-      });
-
-      document.getElementById('conteudo-filter').addEventListener('change', aplicarFiltros);
-
-      fetchFlashcards();
+      disciplinas.add(card.disciplina);
+      disciplinasMapeadas.get(card.disciplina).add(card.conteudo);
     });
+
+    // Preencher o dropdown de disciplinas
+    const disciplinaFilter = document.getElementById('disciplina-filter');
+    disciplinas.forEach(d => {
+      const option = document.createElement('option');
+      option.value = d;
+      option.textContent = d;
+      disciplinaFilter.appendChild(option);
+    });
+  }
+
+  function atualizarConteudos() {
+    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
+    const conteudoFilter = document.getElementById('conteudo-filter');
+
+    // Limpar os conteúdos anteriores
+    conteudoFilter.innerHTML = '<option value="todos">Todos</option>';
+
+    if (disciplinasMapeadas.has(disciplinaSelecionada)) {
+      disciplinasMapeadas.get(disciplinaSelecionada).forEach(conteudo => {
+        const option = document.createElement('option');
+        option.value = conteudo;
+        option.textContent = conteudo;
+        conteudoFilter.appendChild(option);
+      });
+    }
+  }
+
+  function aplicarFiltros() {
+    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
+    const conteudoSelecionado = document.getElementById('conteudo-filter').value;
+
+    const flashcardsFiltrados = flashcards.filter(card => {
+      const disciplinaMatch = disciplinaSelecionada === 'todos' || card.disciplina === disciplinaSelecionada;
+      const conteudoMatch = conteudoSelecionado === 'todos' || card.conteudo === conteudoSelecionado;
+      return disciplinaMatch && conteudoMatch;
+    });
+
+    if (flashcardsFiltrados.length > 0) {
+      flashcards = flashcardsFiltrados;
+      indiceAtual = 0;
+      atualizarFlashcard();
+    } else {
+      alert("Nenhum flashcard encontrado para os filtros aplicados.");
+    }
+  }
+
+  function atualizarFlashcard() {
+    if (flashcards.length === 0) {
+      alert("Nenhum flashcard disponível.");
+      return;
+    }
+
+    document.getElementById('front-content').innerHTML = flashcards[indiceAtual].frente;
+    document.getElementById('back-content').innerHTML = flashcards[indiceAtual].tras;
+    document.getElementById('back-content').style.display = 'none'; // Esconde a parte de trás inicialmente
+  }
+
+  // Alternar visibilidade da parte de trás do flashcard
+  document.getElementById('mostrar-btn').addEventListener('click', () => {
+    const backContent = document.getElementById('back-content');
+    backContent.style.display = backContent.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('ocultar-btn').addEventListener('click', () => {
+    document.getElementById('back-content').style.display = 'none';
+  });
+
+  // Navegação entre flashcards
+  document.getElementById('anterior-btn').addEventListener('click', () => {
+    if (indiceAtual > 0) {
+      indiceAtual--;
+      atualizarFlashcard();
+    } else {
+      alert("Este é o primeiro flashcard.");
+    }
+  });
+
+  document.getElementById('proximo-btn').addEventListener('click', () => {
+    if (indiceAtual < flashcards.length - 1) {
+      indiceAtual++;
+      atualizarFlashcard();
+    } else {
+      alert("Este é o último flashcard.");
+    }
+  });
+
+  document.getElementById('disciplina-filter').addEventListener('change', () => {
+    atualizarConteudos();
+    aplicarFiltros();
+  });
+
+  document.getElementById('conteudo-filter').addEventListener('change', aplicarFiltros);
+
+  fetchFlashcards();
+});
+
+
+
   </script>
 </body>
 
