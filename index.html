@@ -1,169 +1,138 @@
--<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- Link para o CSS -->
   <link rel="stylesheet" href="css/styles.css">
-  
+
 </head>
 
 <body>
-
-  <!-- Tag h2 fixada no topo -->
-<!-- Tag h2 fixada no topo com filtros -->
-
-<div class="header">
-  <h2>
-    DISCIPLINA
+  <div class="header">
+    <h2>Filtros</h2>
     <select id="disciplina-filter">
       <option value="todos">Todos</option>
     </select>
-  </h2>
-  
-  <h2>
-    CONTEÚDO
     <select id="conteudo-filter">
       <option value="todos">Todos</option>
     </select>
-  </h2>
-</div>
-
-
+  </div>
 
   <div class="content">
     <div class="flashcard" id="flashcard">
-      <!-- Parte da frente do flashcard -->
-      <div class="front" id="front-content">
-        <!-- Conteúdo inicial -->
-      </div>
-      
+      <div class="front" id="front-content"></div>
       <hr>
-      
-      <!-- Parte de trás do flashcard -->
-      <div class="back" id="back-content">
-        <!-- Conteúdo inicial -->
-      </div>
+      <div class="back" id="back-content"></div>
     </div>
   </div>
 
   <div class="footer">
-    <!-- Contêiner dos botões "Mostrar" e "Ocultar" -->
     <div class="buttons-container">
       <button id="mostrar-btn">MOSTRAR</button>
       <button id="ocultar-btn">OCULTAR</button>
     </div>
-
-    <!-- Botões "Anterior" e "Próximo" -->
     <div class="navigation-buttons">
       <button id="anterior-btn">ANTERIOR</button>
       <button id="proximo-btn">PRÓXIMO</button>
     </div>
   </div>
 
-  <!-- Link para o JavaScript -->
-  <!-- <script src="js/scripts.js"></script> -->
-
   <script>
-  
-  document.addEventListener("DOMContentLoaded", function () {
-  var flashcards = [];
-  var indiceAtual = 0;
-  var disciplinasMapeadas = new Map();
-  var scriptUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
+    document.addEventListener("DOMContentLoaded", function () {
+      let flashcards = [];
+      let flashcardsFiltrados = [];
+      let indiceAtual = 0;
+      const disciplinasMapeadas = new Map();
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
 
-  function fetchFlashcards() {
-    fetch(scriptUrl)
-      .then(response => response.json())
-      .then(data => {
-        flashcards = data;
-        preencherFiltros();
-        atualizarFlashcard();
-      })
-      .catch(error => console.error('Erro ao buscar dados:', error));
-  }
-
-  function preencherFiltros() {
-    const disciplinas = new Set();
-
-    flashcards.forEach(card => {
-      if (!disciplinasMapeadas.has(card.disciplina)) {
-        disciplinasMapeadas.set(card.disciplina, new Set());
+      function fetchFlashcards() {
+        fetch(scriptUrl)
+          .then(response => response.json())
+          .then(data => {
+            flashcards = data;
+            flashcardsFiltrados = [...flashcards];
+            preencherFiltros();
+            atualizarFlashcard();
+          })
+          .catch(error => console.error('Erro ao buscar dados:', error));
       }
-      disciplinas.add(card.disciplina);
-      disciplinasMapeadas.get(card.disciplina).add(card.conteudo);
-    });
 
-    // Preencher o dropdown de disciplinas
-    const disciplinaFilter = document.getElementById('disciplina-filter');
-    disciplinas.forEach(d => {
-      const option = document.createElement('option');
-      option.value = d;
-      option.textContent = d;
-      disciplinaFilter.appendChild(option);
-    });
-  }
+      function preencherFiltros() {
+        const disciplinas = new Set();
 
-  function atualizarConteudos() {
-    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-    const conteudoFilter = document.getElementById('conteudo-filter');
+        flashcards.forEach(card => {
+          if (!disciplinasMapeadas.has(card.disciplina)) {
+            disciplinasMapeadas.set(card.disciplina, new Set());
+          }
+          disciplinas.add(card.disciplina);
+          disciplinasMapeadas.get(card.disciplina).add(card.conteudo);
+        });
 
-    // Limpar os conteúdos anteriores
-    conteudoFilter.innerHTML = '<option value="todos">Todos</option>';
+        const disciplinaFilter = document.getElementById('disciplina-filter');
+        disciplinas.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d;
+          option.textContent = d;
+          disciplinaFilter.appendChild(option);
+        });
 
-    if (disciplinasMapeadas.has(disciplinaSelecionada)) {
-      disciplinasMapeadas.get(disciplinaSelecionada).forEach(conteudo => {
-        const option = document.createElement('option');
-        option.value = conteudo;
-        option.textContent = conteudo;
-        conteudoFilter.appendChild(option);
+        atualizarConteudos(); // Atualizar os conteúdos para a disciplina inicial
+      }
+
+      function atualizarConteudos() {
+        const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
+        const conteudoFilter = document.getElementById('conteudo-filter');
+
+        conteudoFilter.innerHTML = '<option value="todos">Todos</option>';
+
+        if (disciplinasMapeadas.has(disciplinaSelecionada)) {
+          disciplinasMapeadas.get(disciplinaSelecionada).forEach(conteudo => {
+            const option = document.createElement('option');
+            option.value = conteudo;
+            option.textContent = conteudo;
+            conteudoFilter.appendChild(option);
+          });
+        }
+      }
+
+      function aplicarFiltros() {
+        const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
+        const conteudoSelecionado = document.getElementById('conteudo-filter').value;
+
+        flashcardsFiltrados = flashcards.filter(card => {
+          const disciplinaMatch = disciplinaSelecionada === 'todos' || card.disciplina === disciplinaSelecionada;
+          const conteudoMatch = conteudoSelecionado === 'todos' || card.conteudo === conteudoSelecionado;
+          return disciplinaMatch && conteudoMatch;
+        });
+
+        indiceAtual = 0;
+        atualizarFlashcard();
+      }
+
+      function atualizarFlashcard() {
+        if (flashcardsFiltrados.length === 0) {
+          alert("Nenhum flashcard encontrado.");
+          return;
+        }
+        document.getElementById('front-content').innerHTML = flashcardsFiltrados[indiceAtual].frente;
+        document.getElementById('back-content').innerHTML = flashcardsFiltrados[indiceAtual].tras;
+        document.getElementById('back-content').style.display = 'none';
+      }
+
+      document.getElementById('disciplina-filter').addEventListener('change', () => {
+        atualizarConteudos();
+        aplicarFiltros();
       });
-    }
-  }
 
-  function aplicarFiltros() {
-    const disciplinaSelecionada = document.getElementById('disciplina-filter').value;
-    const conteudoSelecionado = document.getElementById('conteudo-filter').value;
+      document.getElementById('conteudo-filter').addEventListener('change', aplicarFiltros);
 
-    const flashcardsFiltrados = flashcards.filter(card => {
-      const disciplinaMatch = disciplinaSelecionada === 'todos' || card.disciplina === disciplinaSelecionada;
-      const conteudoMatch = conteudoSelecionado === 'todos' || card.conteudo === conteudoSelecionado;
-      return disciplinaMatch && conteudoMatch;
+      fetchFlashcards();
     });
-
-    flashcards = flashcardsFiltrados;
-    indiceAtual = 0;
-    atualizarFlashcard();
-  }
-
-  function atualizarFlashcard() {
-    if (flashcards.length === 0) {
-      alert("Nenhum flashcard encontrado.");
-      return;
-    }
-    document.getElementById('front-content').innerHTML = flashcards[indiceAtual].frente;
-    document.getElementById('back-content').innerHTML = flashcards[indiceAtual].tras;
-    document.getElementById('back-content').style.display = 'none';
-  }
-
-  // Event listeners
-  document.getElementById('disciplina-filter').addEventListener('change', () => {
-    atualizarConteudos();
-    aplicarFiltros();
-  });
-
-  document.getElementById('conteudo-filter').addEventListener('change', aplicarFiltros);
-
-  fetchFlashcards();
-});
-
-
-  
   </script>
-    
 </body>
 
 </html>
