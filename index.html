@@ -6,7 +6,6 @@
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <!-- Link para o CSS  <link rel="stylesheet" href="css/styles.css">  -->
 
   <style>
@@ -266,19 +265,120 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const menuToggle = document.getElementById("menu-toggle");
-      const sideMenu = document.getElementById("side-menu");
-      const closeMenu = document.getElementById("close-menu");
 
-      menuToggle.addEventListener("click", () => sideMenu.classList.add("open"));
-      closeMenu.addEventListener("click", () => sideMenu.classList.remove("open"));
-      document.getElementById("apply-filters").addEventListener("click", () => {
-        sideMenu.classList.remove("open");
-      });
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  const apiUrl = 'https://script.google.com/macros/s/AKfycby3HKvbEcQBc-UENPrm4L_3BXGomvlsYNWAl7bpWzIN9Vc1a7RdxUiZutiGF2RRCHqAOg/exec';
+  let data = [];
+  let currentCardIndex = 0;
+
+  async function fetchData() {
+    const response = await fetch(apiUrl);
+    data = await response.json();
+    populateFilters();
+    renderCard();
+  }
+
+  function renderCard() {
+    if (data.length === 0) return;
+    const card = data[currentCardIndex];
+    document.getElementById("front-content").textContent = card.frente;
+    document.getElementById("back-content").textContent = card.tras;
+    document.getElementById("back-content").style.display = "none";
+  }
+
+  // Populate filters
+  function populateFilters() {
+    const disciplinas = new Set();
+    const conteudos = new Set();
+    const dificuldades = new Set();
+
+    data.forEach(item => {
+      disciplinas.add(item.disciplina);
+      conteudos.add(item.conteudo);
+      dificuldades.add(item.dificuldade);
     });
-  </script>
+
+    populateSelect("disciplina-filter", disciplinas);
+    populateSelect("conteudo-filter", conteudos);
+    populateSelect("dificuldade-filter", dificuldades);
+  }
+
+  function populateSelect(selectId, items) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = `<option value="todos">Todos</option>`;
+    items.forEach(item => {
+      select.innerHTML += `<option value="${item}">${item}</option>`;
+    });
+  }
+
+  // Filter functionality
+  document.getElementById("apply-filters").addEventListener("click", () => {
+    const selectedDisciplina = document.getElementById("disciplina-filter").value;
+    const selectedConteudo = document.getElementById("conteudo-filter").value;
+    const selectedDificuldade = document.getElementById("dificuldade-filter").value;
+
+    currentCardIndex = 0;
+    data = data.filter(card => {
+      const matchDisciplina = selectedDisciplina === "todos" || card.disciplina === selectedDisciplina;
+      const matchConteudo = selectedConteudo === "todos" || card.conteudo === selectedConteudo;
+      const matchDificuldade = selectedDificuldade === "todos" || card.dificuldade === selectedDificuldade;
+      return matchDisciplina && matchConteudo && matchDificuldade;
+    });
+
+    renderCard();
+  });
+
+  // Show/Hide back of the card
+  document.getElementById("mostrar-btn").addEventListener("click", () => {
+    document.getElementById("back-content").style.display = "block";
+  });
+
+  document.getElementById("ocultar-btn").addEventListener("click", () => {
+    document.getElementById("back-content").style.display = "none";
+  });
+
+  // Navigate through cards
+  document.getElementById("anterior-btn").addEventListener("click", () => {
+    if (currentCardIndex > 0) {
+      currentCardIndex--;
+      renderCard();
+    }
+  });
+
+  document.getElementById("proximo-btn").addEventListener("click", () => {
+    if (currentCardIndex < data.length - 1) {
+      currentCardIndex++;
+      renderCard();
+    }
+  });
+
+  // Save difficulty to the sheet
+  document.querySelectorAll("[data-dificuldade]").forEach(button => {
+    button.addEventListener("click", async event => {
+      const dificuldade = event.target.getAttribute("data-dificuldade");
+      const card = data[currentCardIndex];
+
+      // Save the difficulty to Google Sheets
+      const saveUrl = `${apiUrl}?linha=${card.linha}&dificuldade=${dificuldade}`;
+      await fetch(saveUrl);
+      alert(`Dificuldade "${dificuldade}" salva!`);
+    });
+  });
+
+  // Menu Toggle
+  const menuToggle = document.getElementById("menu-toggle");
+  const sideMenu = document.getElementById("side-menu");
+  const closeMenu = document.getElementById("close-menu");
+
+  menuToggle.addEventListener("click", () => sideMenu.classList.toggle("open"));
+  closeMenu.addEventListener("click", () => sideMenu.classList.remove("open"));
+
+  fetchData();
+});
+</script>
+
+
 </body>
 
 </html>
