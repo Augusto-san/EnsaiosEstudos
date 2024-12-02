@@ -285,6 +285,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("back-content").innerHTML = card.tras;
     document.getElementById("back-content").style.display = "none";
   }
+  
+  document.querySelectorAll("[data-dificuldade]").forEach(button => {
+        button.addEventListener("click", async event => {
+          const dificuldade = event.target.getAttribute("data-dificuldade");
+          const card = data[currentCardIndex];
+
+          const saveUrl = `${apiUrl}?linha=${card.linha}&dificuldade=${dificuldade}`;
+          await fetch(saveUrl);
+          alert(`Dificuldade "${dificuldade}" salva!`);
+        });
+      });
 
   function populateFilters() {
     updateDisciplineFilter();
