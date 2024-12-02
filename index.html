@@ -5,9 +5,6 @@
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Link para o CSS  <link rel="stylesheet" href="css/styles.css">  -->
-
   <style>
     /* Reset básico */
     *, *::before, *::after {
@@ -194,7 +191,7 @@
       color: #000;
     }
 
-    #apply-filters {
+    #apply-filters, #clear-filters {
       width: 100%;
       padding: 10px;
       font-size: 16px;
@@ -204,9 +201,10 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s;
+      margin-bottom: 10px;
     }
 
-    #apply-filters:hover {
+    #apply-filters:hover, #clear-filters:hover {
       background-color: #6da32e;
     }
   </style>
@@ -237,6 +235,7 @@
         <option value="todos">Todos</option>
       </select>
       <button id="apply-filters">Aplicar Filtros</button>
+      <button id="clear-filters">Limpar Filtros</button>
     </div>
   </div>
 
@@ -265,16 +264,16 @@
     </div>
   </div>
 
-
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
   const apiUrl = 'https://script.google.com/macros/s/AKfycbzrCnsh11CHkF-DjbOyWa4hyMl7DTZEMiiWkF28qUCN4LTmefWtCHhGEJ5GDMVUO6I/exec';
+  let originalData = [];
   let data = [];
   let currentCardIndex = 0;
 
   async function fetchData() {
     const response = await fetch(apiUrl);
-    data = await response.json();
+    originalData = data = await response.json();
     populateFilters();
     renderCard();
   }
@@ -282,54 +281,113 @@ document.addEventListener("DOMContentLoaded", async function () {
   function renderCard() {
     if (data.length === 0) return;
     const card = data[currentCardIndex];
-    document.getElementById("front-content").textContent = card.frente;
-    document.getElementById("back-content").textContent = card.tras;
+    document.getElementById("front-content").innerHTML = card.frente;
+    document.getElementById("back-content").innerHTML = card.tras;
     document.getElementById("back-content").style.display = "none";
   }
 
-  // Populate filters
   function populateFilters() {
-    const disciplinas = new Set();
-    const conteudos = new Set();
-    const dificuldades = new Set();
-
-    data.forEach(item => {
-      disciplinas.add(item.disciplina);
-      conteudos.add(item.conteudo);
-      dificuldades.add(item.dificuldade);
-    });
-
-    populateSelect("disciplina-filter", disciplinas);
-    populateSelect("conteudo-filter", conteudos);
-    populateSelect("dificuldade-filter", dificuldades);
+    updateDisciplineFilter();
+    updateContentFilter();
+    updateDifficultyFilter();
   }
 
-  function populateSelect(selectId, items) {
-    const select = document.getElementById(selectId);
-    select.innerHTML = `<option value="todos">Todos</option>`;
-    items.forEach(item => {
-      select.innerHTML += `<option value="${item}">${item}</option>`;
+  function updateDisciplineFilter() {
+    const disciplinaFilter = document.getElementById("disciplina-filter");
+    const disciplinas = Array.from(new Set(originalData.map(item => item.disciplina)));
+
+    disciplinaFilter.innerHTML = `<option value="todos">Todos</option>`;
+    disciplinas.forEach(d => {
+      disciplinaFilter.innerHTML += `<option value="${d}">${d}</option>`;
     });
   }
 
-  // Filter functionality
-  document.getElementById("apply-filters").addEventListener("click", () => {
-    const selectedDisciplina = document.getElementById("disciplina-filter").value;
-    const selectedConteudo = document.getElementById("conteudo-filter").value;
-    const selectedDificuldade = document.getElementById("dificuldade-filter").value;
+  function updateContentFilter(selectedDiscipline = "todos") {
+    const conteudoFilter = document.getElementById("conteudo-filter");
+    const filteredData = selectedDiscipline === "todos"
+      ? originalData
+      : originalData.filter(item => item.disciplina === selectedDiscipline);
+    const conteudos = Array.from(new Set(filteredData.map(item => item.conteudo)));
+
+    conteudoFilter.innerHTML = `<option value="todos">Todos</option>`;
+    conteudos.forEach(c => {
+      conteudoFilter.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
+
+  function updateDifficultyFilter(selectedDiscipline = "todos", selectedContent = "todos") {
+    const dificuldadeFilter = document.getElementById("dificuldade-filter");
+    let filteredData = originalData;
+
+    if (selectedDiscipline !== "todos") {
+      filteredData = filteredData.filter(item => item.disciplina === selectedDiscipline);
+    }
+    if (selectedContent !== "todos") {
+      filteredData = filteredData.filter(item => item.conteudo === selectedContent);
+    }
+
+    const dificuldades = Array.from(new Set(filteredData.map(item => item.dificuldade)));
+
+    dificuldadeFilter.innerHTML = `<option value="todos">Todos</option>`;
+    dificuldades.forEach(d => {
+      dificuldadeFilter.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+  }
+
+  function applyFilters() {
+    const disciplina = document.getElementById("disciplina-filter").value;
+    const conteudo = document.getElementById("conteudo-filter").value;
+    const dificuldade = document.getElementById("dificuldade-filter").value;
+
+    data = originalData.filter(item =>
+      (disciplina === "todos" || item.disciplina === disciplina) &&
+      (conteudo === "todos" || item.conteudo === conteudo) &&
+      (dificuldade === "todos" || item.dificuldade === dificuldade)
+    );
 
     currentCardIndex = 0;
-    data = data.filter(card => {
-      const matchDisciplina = selectedDisciplina === "todos" || card.disciplina === selectedDisciplina;
-      const matchConteudo = selectedConteudo === "todos" || card.conteudo === selectedConteudo;
-      const matchDificuldade = selectedDificuldade === "todos" || card.dificuldade === selectedDificuldade;
-      return matchDisciplina && matchConteudo && matchDificuldade;
-    });
-
     renderCard();
+  }
+
+  function clearFilters() {
+    document.getElementById("disciplina-filter").value = "todos";
+    document.getElementById("conteudo-filter").value = "todos";
+    document.getElementById("dificuldade-filter").value = "todos";
+
+    data = originalData;
+    currentCardIndex = 0;
+    populateFilters();
+    renderCard();
+  }
+
+  function toggleSideMenu() {
+    const sideMenu = document.getElementById("side-menu");
+    sideMenu.classList.toggle("open");
+  }
+
+  function closeSideMenu() {
+    const sideMenu = document.getElementById("side-menu");
+    sideMenu.classList.remove("open");
+  }
+
+  // Eventos para atualizar os filtros dinamicamente
+  document.getElementById("disciplina-filter").addEventListener("change", function () {
+    const selectedDiscipline = this.value;
+    updateContentFilter(selectedDiscipline);
+    updateDifficultyFilter(selectedDiscipline, "todos");
   });
 
-  // Show/Hide back of the card
+  document.getElementById("conteudo-filter").addEventListener("change", function () {
+    const selectedDiscipline = document.getElementById("disciplina-filter").value;
+    const selectedContent = this.value;
+    updateDifficultyFilter(selectedDiscipline, selectedContent);
+  });
+
+  document.getElementById("menu-toggle").addEventListener("click", toggleSideMenu);
+  document.getElementById("close-menu").addEventListener("click", closeSideMenu);
+  document.getElementById("apply-filters").addEventListener("click", applyFilters);
+  document.getElementById("clear-filters").addEventListener("click", clearFilters);
+
   document.getElementById("mostrar-btn").addEventListener("click", () => {
     document.getElementById("back-content").style.display = "block";
   });
@@ -338,47 +396,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("back-content").style.display = "none";
   });
 
-  // Navigate through cards
-  document.getElementById("anterior-btn").addEventListener("click", () => {
-    if (currentCardIndex > 0) {
-      currentCardIndex--;
-      renderCard();
-    }
-  });
-
   document.getElementById("proximo-btn").addEventListener("click", () => {
-    if (currentCardIndex < data.length - 1) {
-      currentCardIndex++;
-      renderCard();
-    }
+    currentCardIndex = (currentCardIndex + 1) % data.length;
+    renderCard();
   });
 
-  // Save difficulty to the sheet
-  document.querySelectorAll("[data-dificuldade]").forEach(button => {
-    button.addEventListener("click", async event => {
-      const dificuldade = event.target.getAttribute("data-dificuldade");
-      const card = data[currentCardIndex];
-
-      // Save the difficulty to Google Sheets
-      const saveUrl = `${apiUrl}?linha=${card.linha}&dificuldade=${dificuldade}`;
-      await fetch(saveUrl);
-      alert(`Dificuldade "${dificuldade}" salva!`);
-    });
+  document.getElementById("anterior-btn").addEventListener("click", () => {
+    currentCardIndex = (currentCardIndex - 1 + data.length) % data.length;
+    renderCard();
   });
-
-  // Menu Toggle
-  const menuToggle = document.getElementById("menu-toggle");
-  const sideMenu = document.getElementById("side-menu");
-  const closeMenu = document.getElementById("close-menu");
-
-  menuToggle.addEventListener("click", () => sideMenu.classList.toggle("open"));
-  closeMenu.addEventListener("click", () => sideMenu.classList.remove("open"));
 
   fetchData();
 });
 </script>
 
 
-</body>
 
+</body>
 </html>
