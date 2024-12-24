@@ -134,6 +134,11 @@
       transition: background-color 0.3s;
     }
 
+    .buttons-container button.active {
+      background-color:#477d14;
+      color: #FFF;
+    }
+    
     .buttons-container button:hover {
       background-color: #413f3f; /*#6da32e;*/
     }
@@ -301,13 +306,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     renderCard();
   }
 
-  function renderCard() {
-    if (data.length === 0) return;
-    const card = data[currentCardIndex];
-    document.getElementById("front-content").innerHTML = card.frente;
-    document.getElementById("back-content").innerHTML = card.tras;
-    document.getElementById("back-content").style.display = "none";
+ function renderCard() {
+  if (data.length === 0) return;
+
+  const card = data[currentCardIndex];
+  document.getElementById("front-content").innerHTML = card.frente;
+  document.getElementById("back-content").innerHTML = card.tras;
+  document.getElementById("back-content").style.display = "none";
+
+  // Resetar botões
+  document.querySelectorAll(".buttons-container button").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  // Aplicar classe ativa com base na classificação
+  if (card.dificuldade) {
+    const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
+    if (button) {
+      button.classList.add("active");
+    }
   }
+}
+
   
   document.querySelectorAll("[data-dificuldade]").forEach(button => {
         button.addEventListener("click", async event => {
