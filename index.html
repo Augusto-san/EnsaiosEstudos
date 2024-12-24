@@ -5,6 +5,12 @@
   <meta charset="UTF-8">
   <title>WebApp de Revisões</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/favicon/site.webmanifest">
+  
   <style>
     /* Reset básico */
     *, *::before, *::after {
@@ -20,6 +26,8 @@
       min-height: 100vh;
       background-color: #3a3a3a;
       color: #FFF;
+      font-size: clamp(1rem, 2.5vw, 2rem);
+      line-height: 1.5;
     }
 
     .header {
@@ -58,6 +66,10 @@
       padding: 120px 20px 20px 20px;
     }
 
+    a {
+      color: #6495ed;
+    }
+    
     .flashcard {
       border: 1px solid #81ce39;
       padding: 15px;
@@ -66,7 +78,8 @@
       background-color: #4a4a4a;
       border-radius: 8px;
       width: 100%;
-      max-width: 400px;
+      max-width: 95%;
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
     }
 
     #front-content, #back-content {
@@ -79,7 +92,7 @@
       border: none;
       height: 1px;
       background-color: #81ce39;
-      margin: 25px 0;
+      margin: 20px 0;
     }
 
     .flashcard .back {
@@ -102,13 +115,13 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 200px;
+      max-width: 95%;
       margin-bottom: 10px;
     }
 
     .buttons-container button {
-      margin: 5px 0;
-      padding: 10px;
+      margin: 4% 0;
+      padding: 14px;
       font-size: 16px;
       border: none;
       border-radius: 5px;
