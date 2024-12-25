@@ -303,7 +303,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbzrCnsh11CHkF-DjbOyWa4hyMl7DTZEMiiWkF28qUCN4LTmefWtCHhGEJ5GDMVUO6I/exec';
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbzttXS62MfzGuDR1P3QZJaLfYzZG-5DojzW-xrBkNKiXXDaBDm4Ott-EjZ34Vzg7FCf7Q/exec';
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   fetchData();
 
 
-// FUNÇÃO PARA EDITAR E SALVAR ALTERAÇÕES
+// CÓDIGO PARA EDITAR E SALVAR ALTERAÇÕES
 
   document.getElementById("edit-button").addEventListener("click", toggleEditMode);
 
@@ -489,8 +489,8 @@ function toggleEditMode() {
     const backText = backContent.innerHTML;
 
     // Transformar conteúdo em campos editáveis
-    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px;">${frontText}</textarea>`;
-    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px;">${backText}</textarea>`;
+    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000;">${frontText}</textarea>`;
+    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000;">${backText}</textarea>`;
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
 
     // Alterar texto do botão
@@ -511,23 +511,28 @@ function toggleEditMode() {
     const currentCard = data[currentCardIndex];
     const updateUrl = `${apiUrl}?linha=${currentCard.linha}&frente=${encodeURIComponent(newFrontText)}&tras=${encodeURIComponent(newBackText)}`;
 
-    fetch(updateUrl)
-      .then(() => alert("Alterações salvas com sucesso!"))
-      .catch(() => alert("Erro ao salvar as alterações."));
-  }
+    //fetch(updateUrl)
+    //  .then(() => alert("Alterações salvas com sucesso!"))
+    //  .catch(() => alert("Erro ao salvar as alterações."));
+  //}
+
+
+fetch(updateUrl)
+  .then(response => response.text())
+  //.then(data => console.log(data));
+  .then(() => alert("Alterações salvas com sucesso!"))
+  .catch(() => alert("Erro ao salvar as alterações."));
+
+}
 
   isEditing = !isEditing;
 }
 
-  
 
-  //FIM DA FUNÇÃO PRINCIPAL
+// FIM DA FUNÇÃO PRINCIPAL
 });
-
-  //FIM DO SCRIPT
+  
+//FIM DO SCRIPT
 </script>
-
-
-
 </body>
 </html>
