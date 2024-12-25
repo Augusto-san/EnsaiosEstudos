@@ -471,6 +471,51 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   fetchData();
 });
+
+  document.getElementById("edit-button").addEventListener("click", toggleEditMode);
+
+let isEditing = false;
+
+function toggleEditMode() {
+  const frontContent = document.getElementById("front-content");
+  const backContent = document.getElementById("back-content");
+  const editButton = document.getElementById("edit-button");
+
+  if (!isEditing) {
+    // Modo de edição
+    const frontText = frontContent.innerHTML;
+    const backText = backContent.innerHTML;
+
+    // Transformar conteúdo em campos editáveis
+    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px;">${frontText}</textarea>`;
+    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px;">${backText}</textarea>`;
+    backContent.style.display = "block"; // Certificar-se de mostrar o verso
+
+    // Alterar texto do botão
+    editButton.textContent = "💾";
+  } else {
+    // Salvar alterações
+    const newFrontText = document.getElementById("front-edit").value;
+    const newBackText = document.getElementById("back-edit").value;
+
+    // Atualizar conteúdos
+    frontContent.innerHTML = newFrontText;
+    backContent.innerHTML = newBackText;
+
+    // Alterar texto do botão
+    editButton.textContent = "✎";
+
+    // Opcional: enviar os dados atualizados para a API ou backend, se necessário
+    const currentCard = data[currentCardIndex];
+    const updateUrl = `${apiUrl}?linha=${currentCard.linha}&frente=${encodeURIComponent(newFrontText)}&tras=${encodeURIComponent(newBackText)}`;
+
+    fetch(updateUrl)
+      .then(() => alert("Alterações salvas com sucesso!"))
+      .catch(() => alert("Erro ao salvar as alterações."));
+  }
+
+  isEditing = !isEditing;
+}
 </script>
 
 
