@@ -121,8 +121,11 @@
       margin-bottom: 10px;
     }
 
+    #cancel-button{
+      display: none;
+    }
 
-    #edit-button {
+    #edit-button, #cancel-button{
       flex: none;
       font-size: 20px;
     }
@@ -147,6 +150,7 @@
     
     .buttons-container button:hover {
       background-color: #413f3f; /*#6da32e;*/
+      border: 2px dotted #81ce39;
     }
 
     .navigation-buttons {
@@ -276,6 +280,7 @@
   <div class="content">
     <div class="buttons-container">
       <button id="edit-button">✎</button>
+      <button id="cancel-button">✎</button>
     </div>    
     <div class="flashcard" id="flashcard">
       <div class="front" id="front-content"></div>
@@ -472,16 +477,22 @@ document.addEventListener("DOMContentLoaded", async function () {
   fetchData();
 
 
+
 // CÓDIGO PARA EDITAR E SALVAR ALTERAÇÕES
 
   document.getElementById("edit-button").addEventListener("click", toggleEditMode);
+  document.getElementById("cancel-button").addEventListener("click", cancelEditMode); //escuta o botão para cancelar a ação
+
 
 let isEditing = false;
+let originalFrontText = ""; //mantém as informações atuais do card frente
+let originalBackText = ""; //mantém as informações atuais do card trás
 
 function toggleEditMode() {
   const frontContent = document.getElementById("front-content");
   const backContent = document.getElementById("back-content");
   const editButton = document.getElementById("edit-button");
+  const cancelButton = document.getElementById("cancel-button");
 
   if (!isEditing) {
     // Modo de edição
@@ -495,7 +506,16 @@ function toggleEditMode() {
 
     // Alterar texto do botão
     editButton.textContent = "💾";
+    cancelButton.style.display = "flow"; // Mostrar botão "Voltar"
+
   } else {
+
+
+    // Confirmação para salvar alterações
+    const confirmSave = confirm("Tem certeza que deseja fazer essa modificação?");
+    if (!confirmSave) return;
+
+
     // Salvar alterações
     const newFrontText = document.getElementById("front-edit").value;
     const newBackText = document.getElementById("back-edit").value;
@@ -506,6 +526,8 @@ function toggleEditMode() {
 
     // Alterar texto do botão
     editButton.textContent = "✎";
+    cancelButton.style.display = "none"; // Esconder botão "cancelar" na ação de edição
+
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
     const currentCard = data[currentCardIndex];
@@ -518,14 +540,41 @@ function toggleEditMode() {
 
 
 fetch(updateUrl)
-  .then(response => response.text())
+  //.then(response => response.text())
   //.then(data => console.log(data));
   .then(() => alert("Alterações salvas com sucesso!"))
   .catch(() => alert("Erro ao salvar as alterações."));
 
 }
 
+
   isEditing = !isEditing;
+}
+
+
+// FUNÇÃO SOBRE O BOTÃO CANCELAR
+
+function cancelEditMode() {
+  const frontContent = document.getElementById("front-content");
+  const backContent = document.getElementById("back-content");
+  const editButton = document.getElementById("edit-button");
+  const cancelButton = document.getElementById("cancel-button");
+
+
+  // Confirmação para cancelar alterações
+  const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
+  if (!confirmCancel) return;
+  
+
+  // Restaurar os textos originais
+  frontContent.innerHTML = originalFrontText;
+  backContent.innerHTML = originalBackText;
+
+  // Alterar texto do botão e esconder botão "Voltar"
+  editButton.textContent = "✎";
+  cancelButton.style.display = "none";
+
+  isEditing = false;
 }
 
 
