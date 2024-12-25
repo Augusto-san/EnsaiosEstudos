@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="android-chrome" sizes="192x192" href="favicon/android-chrome-192x192.png">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
   <link rel="manifest" href="favicon/site.webmanifest">
   
   <style>
@@ -470,7 +470,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   fetchData();
-});
+
+
+// FUNÇÃO PARA EDITAR E SALVAR ALTERAÇÕES
 
   document.getElementById("edit-button").addEventListener("click", toggleEditMode);
 
@@ -516,6 +518,13 @@ function toggleEditMode() {
 
   isEditing = !isEditing;
 }
+
+  
+
+  //FIM DA FUNÇÃO PRINCIPAL
+});
+
+  //FIM DO SCRIPT
 </script>
 
 
