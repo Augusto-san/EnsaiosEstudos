@@ -75,16 +75,23 @@
     .flashcard {
       border: 1px solid #81ce39;
       padding: 15px;
-      margin: 10px;
+      margin: 10px 0px;
       text-align: center; /*justify;*/
       background-color: #4a4a4a;
       border-radius: 8px;
-      width: 100%;
-      max-width: 95%;
+      width: 90%;
+      /*max-width: 95%;*/
       font-size: clamp(1.1rem, 2vw, 1.3rem);
     }
 
+    /*#front-content, #back-content, #cabecalho-frente, #cabecalho-verso*/
+
     #front-content, #back-content {
+      margin-top: 10px;
+      text-align: justify;
+    }
+
+    .front, .back {
       border: none;
       color: #FFF;
     }
@@ -99,7 +106,7 @@
 
     .flashcard .back {
       display: none;
-      margin-top: 20px;
+      /*margin-top: 20px;*/
     }
 
     .footer {
@@ -118,7 +125,7 @@
       flex-direction: row; /*column;*/
       width: 100%;
       max-width: 95%;
-      margin-bottom: 10px;
+      /*margin-bottom: 10px;*/
     }
 
     #cancel-button{
@@ -284,8 +291,10 @@
       <button id="cancel-button">❌</button>
     </div>    
     <div class="flashcard" id="flashcard">
+      <div class="front" id="cabecalho-frente"></div>
       <div class="front" id="front-content"></div>
       <hr>
+      <div class="back" id="cabecalho-verso"></div>
       <div class="back" id="back-content"></div>
     </div>
 
@@ -309,7 +318,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbx6ej6v1qbfIDQVCzVBK6TjWs8VCpjr0zLRE5RHzEvZUROI5Zq8-nMaLOxr5_O_Zp03TA/exec';
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbyIBH_lr0B1qFtUDUVUQV7rVWNcroyVJjUX1wmHFWHfhnxtkP90aUY4BuZ1TUZPGJ45Lg/exec';
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
@@ -328,6 +337,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   document.getElementById("front-content").innerHTML = card.frente;
   document.getElementById("back-content").innerHTML = card.tras;
   document.getElementById("back-content").style.display = "none";
+  document.getElementById("cabecalho-frente").innerHTML = card.cabecalho_frente;
+  document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
+  document.getElementById("cabecalho-verso").style.display = "none";
 
   // Resetar botões
   document.querySelectorAll(".buttons-container button").forEach(button => {
@@ -459,10 +471,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   document.getElementById("mostrar-btn").addEventListener("click", () => {
     document.getElementById("back-content").style.display = "block";
+    document.getElementById("cabecalho-verso").style.display = "block";
   });
 
   document.getElementById("ocultar-btn").addEventListener("click", () => {
     document.getElementById("back-content").style.display = "none";
+    document.getElementById("cabecalho-verso").style.display = "none";
   });
 
   document.getElementById("proximo-btn").addEventListener("click", () => {
@@ -501,8 +515,8 @@ function toggleEditMode() {
     const backText = backContent.innerHTML;
 
     // Transformar conteúdo em campos editáveis
-    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000;">${frontText}</textarea>`;
-    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000;">${backText}</textarea>`;
+    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000; overflow-y: scroll; max-width: 100%; min-width: 100%;">${frontText}</textarea>`;
+    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000; overflow-y: scroll; max-width: 100%; min-width: 100%;">${backText}</textarea>`;
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
 
     // Alterar texto do botão
