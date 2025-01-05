@@ -696,6 +696,10 @@ function toggleEditMode() {
     editButton.textContent = "✎";
     cancelButton.style.display = "none"; // Esconder botão "cancelar" na ação de edição
 
+    // Mostrar botões
+    addButton.style.display = "flow"; // Exibir o botão adicionar cartão
+    counterButton.style.display = "flow"; // Exibir o contador
+
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
     const currentCard = data[currentCardIndex];
