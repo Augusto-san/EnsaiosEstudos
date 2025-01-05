@@ -86,6 +86,45 @@
 
     /*#front-content, #back-content, #cabecalho-frente, #cabecalho-verso*/
 
+    #add-card-modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: #3a3a3a; /*rgba(0, 0, 0, 0.8);*/ 
+      color: white; 
+      z-index: 9999;
+    }
+
+    #disciplina-form-add-card, #materia-form-add-card{
+      border-radius: 7px;
+    }
+
+    #add-card-modal-in{
+      max-width: 500px; 
+      /*margin: 50px auto;*/ 
+      padding: 20px; 
+      background: #2a2a2a; /*black;*/ 
+      border-radius: 5px;
+    }
+
+
+    #add-card-modal-in > h2 {
+      text-align: center;
+    }
+
+    #frente-form-textarea, #verso-form-textarea {
+     height: 150px;
+     min-height: 150px;
+     border-radius: 7px; 
+    }
+
+    .label-add-card-form, #add-card-modal-in > h2 {
+      color: #81ce39;
+    }
+
     #front-content, #back-content {
       margin-top: 10px;
       text-align: justify;
@@ -128,11 +167,12 @@
       /*margin-bottom: 10px;*/
     }
 
-    #cancel-button{
+    #cancel-button, #counter-button{
       display: none;
     }
 
-    #edit-button, #cancel-button{
+    #edit-button, #cancel-button, #add-button, #counter-button{
+      width: 17%;
       flex: none;
       font-size: 20px;
     }
@@ -158,6 +198,13 @@
     .buttons-container button:hover {
       background-color: #413f3f; /*#6da32e;*/
       border: 2px dotted #81ce39;
+    }
+
+    .add-card-formulario {
+      width: 100%;
+      max-width: 100%;
+      min-width: 100%;
+      margin-bottom: 10px;
     }
 
     .navigation-buttons {
@@ -289,6 +336,8 @@
     <div class="buttons-container">
       <button id="edit-button">✎</button>
       <button id="cancel-button">❌</button>
+      <button id="add-button">➕</button>
+      <button id="counter-button">o</button>
     </div>    
     <div class="flashcard" id="flashcard">
       <div class="front" id="cabecalho-frente"></div>
@@ -297,6 +346,31 @@
       <div class="back" id="cabecalho-verso"></div>
       <div class="back" id="back-content"></div>
     </div>
+
+    <!-- FORM PARA ADICIONAR NOVO CARTÃO -->
+
+    <div id="add-card-modal"">
+      <div id="add-card-modal-in" ">
+        <h2>ADICIONAR NOVO CARTÃO</h2>
+
+        <form id="add-card-form">
+          <label class="label-add-card-form" for="disciplina-form-add-card">Disciplina</label>
+          <input type="text" id="disciplina-form-add-card" name="disciplina-form-add-card" required class="add-card-formulario">
+          <label class="label-add-card-form" for="materia-form-add-card">Matéria</label>
+          <input type="text" id="materia-form-add-card" name="materia-form-add-card" required class="add-card-formulario">
+          <label class="label-add-card-form" for="frente-form-textarea">Frente</label>
+            <textarea id="frente-form-textarea" name="frente-form-textarea" required class="add-card-formulario"></textarea>
+          <label class="label-add-card-form" for="verso-form-textarea">Verso</label>
+            <textarea id="verso-form-textarea" name="verso-form-textarea" required class="add-card-formulario"></textarea>
+
+          <div class="buttons-container">
+            <button type="button" id="cancel-add-card" style="margin-right: 10px;">CANCELAR</button>
+            <button type="submit" id="save-add-card">SALVAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
     <div id="difficulty-buttons" class="buttons-container">
       <button data-dificuldade="fácil">FÁCIL</button>
@@ -322,6 +396,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
+
+  // AUXILIAR NO CONTADOR DE CARTÕES
+  let remainingCards = 0; // * Variável global para rastrear o número de cartões restantes
+
 
   async function fetchData() {
     const response = await fetch(apiUrl);
@@ -432,7 +510,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const disciplina = document.getElementById("disciplina-filter").value;
     const conteudo = document.getElementById("conteudo-filter").value;
     const dificuldade = document.getElementById("dificuldade-filter").value;
+    const counterButton = document.getElementById("counter-button");
 
+    // FILTRAR OS DADOS COM BASE NOS FILTROS SELECIONADOS
     data = originalData.filter(item =>
       (disciplina === "todos" || item.disciplina === disciplina) &&
       (conteudo === "todos" || item.conteudo === conteudo) &&
@@ -445,9 +525,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     // REINICIAR O ÍNDICE ATUAL PARA O PRIMEIRO CARTÃO
     currentCardIndex = 0;
 
+    // ATUALIZAR O CONTADOR DE CARTÕES
+    //counterButton.textContent = `${data.length}`;
+
+    // * ATUALIZA A VARIÁVEL DE CARTÕES RESTANTES
+    remainingCards = data.length;
+    // * ATUALIZA O CONTADOR NA TELA
+    updateCardCounter();
+
     // RENDERIZAR O PRIMEIRO CARTÃO DO CONJUNTO EMBARALHADO
     renderCard();
+
+    counterButton.style.display = "flow";
   }
+
+
+  // * ATUALIZAR CONTADOR
+  function updateCardCounter() {
+    const cardCountElement = document.getElementById("counter-button");
+    cardCountElement.textContent = `${remainingCards}`;
+  }
+
+
 
   function clearFilters() {
     document.getElementById("disciplina-filter").value = "todos";
@@ -498,15 +597,43 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("cabecalho-verso").style.display = "none";
   });
 
+  //document.getElementById("proximo-btn").addEventListener("click", () => {
+  //  currentCardIndex = (currentCardIndex + 1) % data.length;
+  //  renderCard();
+  //});
+
+
+  // BOTÃO PRÓXIMO QUE ATUALIZA O CONTADOR
   document.getElementById("proximo-btn").addEventListener("click", () => {
-    currentCardIndex = (currentCardIndex + 1) % data.length;
-    renderCard();
+    if (remainingCards > 1) {
+      currentCardIndex = (currentCardIndex + 1) % data.length;
+      remainingCards--; // Reduzir o número de cartões restantes
+      updateCardCounter(); // Atualizar o contador na tela
+      renderCard();
+    } else {
+      alert("Este é o último cartão!");
+    }
   });
 
+
+  //document.getElementById("anterior-btn").addEventListener("click", () => {
+  //  currentCardIndex = (currentCardIndex - 1 + data.length) % data.length;
+  //  renderCard();
+  //});
+
+
+  // BOTÃO ANTERIOR QUE ATUALIZA O CONTADOR
   document.getElementById("anterior-btn").addEventListener("click", () => {
-    currentCardIndex = (currentCardIndex - 1 + data.length) % data.length;
-    renderCard();
+    if (remainingCards < data.length) {
+      currentCardIndex = (currentCardIndex - 1 + data.length) % data.length;
+      remainingCards++; // Incrementar o número de cartões restantes
+      updateCardCounter(); // Atualizar o contador na tela
+      renderCard();
+    } else {
+      alert("Este é o primeiro cartão!");
+    }
   });
+
 
   fetchData();
 
@@ -527,6 +654,9 @@ function toggleEditMode() {
   const backContent = document.getElementById("back-content");
   const editButton = document.getElementById("edit-button");
   const cancelButton = document.getElementById("cancel-button");
+  const addButton = document.getElementById("add-button");
+  const counterButton = document.getElementById("counter-button");
+
 
   if (!isEditing) {
     // Modo de edição
@@ -541,6 +671,10 @@ function toggleEditMode() {
     // Alterar texto do botão
     editButton.textContent = "💾";
     cancelButton.style.display = "flow"; // Mostrar botão "Voltar"
+
+    // Esconde botões
+    addButton.style.display = "none"; // Esconde o botão adicionar cartão
+    counterButton.style.display = "none"; // Esconde o contador
 
   } else {
 
@@ -593,7 +727,8 @@ function cancelEditMode() {
   const backContent = document.getElementById("back-content");
   const editButton = document.getElementById("edit-button");
   const cancelButton = document.getElementById("cancel-button");
-
+  const addButton = document.getElementById("add-button");
+  const counterButton = document.getElementById("counter-button");
 
   // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
@@ -608,8 +743,61 @@ function cancelEditMode() {
   editButton.textContent = "✎";
   cancelButton.style.display = "none";
 
+  // Exibe o botão adicionar cartão
+  addButton.style.display = "flow";
+
+  // Exibir contador
+  counterButton.style.display = "flow"
+
+
   isEditing = false;
 }
+
+
+// FUNÇÃO PARA ADICIONAR NOVO CARTÃO
+
+  const addButton = document.getElementById("add-button");
+  const addCardModal = document.getElementById("add-card-modal");
+  const addCardForm = document.getElementById("add-card-form");
+  const cancelAddCard = document.getElementById("cancel-add-card");
+
+  // Mostrar o modal ao clicar no botão "Adicionar"
+  addButton.addEventListener("click", () => {
+    addCardModal.style.display = "block";
+  });
+
+  // Fechar o modal ao clicar em "Cancelar"
+  cancelAddCard.addEventListener("click", () => {
+    addCardModal.style.display = "none";
+    addCardForm.reset(); // Limpar o formulário
+  });
+
+  // Salvar os dados ao clicar em "Salvar"
+  addCardForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Coletar os dados do formulário
+    const disciplinaFormAddCard = document.getElementById("disciplina-form-add-card").value;
+    const materiaFormAddCard = document.getElementById("materia-form-add-card").value;
+    const frenteFormTextarea = document.getElementById("frente-form-textarea").value;
+    const versoFormTextarea = document.getElementById("verso-form-textarea").value;
+
+    // Enviar os dados para a API
+    const saveUrl = `${apiUrl}?action=add&disciplina-form-add-card=${encodeURIComponent(disciplinaFormAddCard)}&materia-form-add-card=${encodeURIComponent(materiaFormAddCard)}&frente-form-textarea=${encodeURIComponent(frenteFormTextarea)}&verso-form-textarea=${encodeURIComponent(versoFormTextarea)}`;
+    try {
+      await fetch(saveUrl);
+      alert("Novo cartão adicionado com sucesso!");
+
+      // Atualizar os dados e fechar o modal
+      await fetchData();
+      addCardModal.style.display = "none";
+      addCardForm.reset();
+    } catch (error) {
+      alert("Erro ao adicionar o cartão.");
+    }
+  });
+
+
 
 
 // FIM DA FUNÇÃO PRINCIPAL
