@@ -743,6 +743,8 @@ function toggleEditMode() {
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
+  const divFooter = document.querySelector(".footer");
+  const difficultyButtons = document.getElementById("difficulty-buttons");
 
 
   if (!isEditing) {
@@ -773,9 +775,11 @@ function toggleEditMode() {
     // Remover overflow-x da classe buttons-container-header
     //divButtonsContainerHeader.style.overflowX = "none";
 
-    // Ocultar botões
+    // Ocultar botões e footer
     addButton.style.display = "none"; // botão adicionar cartão
     counterButton.style.display = "none"; // contador
+    difficultyButtons.style.display = "none"; // botões de classificação de dificuldade
+    divFooter.style.display = "none"; // footer
     
 
   } else {
@@ -812,10 +816,11 @@ function toggleEditMode() {
     // Reativar overflow-x da classe buttons-container-header
     //divButtonsContainerHeader.style.overflowX = "auto";
 
-    // Mostrar botões
+    // Mostrar botões e footer
     addButton.style.display = "flow"; // botão adicionar cartão
     counterButton.style.display = "flow"; // contador
-
+    divFooter.style.display = "flex"; // footer
+    difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
     const currentCard = data[currentCardIndex];
@@ -853,6 +858,8 @@ function cancelEditMode() {
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
+  const divFooter = document.querySelector(".footer");
+  const difficultyButtons = document.getElementById("difficulty-buttons");
 
   // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
@@ -880,10 +887,11 @@ function cancelEditMode() {
   //divButtonsContainerHeader.style.overflowX = "auto";
 
 
-  // Exibir botões
+  // Exibir botões e footer
   addButton.style.display = "flow"; // botão adicionar cartão
-  counterButton.style.display = "flow" // contador
-
+  counterButton.style.display = "flow"; // contador
+  divFooter.style.display = "flex"; // footer
+  difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
 
   isEditing = false;
 }
