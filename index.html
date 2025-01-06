@@ -148,6 +148,20 @@
       /*margin-top: 20px;*/
     }
 
+
+    /* TEXTAREA EDITAR FRENTE e TEXTAREA EDITAR VERSO */
+    #back-edit, #front-edit{
+      width: 100%; 
+      height: 200px; 
+      color: #FFF; 
+      background-color: #000; 
+      font-family:monospace; 
+      overflow-y: scroll; 
+      max-width: 100%; 
+      min-width: 100%;"
+    }
+
+
     .footer {
       background-color: #2a2a2a;
       padding: 15px 0;
@@ -164,21 +178,52 @@
       flex-direction: row; /*column;*/
       width: 100%;
       max-width: 95%;
-      /*margin-bottom: 10px;*/
+      margin-bottom: 10px;
     }
 
-    #cancel-button, #counter-button{
+    .buttons-container-header {
+      display: flex;
+      flex-direction: row; /*column;*/
+      width: 100%;
+      max-width: 95%;
+      /*margin-bottom: 10px;*/
+      overflow-x: auto; /* permitir a rolagem horizontal */
+      white-space: nowrap; /* Evita quebra de linha */
+      padding-bottom: 10px; /*Para evitar que a barra de rolagem sobreponha os botões*/
+    }
+
+    .buttons-container-header::-webkit-scrollbar {
+      height: 8px; /* Altura da barra de rolagem */
+    }
+
+    .buttons-container-header::-webkit-scrollbar-thumb {
+      background: #81ce39; /* Cor da barra de rolagem */
+      border-radius: 4px;
+    }
+
+    .buttons-container-header::-webkit-scrollbar-track {
+      background: #555555; /* Cor do fundo da barra de rolagem */
+    }
+
+
+
+    #cancel-button, #counter-button, #br-copy-button, 
+    #ppp-copy-button, #link-copy-button {
       display: none;
     }
 
-    #edit-button, #cancel-button, #add-button, #counter-button{
+    #edit-button, #cancel-button, #add-button, 
+    #counter-button; #br-copy-button, #ppp-copy-button,
+    #link-copy-button {
       width: 17%;
       flex: none;
       font-size: 20px;
     }
     
     .buttons-container button {
-      flex: 1;
+      flex: 1; /* equivale a flex: 1 1 0; o item pode crescer, encolher e tem um tamanho inicial de 0
+
+      flex: 0 1 auto; o item pode encolher, mas não cresce. Seu tamanho inicial é automático com base no conteúdo  */
       margin: 2% 2%;
       padding: 15px;
       font-size: 16px;
@@ -190,12 +235,41 @@
       transition: background-color 0.3s;
     }
 
-    .buttons-container button.active {
+    /* ESTRUTURA FLEX:
+
+      FLEX-GROW: controla a capacidade do item de crescer para ocupar espaço adicional
+
+      FLEX-SHRINK: controla a capacidade do item de encolher quando há pouco espaço disponível
+
+      FLEX-BASIS: define o tamanho inicial do item antes de aplicar o crescimento ou encolhimento
+
+     */
+
+    .buttons-container-header button {
+      flex: 1; /*0 0 20%;  
+      FLEX-GROW: 0; o item não crescerá mesmo que haja espaço extra no container 
+
+      FLEX-SHRINK: 0; o item não encolherá mesmo que o container não tenha espaço suficiente
+
+      FLEX-BASIS: 25%; define o tamanho inicial do item como 25% proporcional ao container
+      */
+      margin: 2% 2%;
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #555555; /*#81ce39;*/
+      color: #FFF;
+      transition: background-color 0.3s;
+    }
+
+    .buttons-container button.active, .buttons-container-header button.active {
       background-color:#477d14;
       color: #FFF;
     }
     
-    .buttons-container button:hover {
+    .buttons-container button:hover, .buttons-container-header button:hover {
       background-color: #413f3f; /*#6da32e;*/
       border: 2px dotted #81ce39;
     }
@@ -305,7 +379,7 @@
 
 <body>
   <div class="header">
-    <h2>memoFULL 🧠</h2>
+    <h2>&copy; memoFULL 🧠</h2>
     <button class="menu-toggle" id="menu-toggle">☰</button>
   </div>
 
@@ -333,12 +407,16 @@
   </div>
 
   <div class="content">
-    <div class="buttons-container">
+    <div class="buttons-container-header">
       <button id="edit-button">✎</button>
       <button id="cancel-button">❌</button>
       <button id="add-button">➕</button>
-      <button id="counter-button">o</button>
+      <button id="counter-button">0</button>
+      <button id="br-copy-button">↵</button>
+      <button id="ppp-copy-button">...</button>
+      <button id="link-copy-button">🔗</button>
     </div>    
+
     <div class="flashcard" id="flashcard">
       <div class="front" id="cabecalho-frente"></div>
       <div class="front" id="front-content"></div>
@@ -374,7 +452,7 @@
 
     <div id="difficulty-buttons" class="buttons-container">
       <button data-dificuldade="fácil">FÁCIL</button>
-      <button data-dificuldade="médio">MÉDIO</button>
+      <!--<button data-dificuldade="médio">MÉDIO</button>-->
       <button data-dificuldade="difícil">DIFÍCIL</button>
     </div>
   </div>
@@ -421,6 +499,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Resetar botões
   document.querySelectorAll(".buttons-container button").forEach(button => {
+    button.classList.remove("active");
+  });
+
+
+  document.querySelectorAll(".buttons-container-header button").forEach(button => {
     button.classList.remove("active");
   });
 
@@ -656,6 +739,10 @@ function toggleEditMode() {
   const cancelButton = document.getElementById("cancel-button");
   const addButton = document.getElementById("add-button");
   const counterButton = document.getElementById("counter-button");
+  const brCopyButton = document.getElementById("br-copy-button");
+  const pppCopyButton = document.getElementById("ppp-copy-button");
+  const linkCopyButton = document.getElementById("link-copy-button");
+  const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
 
 
   if (!isEditing) {
@@ -664,17 +751,32 @@ function toggleEditMode() {
     const backText = backContent.innerHTML;
 
     // Transformar conteúdo em campos editáveis
-    frontContent.innerHTML = `<textarea id="front-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000; overflow-y: scroll; max-width: 100%; min-width: 100%;">${frontText}</textarea>`;
-    backContent.innerHTML = `<textarea id="back-edit" style="width: 100%; height: 100px; color: #FFF; background-color: #000; overflow-y: scroll; max-width: 100%; min-width: 100%;">${backText}</textarea>`;
+    frontContent.innerHTML = `<textarea id="front-edit">${frontText}</textarea>`;
+    backContent.innerHTML = `<textarea id="back-edit">${backText}</textarea>`;
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
+
+    // Itera por todos os botões dentro do container e altera o valor do flex
+    buttonsDivContainerHeader.forEach(button => {
+        button.style.flex = "0 0 20%";
+    });
 
     // Alterar texto do botão
     editButton.textContent = "💾";
-    cancelButton.style.display = "flow"; // Mostrar botão "Voltar"
 
-    // Esconde botões
-    addButton.style.display = "none"; // Esconde o botão adicionar cartão
-    counterButton.style.display = "none"; // Esconde o contador
+    // Mostrar botões
+    cancelButton.style.display = "flow"; // botão "Voltar"
+    brCopyButton.style.display = "flow"; // botão copiar <br>
+    pppCopyButton.style.display = "flow"; // botão copiar ...
+    linkCopyButton.style.display = "flow"; // botão copiar link
+
+
+    // Remover overflow-x da classe buttons-container-header
+    //divButtonsContainerHeader.style.overflowX = "none";
+
+    // Ocultar botões
+    addButton.style.display = "none"; // botão adicionar cartão
+    counterButton.style.display = "none"; // contador
+    
 
   } else {
 
@@ -688,17 +790,31 @@ function toggleEditMode() {
     const newFrontText = document.getElementById("front-edit").value;
     const newBackText = document.getElementById("back-edit").value;
 
+    // Itera por todos os botões dentro do container e altera o valor do flex
+    buttonsDivContainerHeader.forEach(button => {
+        button.style.flex = "1";
+    });
+
     // Atualizar conteúdos
     frontContent.innerHTML = newFrontText;
     backContent.innerHTML = newBackText;
 
     // Alterar texto do botão
     editButton.textContent = "✎";
-    cancelButton.style.display = "none"; // Esconder botão "cancelar" na ação de edição
+
+    // Ocultar botões
+    cancelButton.style.display = "none"; // botão "cancelar" na ação de edição
+    brCopyButton.style.display = "none"; // botão copiar <br>
+    pppCopyButton.style.display = "none"; // botão copiar ...
+    linkCopyButton.style.display = "none"; // botão copiar link
+
+
+    // Reativar overflow-x da classe buttons-container-header
+    //divButtonsContainerHeader.style.overflowX = "auto";
 
     // Mostrar botões
-    addButton.style.display = "flow"; // Exibir o botão adicionar cartão
-    counterButton.style.display = "flow"; // Exibir o contador
+    addButton.style.display = "flow"; // botão adicionar cartão
+    counterButton.style.display = "flow"; // contador
 
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
@@ -733,11 +849,19 @@ function cancelEditMode() {
   const cancelButton = document.getElementById("cancel-button");
   const addButton = document.getElementById("add-button");
   const counterButton = document.getElementById("counter-button");
+  const brCopyButton = document.getElementById("br-copy-button");
+  const pppCopyButton = document.getElementById("ppp-copy-button");
+  const linkCopyButton = document.getElementById("link-copy-button");
+  const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
 
   // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
   if (!confirmCancel) return;
   
+    // Itera por todos os botões dentro do container e altera o valor do flex
+    buttonsDivContainerHeader.forEach(button => {
+        button.style.flex = "1";
+    });
 
   // Restaurar os textos originais
   frontContent.innerHTML = originalFrontText;
@@ -745,13 +869,20 @@ function cancelEditMode() {
 
   // Alterar texto do botão e esconder botão "Voltar"
   editButton.textContent = "✎";
+
+  // Ocultar botões
   cancelButton.style.display = "none";
+  brCopyButton.style.display = "none"; // botão copiar <br>
+  pppCopyButton.style.display = "none"; // botão copiar ...
+  linkCopyButton.style.display = "none"; // botão copiar link
 
-  // Exibe o botão adicionar cartão
-  addButton.style.display = "flow";
+  // Reativar overflow-x da classe buttons-container-header
+  //divButtonsContainerHeader.style.overflowX = "auto";
 
-  // Exibir contador
-  counterButton.style.display = "flow"
+
+  // Exibir botões
+  addButton.style.display = "flow"; // botão adicionar cartão
+  counterButton.style.display = "flow" // contador
 
 
   isEditing = false;
