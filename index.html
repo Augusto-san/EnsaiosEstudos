@@ -478,15 +478,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   // AUXILIAR NO CONTADOR DE CARTÕES
   let remainingCards = 0; // * Variável global para rastrear o número de cartões restantes
 
+// Função para buscar os dados e carregar apenas os filtros
+  async function fetchFilters() {
+    const response = await fetch(apiUrl);
+    originalData = await response.json();
+    populateFilters();
+  }
 
-  async function fetchData() {
+/*  async function fetchData() {
     const response = await fetch(apiUrl);
     originalData = data = await response.json();
     populateFilters();
     renderCard();
-  }
+  }*/
 
- function renderCard() {
+ /*function renderCard() {
   if (data.length === 0) return;
 
   const card = data[currentCardIndex];
@@ -514,10 +520,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       button.classList.add("active");
     }
   }
-}
+}*/
 
+  // Função para carregar os flashcards após aplicar filtros
+  async function fetchCards() {
+    data = originalData;
+    applyFilters();
+  }
   
-  document.querySelectorAll("[data-dificuldade]").forEach(button => {
+/*  document.querySelectorAll("[data-dificuldade]").forEach(button => {
         button.addEventListener("click", async event => {
           const dificuldade = event.target.getAttribute("data-dificuldade");
           const card = data[currentCardIndex];
@@ -526,7 +537,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           await fetch(saveUrl);
           alert(`Dificuldade "${dificuldade}" salva!`);
         });
-      });
+      });*/
 
   function populateFilters() {
     updateDisciplineFilter();
@@ -577,15 +588,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
 
-  // EMBARALHAR CARTÕES
 
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Troca de elementos
-    }
-    return array;
-  }
 
   // APLICAR FILTROS
   
@@ -616,10 +619,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     // * ATUALIZA O CONTADOR NA TELA
     updateCardCounter();
 
+    
+    if (data.length > 0) {
+      renderCard();
+    } else {
+      alert("Nenhum cartão encontrado com os filtros aplicados.");
+    }
+
     // RENDERIZAR O PRIMEIRO CARTÃO DO CONJUNTO EMBARALHADO
-    renderCard();
+    //renderCard();
 
     counterButton.style.display = "flow";
+  }
+
+
+  function renderCard() {
+    if (data.length === 0) return;
+
+    const card = data[currentCardIndex];
+    document.getElementById("front-content").innerHTML = card.frente;
+    document.getElementById("back-content").innerHTML = card.tras;
+    document.getElementById("back-content").style.display = "none";
+    document.getElementById("cabecalho-frente").innerHTML = card.cabecalho_frente;
+    document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
+    document.getElementById("cabecalho-verso").style.display = "none";
   }
 
 
@@ -630,8 +653,18 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
 
+  // EMBARALHAR CARTÕES
 
-  function clearFilters() {
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Troca de elementos
+    }
+    return array;
+  }
+
+
+/*  function clearFilters() {
     document.getElementById("disciplina-filter").value = "todos";
     document.getElementById("conteudo-filter").value = "todos";
     document.getElementById("dificuldade-filter").value = "todos";
@@ -640,6 +673,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     currentCardIndex = 0;
     populateFilters();
     renderCard();
+  }*/
+
+
+  function clearFilters() {
+    document.getElementById("disciplina-filter").value = "todos";
+    document.getElementById("conteudo-filter").value = "todos";
+    document.getElementById("dificuldade-filter").value = "todos";
+
+    data = [];
+    currentCardIndex = 0;
+    updateCardCounter();
+    document.getElementById("front-content").innerHTML = "";
+    document.getElementById("back-content").innerHTML = "";
   }
 
   function toggleSideMenu() {
@@ -718,8 +764,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
 
-  fetchData();
-
+  //fetchData();
+  // Chamar apenas os filtros na inicialização
+  fetchFilters();
 
 
 // CÓDIGO PARA EDITAR E SALVAR ALTERAÇÕES
