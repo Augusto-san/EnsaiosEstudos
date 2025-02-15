@@ -513,13 +513,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     button.classList.remove("active");
   });
 
-  // Aplicar classe ativa com base na classificação
-  if (card.dificuldade) {
-    const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
-    if (button) {
-      button.classList.add("active");
-    }
-  }
+
 }*/
 
   // Função para carregar os flashcards após aplicar filtros
@@ -528,7 +522,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     applyFilters();
   }
   
-/*  document.querySelectorAll("[data-dificuldade]").forEach(button => {
+  document.querySelectorAll("[data-dificuldade]").forEach(button => {
         button.addEventListener("click", async event => {
           const dificuldade = event.target.getAttribute("data-dificuldade");
           const card = data[currentCardIndex];
@@ -537,7 +531,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           await fetch(saveUrl);
           alert(`Dificuldade "${dificuldade}" salva!`);
         });
-      });*/
+      });
 
   function populateFilters() {
     updateDisciplineFilter();
@@ -643,6 +637,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("cabecalho-frente").innerHTML = card.cabecalho_frente;
     document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
     document.getElementById("cabecalho-verso").style.display = "none";
+
+
+
+      // Remover classe ativa de todos os botões de dificuldade
+    document.querySelectorAll("[data-dificuldade]").forEach(button => {
+        button.classList.remove("active");
+        });
+
+
+      // Aplicar classe ativa com base na classificação
+    if (card.dificuldade) {
+      const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
+      if (button) {
+        button.classList.add("active");
+      }
+    }
   }
 
 
@@ -986,8 +996,6 @@ function cancelEditMode() {
       alert("Erro ao adicionar o cartão.");
     }
   });
-
-
 
 
 // FIM DA FUNÇÃO PRINCIPAL
