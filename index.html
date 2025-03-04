@@ -208,7 +208,7 @@
 
 
     #cancel-button, #counter-button, #br-copy-button, 
-    #ppp-copy-button, #link-copy-button {
+    #ppp-copy-button, #link-copy-button, #data-button {
       display: none;
     }
 
@@ -390,17 +390,21 @@
     </div>
     <div class="filters">
       <label for="disciplina-filter">Disciplina:</label>
-      <select id="disciplina-filter">
-        <option value="todos">Todos</option>
-      </select>
+        <select id="disciplina-filter">
+          <option value="todos">Todos</option>
+        </select>
       <label for="conteudo-filter">Conteúdo:</label>
-      <select id="conteudo-filter">
-        <option value="todos">Todos</option>
-      </select>
+        <select id="conteudo-filter">
+          <option value="todos">Todos</option>
+        </select>
       <label for="dificuldade-filter">Dificuldade:</label>
-      <select id="dificuldade-filter">
-        <option value="todos">Todos</option>
-      </select>
+        <select id="dificuldade-filter">
+          <option value="todos">Todos</option>
+        </select>
+      <label for="data-filter">Data:</label> <!-- // 02-03-2025 -->  
+        <select id="data-filter"> <!-- // 02-03-2025 -->  
+          <option value="todos">Todos</option> <!-- // 02-03-2025 -->  
+        </select> <!-- // 02-03-2025 -->  
       <button id="apply-filters">Aplicar Filtros</button>
       <button id="clear-filters">Limpar Filtros</button>
     </div>
@@ -415,6 +419,7 @@
       <button id="br-copy-button">↵</button>
       <button id="ppp-copy-button">...</button>
       <button id="link-copy-button">🔗</button>
+      <button id="data-button">Data</button> <!-- // 02-03-2025 -->    
     </div>    
 
     <div class="flashcard" id="flashcard">
@@ -470,7 +475,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbyIBH_lr0B1qFtUDUVUQV7rVWNcroyVJjUX1wmHFWHfhnxtkP90aUY4BuZ1TUZPGJ45Lg/exec';
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbwUqGYzyKh1Zc_fHLA23_J3N49XwSv2m_GpAUqZygyP6VR8JFaHeMOMuS-JfZCgKbLE/exec'; // 02-03-2025
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
@@ -485,36 +490,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     populateFilters();
   }
 
-/*  async function fetchData() {
-    const response = await fetch(apiUrl);
-    originalData = data = await response.json();
-    populateFilters();
-    renderCard();
-  }*/
-
- /*function renderCard() {
-  if (data.length === 0) return;
-
-  const card = data[currentCardIndex];
-  document.getElementById("front-content").innerHTML = card.frente;
-  document.getElementById("back-content").innerHTML = card.tras;
-  document.getElementById("back-content").style.display = "none";
-  document.getElementById("cabecalho-frente").innerHTML = card.cabecalho_frente;
-  document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
-  document.getElementById("cabecalho-verso").style.display = "none";
-
-  // Resetar botões
-  document.querySelectorAll(".buttons-container button").forEach(button => {
-    button.classList.remove("active");
-  });
-
-
-  document.querySelectorAll(".buttons-container-header button").forEach(button => {
-    button.classList.remove("active");
-  });
-
-
-}*/
 
   // Função para carregar os flashcards após aplicar filtros
   async function fetchCards() {
@@ -522,6 +497,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     applyFilters();
   }
   
+  // SALVAR DIFICULDADES DOS CARTÕES
   document.querySelectorAll("[data-dificuldade]").forEach(button => {
         button.addEventListener("click", async event => {
           const dificuldade = event.target.getAttribute("data-dificuldade");
@@ -537,8 +513,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     updateDisciplineFilter();
     updateContentFilter();
     updateDifficultyFilter();
+    updateDataFilter(); //02-03-2025
   }
 
+  // ATUALIZAR O FIILTRO DE DISCIPLINA
   function updateDisciplineFilter() {
     const disciplinaFilter = document.getElementById("disciplina-filter");
     const disciplinas = Array.from(new Set(originalData.map(item => item.disciplina)));
@@ -549,6 +527,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  // ATUALIZAR O FIILTRO DE CONTEÚDO BASEADO NA DISCIPLINA
   function updateContentFilter(selectedDiscipline = "todos") {
     const conteudoFilter = document.getElementById("conteudo-filter");
     const filteredData = selectedDiscipline === "todos"
@@ -562,6 +541,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  // ATUALIZAR O FILTRO DE DIFICULDADE BASEADO NA DISCIPLINA E NO CONTEÚDO
   function updateDifficultyFilter(selectedDiscipline = "todos", selectedContent = "todos") {
     const dificuldadeFilter = document.getElementById("dificuldade-filter");
     let filteredData = originalData;
@@ -582,21 +562,49 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
 
+// ATUALIZA O FILTRO DE DATA BASEADO NA DISCIPLINA, CONTEÚDO E DIFICULDADE - 03-03-2025
+
+function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos", selectedDifficulty = "todos") {
+  const dataFilter = document.getElementById("data-filter");
+  let filteredData = originalData;
+
+  if (selectedDiscipline !== "todos") {
+    filteredData = filteredData.filter(item => item.disciplina === selectedDiscipline);
+  }
+  if (selectedContent !== "todos") {
+    filteredData = filteredData.filter(item => item.conteudo === selectedContent);
+  }
+  if (selectedDifficulty !== "todos") {
+    filteredData = filteredData.filter(item => item.dificuldade === selectedDifficulty);
+  }
+
+  // Extrai as datas únicas disponíveis na base filtrada
+  const datas = Array.from(new Set(filteredData.map(item => item.data_revisao))).sort();
+
+  dataFilter.innerHTML = `<option value="todos">Todos</option>`;
+  datas.forEach(d => {
+    dataFilter.innerHTML += `<option value="${d}">${d}</option>`;
+  });
+}
 
 
-  // APLICAR FILTROS
+  // APLICAR FILTROS - 02-03-2025
   
+
   function applyFilters() {
     const disciplina = document.getElementById("disciplina-filter").value;
     const conteudo = document.getElementById("conteudo-filter").value;
     const dificuldade = document.getElementById("dificuldade-filter").value;
+    const dataRevisao = document.getElementById("data-filter").value; // Novo filtro de data
     const counterButton = document.getElementById("counter-button");
+    const dataButton = document.getElementById("data-button");
 
     // FILTRAR OS DADOS COM BASE NOS FILTROS SELECIONADOS
     data = originalData.filter(item =>
       (disciplina === "todos" || item.disciplina === disciplina) &&
       (conteudo === "todos" || item.conteudo === conteudo) &&
-      (dificuldade === "todos" || item.dificuldade === dificuldade)
+      (dificuldade === "todos" || item.dificuldade === dificuldade) &&
+      (dataRevisao === "todos" || item.data_revisao === dataRevisao) // Aplicando o filtro de data
     );
 
     // EMBARALHAR OS CARTÕES FILTRADOS
@@ -605,26 +613,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     // REINICIAR O ÍNDICE ATUAL PARA O PRIMEIRO CARTÃO
     currentCardIndex = 0;
 
-    // ATUALIZAR O CONTADOR DE CARTÕES
-    //counterButton.textContent = `${data.length}`;
 
     // * ATUALIZA A VARIÁVEL DE CARTÕES RESTANTES
     remainingCards = data.length;
     // * ATUALIZA O CONTADOR NA TELA
     updateCardCounter();
 
-    
     if (data.length > 0) {
       renderCard();
     } else {
       alert("Nenhum cartão encontrado com os filtros aplicados.");
     }
 
-    // RENDERIZAR O PRIMEIRO CARTÃO DO CONJUNTO EMBARALHADO
-    //renderCard();
-
     counterButton.style.display = "flow";
-  }
+    dataButton.style.display = "flow";
+}
 
 
   function renderCard() {
@@ -638,6 +641,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
     document.getElementById("cabecalho-verso").style.display = "none";
 
+
+    const dataRevisao = card.data_revisao ? new Date(card.data_revisao).toLocaleDateString('pt-BR') : "Sem revisão";
+
+    dataButton.textContent = `${dataRevisao}`;
 
 
       // Remover classe ativa de todos os botões de dificuldade
@@ -653,7 +660,42 @@ document.addEventListener("DOMContentLoaded", async function () {
         button.classList.add("active");
       }
     }
-  }
+
+}
+
+
+// Seleciona o botão de salvar a data - 03-03-2025
+const dataButton = document.getElementById("data-button");
+
+
+// Adiciona o evento ao botão de salvar a data
+dataButton.addEventListener("click", async () => {
+    if (data.length === 0) {
+        alert("Nenhum cartão carregado.");
+        return;
+    }
+
+    const card = data[currentCardIndex];
+    // const dataRevisao = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    const dataRevisao = new Date().toLocaleDateString("pt-BR"); // Formato DD/MM/AAAA
+
+    const saveUrl = `${apiUrl}?linha=${card.linha}&dataRevisao=${dataRevisao}`;
+
+     try {
+        await fetch(saveUrl);
+        alert(`Data de revisão ${dataRevisao} salva!`);
+
+        // Atualizar a data no botão
+        dataButton.textContent = `${dataRevisao}`;
+
+        // Atualizar a data no objeto do cartão atual
+        card.data_revisao = dataRevisao;
+    } catch (error) {
+        console.error("Erro ao salvar a data:", error);
+        alert("Erro ao salvar a data. Tente novamente.");
+    }
+});
+
 
 
   // * ATUALIZAR CONTADOR
@@ -674,29 +716,35 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
 
-/*  function clearFilters() {
+
+// LIMPAR FILTROS E ESCONDER CONTADOR E BOTÃO DATA
+function clearFilters() {
     document.getElementById("disciplina-filter").value = "todos";
     document.getElementById("conteudo-filter").value = "todos";
     document.getElementById("dificuldade-filter").value = "todos";
+    document.getElementById("data-filter").value = "todos";
 
-    data = originalData;
-    currentCardIndex = 0;
-    populateFilters();
-    renderCard();
-  }*/
-
-
-  function clearFilters() {
-    document.getElementById("disciplina-filter").value = "todos";
-    document.getElementById("conteudo-filter").value = "todos";
-    document.getElementById("dificuldade-filter").value = "todos";
-
+    // Limpa os dados e reseta o índice dos cartões
     data = [];
     currentCardIndex = 0;
+
+    // Atualiza o contador de cartões e esconde caso não tenha cartões
     updateCardCounter();
+    
+    if (data.length === 0) {
+        document.getElementById("counter-button").style.display = "none"; // Oculta contador de cartões
+        document.getElementById("data-button").style.display = "none"; // Oculta botão de data
+    }
+
+    // Remove o conteúdo dos cartões
     document.getElementById("front-content").innerHTML = "";
     document.getElementById("back-content").innerHTML = "";
-  }
+
+
+}
+
+
+
 
   function toggleSideMenu() {
     const sideMenu = document.getElementById("side-menu");
@@ -708,18 +756,29 @@ document.addEventListener("DOMContentLoaded", async function () {
     sideMenu.classList.remove("open");
   }
 
-  // Eventos para atualizar os filtros dinamicamente
-  document.getElementById("disciplina-filter").addEventListener("change", function () {
+
+
+  // Eventos para atualizar os filtros dinamicamente - 02-03-2025
+document.getElementById("disciplina-filter").addEventListener("change", function () {
     const selectedDiscipline = this.value;
     updateContentFilter(selectedDiscipline);
     updateDifficultyFilter(selectedDiscipline, "todos");
-  });
+    updateDataFilter(selectedDiscipline, "todos", "todos"); // Atualiza o filtro de data
+});
 
-  document.getElementById("conteudo-filter").addEventListener("change", function () {
+document.getElementById("conteudo-filter").addEventListener("change", function () {
     const selectedDiscipline = document.getElementById("disciplina-filter").value;
     const selectedContent = this.value;
     updateDifficultyFilter(selectedDiscipline, selectedContent);
-  });
+    updateDataFilter(selectedDiscipline, selectedContent, "todos"); // Atualiza o filtro de data
+});
+
+document.getElementById("dificuldade-filter").addEventListener("change", function () {
+    const selectedDiscipline = document.getElementById("disciplina-filter").value;
+    const selectedContent = document.getElementById("conteudo-filter").value;
+    const selectedDificuldade = this.value;
+    updateDataFilter(selectedDiscipline, selectedContent, selectedDificuldade); // Atualiza o filtro de data
+});
 
   document.getElementById("menu-toggle").addEventListener("click", toggleSideMenu);
   document.getElementById("close-menu").addEventListener("click", closeSideMenu);
@@ -736,10 +795,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("cabecalho-verso").style.display = "none";
   });
 
-  //document.getElementById("proximo-btn").addEventListener("click", () => {
-  //  currentCardIndex = (currentCardIndex + 1) % data.length;
-  //  renderCard();
-  //});
 
 
   // BOTÃO PRÓXIMO QUE ATUALIZA O CONTADOR
@@ -755,11 +810,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
 
-  //document.getElementById("anterior-btn").addEventListener("click", () => {
-  //  currentCardIndex = (currentCardIndex - 1 + data.length) % data.length;
-  //  renderCard();
-  //});
-
 
   // BOTÃO ANTERIOR QUE ATUALIZA O CONTADOR
   document.getElementById("anterior-btn").addEventListener("click", () => {
@@ -774,8 +824,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
 
-  //fetchData();
-  // Chamar apenas os filtros na inicialização
+
   fetchFilters();
 
 
@@ -829,8 +878,6 @@ function toggleEditMode() {
     linkCopyButton.style.display = "flow"; // botão copiar link
 
 
-    // Remover overflow-x da classe buttons-container-header
-    //divButtonsContainerHeader.style.overflowX = "none";
 
     // Ocultar botões e footer
     addButton.style.display = "none"; // botão adicionar cartão
@@ -870,8 +917,6 @@ function toggleEditMode() {
     linkCopyButton.style.display = "none"; // botão copiar link
 
 
-    // Reativar overflow-x da classe buttons-container-header
-    //divButtonsContainerHeader.style.overflowX = "auto";
 
     // Mostrar botões e footer
     addButton.style.display = "flow"; // botão adicionar cartão
@@ -883,10 +928,6 @@ function toggleEditMode() {
     const currentCard = data[currentCardIndex];
     const updateUrl = `${apiUrl}?linha=${currentCard.linha}&frente=${encodeURIComponent(newFrontText)}&tras=${encodeURIComponent(newBackText)}`;
 
-    //fetch(updateUrl)
-    //  .then(() => alert("Alterações salvas com sucesso!"))
-    //  .catch(() => alert("Erro ao salvar as alterações."));
-  //}
 
 
 fetch(updateUrl)
@@ -939,9 +980,6 @@ function cancelEditMode() {
   brCopyButton.style.display = "none"; // botão copiar <br>
   pppCopyButton.style.display = "none"; // botão copiar ...
   linkCopyButton.style.display = "none"; // botão copiar link
-
-  // Reativar overflow-x da classe buttons-container-header
-  //divButtonsContainerHeader.style.overflowX = "auto";
 
 
   // Exibir botões e footer
