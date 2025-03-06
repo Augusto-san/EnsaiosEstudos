@@ -206,9 +206,13 @@
     }
 
 
+    #excluir-button, #edit-button {
+      font-size: 25px;
+    }
+
 
     #cancel-button, #counter-button, #br-copy-button, 
-    #ppp-copy-button, #link-copy-button, #data-button {
+    #ppp-copy-button, #link-copy-button, #data-button, #excluir-button {
       display: none;
     }
 
@@ -254,7 +258,7 @@
       FLEX-BASIS: 25%; define o tamanho inicial do item como 25% proporcional ao container
       */
       margin: 2% 2%;
-      padding: 15px;
+      padding: 9px;
       font-size: 16px;
       border: none;
       border-radius: 5px;
@@ -419,7 +423,8 @@
       <button id="br-copy-button">↵</button>
       <button id="ppp-copy-button">...</button>
       <button id="link-copy-button">🔗</button>
-      <button id="data-button">Data</button> <!-- // 02-03-2025 -->    
+      <button id="data-button">Data</button> <!-- // 02-03-2025 --> 
+      <button id="excluir-button">🗑</button>   <!-- // 06-03-2025 --> 
     </div>    
 
     <div class="flashcard" id="flashcard">
@@ -475,7 +480,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbwMQqRFUx2m-fOEbivoKvwelnwSjmPrn1MAMIODPhtLuoNO9R7gMfMOEroLQlDq18-i/exec'; // 03-03-2025
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbwH76qIQGycFp8Mf52GB8H3w1EU2XCJPjY9JVQy1UYJjb679lWN4s3sx-O0LRvQlt2aQg/exec'; // 06-03-2025
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
@@ -598,6 +603,7 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
     const dataRevisao = document.getElementById("data-filter").value; // Novo filtro de data
     const counterButton = document.getElementById("counter-button");
     const dataButton = document.getElementById("data-button");
+    const excluirButton = document.getElementById("excluir-button");
 
     // FILTRAR OS DADOS COM BASE NOS FILTROS SELECIONADOS
     data = originalData.filter(item =>
@@ -627,6 +633,8 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
 
     counterButton.style.display = "flow";
     dataButton.style.display = "flow";
+    excluirButton.style.display = "flow";
+
 }
 
 
@@ -647,19 +655,24 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
     dataButton.textContent = `${dataRevisao}`;
 
 
-      // Remover classe ativa de todos os botões de dificuldade
-    document.querySelectorAll("[data-dificuldade]").forEach(button => {
+      // Remover classe ativa de todos os botões de dificuldade e exclusão
+      document.querySelectorAll("[data-dificuldade],#excluir-button").forEach(button => {
         button.classList.remove("active");
-        });
+      });
 
 
       // Aplicar classe ativa com base na classificação
-    if (card.dificuldade) {
-      const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
-      if (button) {
-        button.classList.add("active");
+      if (card.dificuldade) {
+        const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
+        if (button) {
+          button.classList.add("active");
+        }
       }
-    }
+
+      // Aplicar classe ativa ao botão de exclusão se o cartão estiver marcado como "Excluir"
+      if (card.marcar_excluir && card.marcar_excluir.toLowerCase() === "excluir") {
+          document.getElementById("excluir-button").classList.add("active");
+      }
 
 }
 
@@ -698,6 +711,47 @@ dataButton.addEventListener("click", async () => {
 
 
 
+// FUNÇÃO PARA MARCAR O CARTÃO COMO "EXCLUIR" - 06-03-2025
+const excluirButton = document.getElementById("excluir-button");
+
+excluirButton.addEventListener("click", async () => {
+    if (data.length === 0) {
+        alert("Nenhum cartão carregado.");
+        return;
+    }
+
+    const card = data[currentCardIndex];
+
+    const marcarExcluir = "Excluir";
+
+
+    // Verifica se o cartão possui um número de linha válido
+    if (!card.linha) {
+        alert("Erro: Número da linha não encontrado.");
+        return;
+    }
+
+    // Monta a URL da requisição
+    const excluirUrl = `${apiUrl}?linha=${card.linha}&marcarExcluir=${marcarExcluir}`;
+
+
+    try {
+        await fetch(excluirUrl);
+        alert("cartão marcado para exclusão!");
+
+        // Atualiza o texto do botão
+        //excluirButton.textContent = Excluir;
+
+        // Atualizar a data no objeto do cartão atual
+        // card.data_revisao = dataRevisao;
+    } catch (error) {
+        console.error("Erro ao marcar o cartão!", error);
+        alert("Não foi possível salvar a alteração!");
+    }
+
+});
+
+
   // * ATUALIZAR CONTADOR
   function updateCardCounter() {
     const cardCountElement = document.getElementById("counter-button");
@@ -733,7 +787,11 @@ function clearFilters() {
     
     if (data.length === 0) {
         document.getElementById("counter-button").style.display = "none"; // Oculta contador de cartões
+
         document.getElementById("data-button").style.display = "none"; // Oculta botão de data
+
+        document.getElementById("excluir-button").style.display = "none"; // Ocultar botão excluir
+
     }
 
     // Remove o conteúdo dos cartões
