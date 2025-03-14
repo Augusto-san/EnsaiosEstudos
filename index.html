@@ -584,8 +584,13 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
   }
 
   // Extrai as datas únicas disponíveis na base filtrada
-  const datas = Array.from(new Set(filteredData.map(item => item.data_revisao))).sort();
+  //const datas = Array.from(new Set(filteredData.map(item => item.data_revisao))).sort();
 
+  // EXTRAI AS DATAS ÚNICAS DISPONÍVEIS NA BASE FILTRADA E AS CONVERTE NO FORMATO DD/MM/AAAA DO BRASIL
+const datas = Array.from(new Set(filteredData.map(item => item.data_revisao)))
+  .map(d => d ? new Date(d).toLocaleDateString("pt-BR") : d) // Converte para DD/MM/AAAA, preservando valores nulos
+  .sort();
+  
   dataFilter.innerHTML = `<option value="todos">Todos</option>`;
   datas.forEach(d => {
     dataFilter.innerHTML += `<option value="${d}">${d}</option>`;
