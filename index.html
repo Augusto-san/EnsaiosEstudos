@@ -1110,7 +1110,7 @@ function toggleEditMode() {
         const selectedText = value.slice(selectionStart, selectionEnd);
 
         // Se houver texto selecionado, insere entre as tags <mark>...</mark>
-        if (selectedText) ,{
+        if (selectedText) {
           applyTextAction('marcador', `<mark><span style="color: red;">${selectedText}</span></mark>`);
         } else {
           // Se não houver texto selecionado, insere um texto padrão
