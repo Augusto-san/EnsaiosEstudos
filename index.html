@@ -212,7 +212,7 @@
 
 
     #cancel-button, #counter-button, #br-copy-button, 
-    #ppp-copy-button, #link-copy-button, #data-button, #excluir-button {
+    #ppp-copy-button, #link-copy-button, #data-button, #excluir-button, #bold-button, #italic-button, #underline-button, #mark-button {
       display: none;
     }
 
@@ -378,6 +378,8 @@
     #apply-filters:hover, #clear-filters:hover {
       background-color: #6da32e;
     }
+
+
   </style>
 </head>
 
@@ -386,6 +388,7 @@
     <h2>&copy; memoFULL 🧠</h2>
     <button class="menu-toggle" id="menu-toggle">☰</button>
   </div>
+
 
   <div class="side-menu" id="side-menu">
     <div class="menu-header">
@@ -415,12 +418,17 @@
   </div>
 
   <div class="content">
+    
     <div class="buttons-container-header">
       <button id="edit-button">✎</button>
       <button id="cancel-button">❌</button>
       <button id="add-button">➕</button>
       <button id="counter-button">0</button>
-      <button id="br-copy-button">↵</button>
+      <button id="br-copy-button">br</button>
+            <button id="bold-button">𝐁</button>
+            <button id="italic-button">ⅈ</button>
+            <button id="underline-button">ḵ</button> 
+            <button id="mark-button">🖊</button> 
       <button id="ppp-copy-button">...</button>
       <button id="link-copy-button">🔗</button>
       <button id="data-button">Data</button> <!-- // 02-03-2025 --> 
@@ -571,6 +579,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos", selectedDifficulty = "todos") {
   const dataFilter = document.getElementById("data-filter");
+
+  //new Date().toLocaleDateString("pt-BR"); // Formato DD/MM/AAAA
+
+
   let filteredData = originalData;
 
   if (selectedDiscipline !== "todos") {
@@ -585,12 +597,12 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
 
   // Extrai as datas únicas disponíveis na base filtrada
   //const datas = Array.from(new Set(filteredData.map(item => item.data_revisao))).sort();
-
   // EXTRAI AS DATAS ÚNICAS DISPONÍVEIS NA BASE FILTRADA E AS CONVERTE NO FORMATO DD/MM/AAAA DO BRASIL
-const datas = Array.from(new Set(filteredData.map(item => item.data_revisao)))
-  .map(d => d ? new Date(d).toLocaleDateString("pt-BR") : d) // Converte para DD/MM/AAAA, preservando valores nulos
-  .sort();
-  
+  const datas = Array.from(new Set(filteredData.map(item => item.data_revisao)))
+    .map(d => d ? new Date(d).toLocaleDateString("pt-BR") : d) // Converte para DD/MM/AAAA, preservando valores nulos
+    .sort();
+
+
   dataFilter.innerHTML = `<option value="todos">Todos</option>`;
   datas.forEach(d => {
     dataFilter.innerHTML += `<option value="${d}">${d}</option>`;
@@ -909,11 +921,20 @@ function toggleEditMode() {
   const addButton = document.getElementById("add-button");
   const counterButton = document.getElementById("counter-button");
   const brCopyButton = document.getElementById("br-copy-button");
+    const boldButton = document.getElementById("bold-button");
+    const italicButton = document.getElementById("italic-button");
+    const underlineButton = document.getElementById("underline-button");
+    const markButton = document.getElementById("mark-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
   const divFooter = document.querySelector(".footer");
   const difficultyButtons = document.getElementById("difficulty-buttons");
+
+
+  // VARIÁVEIS PARA AS FUNÇÕES DOS BOTÕES DE EDIÇÃO
+  let lastFocusedTextarea = null;
+
 
 
   if (!isEditing) {
@@ -937,6 +958,10 @@ function toggleEditMode() {
     // Mostrar botões
     cancelButton.style.display = "flow"; // botão "Voltar"
     brCopyButton.style.display = "flow"; // botão copiar <br>
+      boldButton.style.display = "flow"; // botão bold <b>
+      italicButton.style.display = "flow"; // botão itáliico <i>
+      underlineButton.style.display = "flow"; // botão sublinhado
+      markButton.style.display = "flow"; // botão marcador
     pppCopyButton.style.display = "flow"; // botão copiar ...
     linkCopyButton.style.display = "flow"; // botão copiar link
 
@@ -948,6 +973,153 @@ function toggleEditMode() {
     difficultyButtons.style.display = "none"; // botões de classificação de dificuldade
     divFooter.style.display = "none"; // footer
     
+
+    // FUNÇÃO PARA OS BOTÕES DE EDIÇÃO
+    // Sempre que focar em um textarea, armazenamos a referência
+      document.getElementById("front-edit").addEventListener("focus", (e) => {
+        lastFocusedTextarea = e.target;
+      });
+      document.getElementById("back-edit").addEventListener("focus", (e) => {
+        lastFocusedTextarea = e.target;
+      });
+
+      // Função genérica para lidar com qualquer ação (ex: <br>, negrito, etc.)
+      function applyTextAction(action, valueToInsert) {
+
+        if (!lastFocusedTextarea) {
+          //showMessage("Selecione um campo antes de aplicar a ação.");
+          return;
+        }
+
+        const { selectionStart, selectionEnd, value } = lastFocusedTextarea;
+
+        let newText = value.slice(0, selectionStart) + valueToInsert + value.slice(selectionEnd);
+        lastFocusedTextarea.value = newText;
+        lastFocusedTextarea.selectionStart = lastFocusedTextarea.selectionEnd = selectionStart + valueToInsert.length;
+        lastFocusedTextarea.focus();
+      }
+
+
+      // BOTÃO <BR>
+      document.getElementById("br-copy-button").addEventListener("click", () => {
+        applyTextAction('br', "<br>");
+      });
+
+
+      // Função específica para o botão de pontos vermelhos
+      document.getElementById("ppp-copy-button").addEventListener("click", () => {
+
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes!");
+          return; // Impede que o código continue se lastFocusedTextarea for null
+        }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        // Se houver texto selecionado, insere entre as tags <b>...</b>
+        if (selectedText) {
+          applyTextAction('red points', `<span style="color: red;"><b>${selectedText}</b></span>`);
+        } else {
+          // Se não houver texto selecionado, insere um texto padrão
+          applyTextAction('red points', '<span style="color: red;"><b>...</b></span>');
+        }
+      });
+
+
+      // BOTÃO NEGRITO
+      document.getElementById("bold-button").addEventListener("click", () => {
+        
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes de aplicar o negrito.");
+          return; // Impede que o código continue se lastFocusedTextarea for null
+        }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        // Se houver texto selecionado, insere entre as tags <b>...</b>
+        if (selectedText) {
+          applyTextAction('negrito', `<span style="color: red;"><strong>${selectedText}</strong></span>`);
+        } else {
+          // Se não houver texto selecionado, insere um texto padrão
+          alert("Selecione alguma palavra!");
+        }
+      });
+
+
+
+      // BOTÃO ITÁLICO
+      document.getElementById("italic-button").addEventListener("click", () => {
+        
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes de aplicar o itálico.");
+          return; // Impede que o código continue se lastFocusedTextarea for null
+        }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        // Se houver texto selecionado, insere entre as tags <b>...</b>
+        if (selectedText) {
+          applyTextAction('itálico', `<span style="color: red;"><em>${selectedText}</em></span>`);
+        } else {
+          // Se não houver texto selecionado, insere um texto padrão
+          alert("Selecione alguma palavra!");
+        }
+      });
+
+
+
+      // BOTÃO SUBLINHADO
+      document.getElementById("underline-button").addEventListener("click", () => {
+        
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes de aplicar o sublinhado.");
+          return; // Impede que o código continue se lastFocusedTextarea for null
+        }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        // Se houver texto selecionado, insere entre as tags <b>...</b>
+        if (selectedText) {
+          applyTextAction('sublinhado', `<span style="text-decoration: underline; text-decoration-color: red;">${selectedText}</span>`);
+        } else {
+          // Se não houver texto selecionado, insere um texto padrão
+          alert("Selecione alguma palavra!");
+        }
+      });
+
+
+
+      // BOTÃO MARCADOR
+      document.getElementById("mark-button").addEventListener("click", () => {
+        
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes de aplicar o marcador.");
+          return; // Impede que o código continue se lastFocusedTextarea for null
+        }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        // Se houver texto selecionado, insere entre as tags <mark>...</mark>
+        if (selectedText) ,{
+          applyTextAction('marcador', `<mark><span style="color: red;">${selectedText}</span></mark>`);
+        } else {
+          // Se não houver texto selecionado, insere um texto padrão
+          alert("Selecione alguma palavra!");
+        }
+      });
+
+      // FIM DA FUNÇÃO DOS BOTÕES EM EDITAR
+
 
   } else {
 
@@ -976,6 +1148,9 @@ function toggleEditMode() {
     // Ocultar botões
     cancelButton.style.display = "none"; // botão "cancelar" na ação de edição
     brCopyButton.style.display = "none"; // botão copiar <br>
+      boldButton.style.display = "none"; // botão bold <b>
+      italicButton.style.display = "none"; // botão itáliico <i>
+      underlineButton.style.display = "none"; // botão sublinhado
     pppCopyButton.style.display = "none"; // botão copiar ...
     linkCopyButton.style.display = "none"; // botão copiar link
 
@@ -1016,6 +1191,10 @@ function cancelEditMode() {
   const addButton = document.getElementById("add-button");
   const counterButton = document.getElementById("counter-button");
   const brCopyButton = document.getElementById("br-copy-button");
+    const boldButton = document.getElementById("bold-button");
+    const italicButton = document.getElementById("italic-button");
+    const underlineButton = document.getElementById("underline-button");
+    const markButton = document.getElementById("mark-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
@@ -1041,6 +1220,10 @@ function cancelEditMode() {
   // Ocultar botões
   cancelButton.style.display = "none";
   brCopyButton.style.display = "none"; // botão copiar <br>
+      boldButton.style.display = "none"; // botão bold <b>
+      italicButton.style.display = "none"; // botão itáliico <i>
+      underlineButton.style.display = "none"; // botão sublinhado
+      markButton.style.display = "none"; // botão marcador
   pppCopyButton.style.display = "none"; // botão copiar ...
   linkCopyButton.style.display = "none"; // botão copiar link
 
