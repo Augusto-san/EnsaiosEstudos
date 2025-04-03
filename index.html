@@ -575,13 +575,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
 
-// ATUALIZA O FILTRO DE DATA BASEADO NA DISCIPLINA, CONTEÚDO E DIFICULDADE - 03-03-2025
-
+// ATUALIZA O FILTRO DE DATA BASEADO NA DISCIPLINA, CONTEÚDO E DIFICULDADE
 function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos", selectedDifficulty = "todos") {
   const dataFilter = document.getElementById("data-filter");
-
-  //new Date().toLocaleDateString("pt-BR"); // Formato DD/MM/AAAA
-
 
   let filteredData = originalData;
 
@@ -595,64 +591,60 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
     filteredData = filteredData.filter(item => item.dificuldade === selectedDifficulty);
   }
 
-  // Extrai as datas únicas disponíveis na base filtrada
-  //const datas = Array.from(new Set(filteredData.map(item => item.data_revisao))).sort();
-  // EXTRAI AS DATAS ÚNICAS DISPONÍVEIS NA BASE FILTRADA E AS CONVERTE NO FORMATO DD/MM/AAAA DO BRASIL
-  const datas = Array.from(new Set(filteredData.map(item => item.data_revisao)))
-    .map(d => d ? new Date(d).toLocaleDateString("pt-BR") : d) // Converte para DD/MM/AAAA, preservando valores nulos
-    .sort();
+  // Convertendo todas as datas para o formato "DD/MM/AAAA"
+  const datas = Array.from(new Set(filteredData.map(item => {
+    return item.data_revisao ? new Date(item.data_revisao).toLocaleDateString("pt-BR") : null;
+  }))).filter(Boolean) // Remove valores nulos ou inválidos
+  .sort();
 
-
+  // Atualiza as opções do filtro de data
   dataFilter.innerHTML = `<option value="todos">Todos</option>`;
   datas.forEach(d => {
     dataFilter.innerHTML += `<option value="${d}">${d}</option>`;
   });
 }
 
+// APLICA OS FILTROS
+function applyFilters() {
+  const disciplina = document.getElementById("disciplina-filter").value;
+  const conteudo = document.getElementById("conteudo-filter").value;
+  const dificuldade = document.getElementById("dificuldade-filter").value;
+  const dataRevisao = document.getElementById("data-filter").value; // Novo filtro de data
 
-  // APLICAR FILTROS - 02-03-2025
-  
+  const counterButton = document.getElementById("counter-button");
+  const dataButton = document.getElementById("data-button");
+  const excluirButton = document.getElementById("excluir-button");
 
-  function applyFilters() {
-    const disciplina = document.getElementById("disciplina-filter").value;
-    const conteudo = document.getElementById("conteudo-filter").value;
-    const dificuldade = document.getElementById("dificuldade-filter").value;
-    const dataRevisao = document.getElementById("data-filter").value; // Novo filtro de data
-    const counterButton = document.getElementById("counter-button");
-    const dataButton = document.getElementById("data-button");
-    const excluirButton = document.getElementById("excluir-button");
+  // FILTRAR OS DADOS COM BASE NOS FILTROS SELECIONADOS
+  data = originalData.filter(item =>
+    (disciplina === "todos" || item.disciplina === disciplina) &&
+    (conteudo === "todos" || item.conteudo === conteudo) &&
+    (dificuldade === "todos" || item.dificuldade === dificuldade) &&
+    (dataRevisao === "todos" || (item.data_revisao && new Date(item.data_revisao).toLocaleDateString("pt-BR") === dataRevisao)) // Ajustando a comparação
+  );
 
-    // FILTRAR OS DADOS COM BASE NOS FILTROS SELECIONADOS
-    data = originalData.filter(item =>
-      (disciplina === "todos" || item.disciplina === disciplina) &&
-      (conteudo === "todos" || item.conteudo === conteudo) &&
-      (dificuldade === "todos" || item.dificuldade === dificuldade) &&
-      (dataRevisao === "todos" || item.data_revisao === dataRevisao) // Aplicando o filtro de data
-    );
+  // EMBARALHAR OS CARTÕES FILTRADOS
+  data = shuffleArray(data);
 
-    // EMBARALHAR OS CARTÕES FILTRADOS
-    data = shuffleArray(data);
+  // REINICIAR O ÍNDICE ATUAL PARA O PRIMEIRO CARTÃO
+  currentCardIndex = 0;
 
-    // REINICIAR O ÍNDICE ATUAL PARA O PRIMEIRO CARTÃO
-    currentCardIndex = 0;
+  // ATUALIZA A VARIÁVEL DE CARTÕES RESTANTES
+  remainingCards = data.length;
+  // ATUALIZA O CONTADOR NA TELA
+  updateCardCounter();
 
+  if (data.length > 0) {
+    renderCard();
+  } else {
+    alert("Nenhum cartão encontrado com os filtros aplicados.");
+  }
 
-    // * ATUALIZA A VARIÁVEL DE CARTÕES RESTANTES
-    remainingCards = data.length;
-    // * ATUALIZA O CONTADOR NA TELA
-    updateCardCounter();
-
-    if (data.length > 0) {
-      renderCard();
-    } else {
-      alert("Nenhum cartão encontrado com os filtros aplicados.");
-    }
-
-    counterButton.style.display = "flow";
-    dataButton.style.display = "flow";
-    excluirButton.style.display = "flow";
-
+  counterButton.style.display = "flow";
+  dataButton.style.display = "flow";
+  excluirButton.style.display = "flow";
 }
+
 
 
   function renderCard() {
