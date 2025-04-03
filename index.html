@@ -12,6 +12,18 @@
   <link rel="android-chrome" sizes="192x192" href="favicon/android-chrome-192x192.png">
   <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
   <link rel="manifest" href="favicon/site.webmanifest">
+
+  <!--
+  Estilos do CodeMirror
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+
+  Scripts do CodeMirror
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closetag.min.js"></script>
+  -->
   
   <style>
     /* Reset básico */
@@ -217,7 +229,7 @@
 
 
     #cancel-button, #counter-button, #br-copy-button, 
-    #ppp-copy-button, #link-copy-button, #data-button, #excluir-button, #bold-button, #italic-button, #underline-button, #mark-button {
+    #ppp-copy-button, #link-copy-button, #data-button, #excluir-button, #bold-button, #italic-button, #underline-button, #mark-button, #borda-button {
       display: none;
     }
 
@@ -433,7 +445,8 @@
             <button id="bold-button">𝐁</button>
             <button id="italic-button">ⅈ</button>
             <button id="underline-button">ḵ</button> 
-            <button id="mark-button">🖊</button> 
+            <button id="mark-button">🖊</button>
+            <button id="borda-button">☐</button>
       <button id="ppp-copy-button">...</button>
       <button id="link-copy-button">🔗</button>
       <button id="data-button">Data</button> <!-- // 02-03-2025 --> 
@@ -922,6 +935,7 @@ function toggleEditMode() {
     const italicButton = document.getElementById("italic-button");
     const underlineButton = document.getElementById("underline-button");
     const markButton = document.getElementById("mark-button");
+    const bordaButton = document.getElementById("borda-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
@@ -931,7 +945,6 @@ function toggleEditMode() {
 
   // VARIÁVEIS PARA AS FUNÇÕES DOS BOTÕES DE EDIÇÃO
   let lastFocusedTextarea = null;
-
 
 
   if (!isEditing) {
@@ -959,6 +972,7 @@ function toggleEditMode() {
       italicButton.style.display = "flow"; // botão itáliico <i>
       underlineButton.style.display = "flow"; // botão sublinhado
       markButton.style.display = "flow"; // botão marcador
+      bordaButton.style.display = "flow"; // botão inserir borda
     pppCopyButton.style.display = "flow"; // botão copiar ...
     linkCopyButton.style.display = "flow"; // botão copiar link
 
@@ -970,6 +984,25 @@ function toggleEditMode() {
     difficultyButtons.style.display = "none"; // botões de classificação de dificuldade
     divFooter.style.display = "none"; // footer
     
+
+
+    // CODE MIRROR NA EDIÇÃO DOS CARTÕES
+
+/*    var frontEditor = CodeMirror.fromTextArea(document.getElementById("front-edit"), {
+      mode: "xml",
+      theme: "monokai",
+      styleActiveLine: true,
+      lineWrapping: true
+    });
+
+    var backEditor = CodeMirror.fromTextArea(document.getElementById("back-edit"), {
+      mode: "xml",
+      theme: "monokai",
+      styleActiveLine: true,
+      lineWrapping: true
+    });*/
+
+
 
     // FUNÇÃO PARA OS BOTÕES DE EDIÇÃO
     // Sempre que focar em um textarea, armazenamos a referência
@@ -1003,29 +1036,13 @@ function toggleEditMode() {
       });
 
 
-      // Função específica para o botão de pontos vermelhos
+      // BOTÃO TRÊS PONTOS
       document.getElementById("ppp-copy-button").addEventListener("click", () => {
-
-        if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes!");
-          return; // Impede que o código continue se lastFocusedTextarea for null
-        }
-
-        const editor = lastFocusedTextarea;
-        const { selectionStart, selectionEnd, value } = editor;
-        const selectedText = value.slice(selectionStart, selectionEnd);
-
-        // Se houver texto selecionado, insere entre as tags <b>...</b>
-        if (selectedText) {
-          applyTextAction('red points', `<span style="color: red;"><b>${selectedText}</b></span>`);
-        } else {
-          // Se não houver texto selecionado, insere um texto padrão
-          applyTextAction('red points', '<span style="color: red;"><b>...</b></span>');
-        }
+        applyTextAction('red points', '<span style="color: red;"><b>...</b></span>');
       });
 
 
-      // BOTÃO NEGRITO
+      // BOTÃO NEGRITO + SPAN
       document.getElementById("bold-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
@@ -1037,18 +1054,15 @@ function toggleEditMode() {
         const { selectionStart, selectionEnd, value } = editor;
         const selectedText = value.slice(selectionStart, selectionEnd);
 
-        // Se houver texto selecionado, insere entre as tags <b>...</b>
-        if (selectedText) {
-          applyTextAction('negrito', `<span style="color: red;"><strong>${selectedText}</strong></span>`);
-        } else {
-          // Se não houver texto selecionado, insere um texto padrão
-          alert("Selecione alguma palavra!");
-        }
+
+        applyTextAction('negrito', `<span style="color: #FF8C00;"><strong>${selectedText}</strong></span>`);
+
+
       });
 
 
 
-      // BOTÃO ITÁLICO
+      // BOTÃO ITÁLICO + SPAN
       document.getElementById("italic-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
@@ -1060,13 +1074,9 @@ function toggleEditMode() {
         const { selectionStart, selectionEnd, value } = editor;
         const selectedText = value.slice(selectionStart, selectionEnd);
 
-        // Se houver texto selecionado, insere entre as tags <b>...</b>
-        if (selectedText) {
-          applyTextAction('itálico', `<span style="color: red;"><em>${selectedText}</em></span>`);
-        } else {
-          // Se não houver texto selecionado, insere um texto padrão
-          alert("Selecione alguma palavra!");
-        }
+        applyTextAction('itálico', `<span style="color: #FF8C00;"><em>${selectedText}</em></span>`);
+
+
       });
 
 
@@ -1083,18 +1093,14 @@ function toggleEditMode() {
         const { selectionStart, selectionEnd, value } = editor;
         const selectedText = value.slice(selectionStart, selectionEnd);
 
-        // Se houver texto selecionado, insere entre as tags <b>...</b>
-        if (selectedText) {
-          applyTextAction('sublinhado', `<span style="text-decoration: underline; text-decoration-color: red;">${selectedText}</span>`);
-        } else {
-          // Se não houver texto selecionado, insere um texto padrão
-          alert("Selecione alguma palavra!");
-        }
+        applyTextAction('sublinhado', `<span style="text-decoration: underline; text-decoration-color: red;">${selectedText}</span>`);
+
+
       });
 
 
 
-      // BOTÃO MARCADOR
+      // BOTÃO MARCADOR + SPAN
       document.getElementById("mark-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
@@ -1106,16 +1112,34 @@ function toggleEditMode() {
         const { selectionStart, selectionEnd, value } = editor;
         const selectedText = value.slice(selectionStart, selectionEnd);
 
-        // Se houver texto selecionado, insere entre as tags <mark>...</mark>
-        if (selectedText) {
-          applyTextAction('marcador', `<mark><span style="color: red;">${selectedText}</span></mark>`);
-        } else {
-          // Se não houver texto selecionado, insere um texto padrão
-          alert("Selecione alguma palavra!");
+        applyTextAction('marcador', `<mark style="background-color: #FFD700; padding: 2px 4px; border-radius: 4px;"><span style="color: #000000;">${selectedText}</span></mark>`);
+
+
+      });
+
+
+
+      // BOTÃO BORDA
+      document.getElementById("borda-button").addEventListener("click", () => {
+        
+        if (!lastFocusedTextarea) {
+          alert("Selecione um campo antes de aplicar o marcador.");
+          return; // Impede que o código continue se lastFocusedTextarea for null
         }
+
+        const editor = lastFocusedTextarea;
+        const { selectionStart, selectionEnd, value } = editor;
+        const selectedText = value.slice(selectionStart, selectionEnd);
+
+        applyTextAction('borda', `<span style="border: 2px solid #FF8C00; padding: 2px; color: #000000;">${selectedText}</span>`);
+
       });
 
       // FIM DA FUNÇÃO DOS BOTÕES EM EDITAR
+
+
+
+
 
 
   } else {
@@ -1149,6 +1173,7 @@ function toggleEditMode() {
       italicButton.style.display = "none"; // botão itáliico <i>
       underlineButton.style.display = "none"; // botão sublinhado
       markButton.style.display = "none"; // botão marcador
+      bordaButton.style.display = "none"; // botão inserir borda
     pppCopyButton.style.display = "none"; // botão copiar ...
     linkCopyButton.style.display = "none"; // botão copiar link
 
@@ -1193,6 +1218,7 @@ function cancelEditMode() {
     const italicButton = document.getElementById("italic-button");
     const underlineButton = document.getElementById("underline-button");
     const markButton = document.getElementById("mark-button");
+    const bordaButton = document.getElementById("borda-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
@@ -1222,6 +1248,7 @@ function cancelEditMode() {
       italicButton.style.display = "none"; // botão itáliico <i>
       underlineButton.style.display = "none"; // botão sublinhado
       markButton.style.display = "none"; // botão marcador
+      bordaButton.style.display = "none"; // botão inserir borda
   pppCopyButton.style.display = "none"; // botão copiar ...
   linkCopyButton.style.display = "none"; // botão copiar link
 
@@ -1278,6 +1305,8 @@ function cancelEditMode() {
       alert("Erro ao adicionar o cartão.");
     }
   });
+
+
 
 
 // FIM DA FUNÇÃO PRINCIPAL
