@@ -487,9 +487,9 @@
 
 
     <div id="difficulty-buttons" class="buttons-container">
-      <button data-dificuldade="fácil">FÁCIL</button>
+      <button data-dificuldade="acertei">ACERTEI</button>
       <!--<button data-dificuldade="médio">MÉDIO</button>-->
-      <button data-dificuldade="difícil">DIFÍCIL</button>
+      <button data-dificuldade="errei">ERREI</button>
     </div>
   </div>
 
@@ -536,7 +536,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
           const saveUrl = `${apiUrl}?linha=${card.linha}&dificuldade=${dificuldade}`;
           await fetch(saveUrl);
-          alert(`Dificuldade "${dificuldade}" salva!`);
+          alert(`Marcador "${dificuldade}" salvo!`);
         });
       });
 
