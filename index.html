@@ -5,13 +5,9 @@
   <meta charset="UTF-8">
   <title>memoFULL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2a2a2a">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-  <link rel="android-chrome" sizes="192x192" href="favicon/android-chrome-192x192.png">
-  <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
-  <link rel="manifest" href="favicon/site.webmanifest">
+  <base target="_top">
 
   <!--
   Estilos do CodeMirror
@@ -105,6 +101,7 @@
       left: 0; 
       width: 100%; 
       height: 100%; 
+      overflow-y: auto;
       background: #3a3a3a; /*rgba(0, 0, 0, 0.8);*/ 
       color: white; 
       z-index: 9999;
@@ -130,6 +127,9 @@
     #frente-form-textarea, #verso-form-textarea {
      height: 150px;
      min-height: 150px;
+     box-sizing: border-box;
+     overflow-y: hidden;
+     resize: none;
      border-radius: 7px; 
     }
 
@@ -140,6 +140,7 @@
     #front-content, #back-content {
       margin-top: 10px;
       text-align: justify;
+      white-space: pre-wrap;
     }
 
     .front, .back {
@@ -201,11 +202,19 @@
     .buttons-container-header {
       display: flex;
       flex-direction: row; /*column;*/
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0;
       width: 100%;
       max-width: 95%;
+      margin: 0 auto;
       /*margin-bottom: 10px;*/
-      overflow-x: auto; /* permitir a rolagem horizontal */
-      white-space: nowrap; /* Evita quebra de linha */
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
       padding-bottom: 10px; /*Para evitar que a barra de rolagem sobreponha os botões*/
     }
 
@@ -234,10 +243,8 @@
     }
 
     #edit-button, #cancel-button, #add-button, 
-    #counter-button; #br-copy-button, #ppp-copy-button,
+    #counter-button, #br-copy-button, #ppp-copy-button,
     #link-copy-button {
-      width: 17%;
-      flex: none;
       font-size: 20px;
     }
     
@@ -248,6 +255,7 @@
       margin: 2% 2%;
       padding: 15px;
       font-size: 16px;
+      line-height: 24px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
@@ -267,7 +275,9 @@
      */
 
     .buttons-container-header button {
-      flex: 1; /*0 0 20%;  
+      flex: 0 0 46%;
+      min-width: 48px;
+      /*0 0 20%;  
       FLEX-GROW: 0; o item não crescerá mesmo que haja espaço extra no container 
 
       FLEX-SHRINK: 0; o item não encolherá mesmo que o container não tenha espaço suficiente
@@ -275,14 +285,16 @@
       FLEX-BASIS: 25%; define o tamanho inicial do item como 25% proporcional ao container
       */
       margin: 2% 2%;
-      padding: 9px;
+      padding: 15px;
       font-size: 16px;
+      line-height: 24px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background-color: #555555; /*#81ce39;*/
       color: #FFF;
       transition: background-color 0.3s;
+      scroll-snap-align: start;
     }
 
     .buttons-container button.active, .buttons-container-header button.active {
@@ -300,6 +312,15 @@
       max-width: 100%;
       min-width: 100%;
       margin-bottom: 10px;
+    }
+
+    input.add-card-formulario,
+    select.add-card-formulario {
+      height: 54px;
+      min-height: 54px;
+      box-sizing: border-box;
+      padding: 0 12px;
+      font-size: 16px;
     }
 
     .navigation-buttons {
@@ -352,38 +373,51 @@
 
     .menu-header h3 {
       margin: 0;
+      color: #81ce39;
     }
 
     #close-menu {
       font-size: 20px;
       background: none;
       border: none;
-      color: #FFF;
+      color: #ff0202;
       cursor: pointer;
+    }
+
+    .filters {
+      margin-top: 16px;
     }
 
     .filters label {
       display: block;
       margin-bottom: 5px;
       font-size: 14px;
+      color: #81ce39;
     }
 
     .filters select {
       width: 100%;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       padding: 8px;
       font-size: 14px;
       border-radius: 5px;
       border: 1px solid #ccc;
       background-color: #fff;
-      color: #000;
+      color: #0063cb; /*000;*/
+    }
+
+    .field-divider {
+      width: 100%;
+      height: 1px;
+      margin: 0 0 14px;
+      background-color: #81ce39;
     }
 
     #apply-filters, #clear-filters {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-      background-color: #81ce39;
+      background-color: #3f7f04; /*81ce39;*/
       color: #FFF;
       border: none;
       border-radius: 5px;
@@ -392,8 +426,10 @@
       margin-bottom: 10px;
     }
 
-    #apply-filters:hover, #clear-filters:hover {
-      background-color: #6da32e;
+    #apply-filters:hover, #clear-filters:hover,
+    #apply-filters:focus, #clear-filters:focus,
+    #apply-filters:active, #clear-filters:active {
+      background-color: #3f7f04;
     }
 
 
@@ -417,18 +453,22 @@
         <select id="disciplina-filter">
           <option value="todos">Todos</option>
         </select>
+      <div class="field-divider" aria-hidden="true"></div>
       <label for="conteudo-filter">Conteúdo:</label>
         <select id="conteudo-filter">
           <option value="todos">Todos</option>
         </select>
+      <div class="field-divider" aria-hidden="true"></div>
       <label for="dificuldade-filter">Dificuldade:</label>
         <select id="dificuldade-filter">
           <option value="todos">Todos</option>
         </select>
+      <div class="field-divider" aria-hidden="true"></div>
       <label for="data-filter">Data:</label> <!-- // 02-03-2025 -->  
         <select id="data-filter"> <!-- // 02-03-2025 -->  
           <option value="todos">Todos</option> <!-- // 02-03-2025 -->  
         </select> <!-- // 02-03-2025 -->  
+      <div class="field-divider" aria-hidden="true"></div>
       <button id="apply-filters">Aplicar Filtros</button>
       <button id="clear-filters">Limpar Filtros</button>
     </div>
@@ -463,19 +503,27 @@
 
     <!-- FORM PARA ADICIONAR NOVO CARTÃO -->
 
-    <div id="add-card-modal"">
-      <div id="add-card-modal-in" ">
+    <div id="add-card-modal">
+      <div id="add-card-modal-in">
         <h2>ADICIONAR NOVO CARTÃO</h2>
 
         <form id="add-card-form">
           <label class="label-add-card-form" for="disciplina-form-add-card">Disciplina</label>
-          <input type="text" id="disciplina-form-add-card" name="disciplina-form-add-card" required class="add-card-formulario">
+          <select id="disciplina-form-add-card" name="disciplina-form-add-card" required class="add-card-formulario">
+            <option value="">Selecione uma disciplina</option>
+          </select>
+          <div class="field-divider" aria-hidden="true"></div>
           <label class="label-add-card-form" for="materia-form-add-card">Matéria</label>
-          <input type="text" id="materia-form-add-card" name="materia-form-add-card" required class="add-card-formulario">
+          <select id="materia-form-add-card" name="materia-form-add-card" required class="add-card-formulario" disabled>
+            <option value="">Selecione uma disciplina primeiro</option>
+          </select>
+          <div class="field-divider" aria-hidden="true"></div>
           <label class="label-add-card-form" for="frente-form-textarea">Frente</label>
             <textarea id="frente-form-textarea" name="frente-form-textarea" required class="add-card-formulario"></textarea>
+          <div class="field-divider" aria-hidden="true"></div>
           <label class="label-add-card-form" for="verso-form-textarea">Verso</label>
             <textarea id="verso-form-textarea" name="verso-form-textarea" required class="add-card-formulario"></textarea>
+          <div class="field-divider" aria-hidden="true"></div>
 
           <div class="buttons-container">
             <button type="button" id="cancel-add-card" style="margin-right: 10px;">CANCELAR</button>
@@ -505,20 +553,148 @@
   </div>
 
 <script>
+const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbxMnC-66uQ286-kPM2iyDKL0qey6Pxx8YykVWeYukKAf51CzlqM_cyeQ5vvzC0OipQZvg/exec";
+
 document.addEventListener("DOMContentLoaded", async function () {
-  const apiUrl = 'https://script.google.com/macros/s/AKfycbwH76qIQGycFp8Mf52GB8H3w1EU2XCJPjY9JVQy1UYJjb679lWN4s3sx-O0LRvQlt2aQg/exec'; // 06-03-2025
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
+  let addCardOptions = { disciplinas: [], materias: [] };
+
+  async function callAppsScript(method, parameters = {}) {
+    if (!APPS_SCRIPT_API_URL.startsWith("https://script.google.com/macros/s/") ||
+        !APPS_SCRIPT_API_URL.endsWith("/exec")) {
+      throw new Error("Configure a URL /exec da implantação da API no início do script.");
+    }
+
+    let requestUrl = APPS_SCRIPT_API_URL;
+    let requestOptions;
+    if (method === "getCards" || method === "getAddCardOptions") {
+      if (method === "getAddCardOptions") requestUrl += "?action=options";
+      requestOptions = {
+        method: "GET",
+        cache: "no-store",
+        redirect: "follow"
+      };
+    } else if (method === "addCard" || method === "saveCard") {
+      const payload = {
+        ...parameters,
+        action: method === "addCard" ? "add" : "update"
+      };
+      const body = new URLSearchParams();
+      Object.entries(payload).forEach(([key, value]) => {
+        body.append(key, value == null ? "" : String(value));
+      });
+      requestOptions = {
+        method: "POST",
+        body,
+        redirect: "follow"
+      };
+    } else {
+      throw new Error("Função da API desconhecida.");
+    }
+
+    const response = await fetch(requestUrl, requestOptions);
+    const responseText = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(responseText);
+    } catch (error) {
+      throw new Error("A API não retornou JSON. Confira a URL e a implantação do Apps Script.");
+    }
+
+    if (!response.ok) {
+      throw new Error((result && result.error) || `Falha na API (${response.status}).`);
+    }
+    if (result && result.success === false) {
+      throw new Error(result.error || "A API informou que a operação falhou.");
+    }
+
+    return result;
+  }
+
+  async function sendApiMutation(parameters) {
+    const method = parameters.action === "add" ? "addCard" : "saveCard";
+    const result = await callAppsScript(method, parameters);
+    if (!result || result.success !== true) {
+      throw new Error((result && result.error) || "O Apps Script não confirmou a gravação.");
+    }
+
+    return result;
+  }
+
+  function cardMutationReference(card) {
+    return card.id ? { id: card.id } : { linha: card.linha };
+  }
 
   // AUXILIAR NO CONTADOR DE CARTÕES
   let remainingCards = 0; // * Variável global para rastrear o número de cartões restantes
 
 // Função para buscar os dados e carregar apenas os filtros
   async function fetchFilters() {
-    const response = await fetch(apiUrl);
-    originalData = await response.json();
+    originalData = await callAppsScript("getCards");
+    if (!Array.isArray(originalData)) {
+      throw new Error("O Apps Script não retornou uma lista de cartões.");
+    }
     populateFilters();
+  }
+
+  async function fetchAddCardOptions() {
+    const options = await callAppsScript("getAddCardOptions");
+    if (!options || !Array.isArray(options.disciplinas) || !Array.isArray(options.materias)) {
+      if (Array.isArray(options)) {
+        throw new Error("O /exec ainda está devolvendo os cartões. Publique no Apps Script a versão com action=options.");
+      }
+      const keys = options && typeof options === "object" ? Object.keys(options).join(", ") : typeof options;
+      throw new Error(`Resposta de opções inválida da API (${keys}).`);
+    }
+    addCardOptions = options;
+    populateAddCardDisciplineOptions();
+  }
+
+  function populateAddCardDisciplineOptions() {
+    const disciplineSelect = document.getElementById("disciplina-form-add-card");
+    disciplineSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Selecione uma disciplina";
+    disciplineSelect.appendChild(placeholder);
+
+    sortedUniqueFilterValues(addCardOptions.disciplinas).forEach(discipline => {
+      const option = document.createElement("option");
+      option.value = discipline;
+      option.textContent = discipline;
+      disciplineSelect.appendChild(option);
+    });
+
+    updateAddCardMatterOptions();
+  }
+
+  function updateAddCardMatterOptions() {
+    const disciplineSelect = document.getElementById("disciplina-form-add-card");
+    const matterSelect = document.getElementById("materia-form-add-card");
+    const selectedDiscipline = disciplineSelect.value;
+    const availableMatters = selectedDiscipline
+      ? addCardOptions.materias.filter(item => item.disciplina === selectedDiscipline)
+      : [];
+
+    matterSelect.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = selectedDiscipline
+      ? "Selecione uma matéria"
+      : "Selecione uma disciplina primeiro";
+    matterSelect.appendChild(placeholder);
+    matterSelect.disabled = !selectedDiscipline;
+
+    sortedUniqueFilterValues(availableMatters.map(item => item.materia)).forEach(matter => {
+      const option = document.createElement("option");
+      option.value = matter;
+      option.textContent = matter;
+      matterSelect.appendChild(option);
+    });
   }
 
 
@@ -534,9 +710,14 @@ document.addEventListener("DOMContentLoaded", async function () {
           const dificuldade = event.target.getAttribute("data-dificuldade");
           const card = data[currentCardIndex];
 
-          const saveUrl = `${apiUrl}?linha=${card.linha}&dificuldade=${dificuldade}`;
-          await fetch(saveUrl);
-          alert(`Marcador "${dificuldade}" salvo!`);
+          try {
+            await sendApiMutation({ ...cardMutationReference(card), dificuldade });
+            card.dificuldade = dificuldade;
+            alert(`Marcador "${dificuldade}" salvo!`);
+          } catch (error) {
+            console.error("Error saving difficulty:", error);
+            alert("Não foi possível salvar a dificuldade. Tente novamente.");
+          }
         });
       });
 
@@ -547,10 +728,55 @@ document.addEventListener("DOMContentLoaded", async function () {
     updateDataFilter(); //02-03-2025
   }
 
+  const filterCollator = new Intl.Collator("pt-BR", {
+    numeric: true,
+    sensitivity: "base"
+  });
+
+  function sortedUniqueFilterValues(values) {
+    return Array.from(new Set(values)).sort((a, b) =>
+      filterCollator.compare(String(a ?? ""), String(b ?? ""))
+    );
+  }
+
+  function parseFilterDate(value) {
+    if (!value) return null;
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    const text = String(value).trim();
+    if (!text || text === "-") return null;
+
+    const isoDate = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoDate) {
+      return new Date(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]));
+    }
+
+    const brazilianDate = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (brazilianDate) {
+      return new Date(Number(brazilianDate[3]), Number(brazilianDate[2]) - 1, Number(brazilianDate[1]));
+    }
+
+    const parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  function formatFilterDate(value) {
+    const date = parseFilterDate(value);
+    return date ? date.toLocaleDateString("pt-BR") : "";
+  }
+
+  function compareFilterDateLabels(first, second) {
+    const [firstDay, firstMonth, firstYear] = first.split("/").map(Number);
+    const [secondDay, secondMonth, secondYear] = second.split("/").map(Number);
+    return firstYear - secondYear || firstMonth - secondMonth || firstDay - secondDay;
+  }
+
   // ATUALIZAR O FIILTRO DE DISCIPLINA
   function updateDisciplineFilter() {
     const disciplinaFilter = document.getElementById("disciplina-filter");
-    const disciplinas = Array.from(new Set(originalData.map(item => item.disciplina)));
+    const disciplinas = sortedUniqueFilterValues(originalData.map(item => item.disciplina));
 
     disciplinaFilter.innerHTML = `<option value="todos">Todos</option>`;
     disciplinas.forEach(d => {
@@ -564,7 +790,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const filteredData = selectedDiscipline === "todos"
       ? originalData
       : originalData.filter(item => item.disciplina === selectedDiscipline);
-    const conteudos = Array.from(new Set(filteredData.map(item => item.conteudo)));
+    const conteudos = sortedUniqueFilterValues(filteredData.map(item => item.conteudo));
 
     conteudoFilter.innerHTML = `<option value="todos">Todos</option>`;
     conteudos.forEach(c => {
@@ -584,7 +810,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       filteredData = filteredData.filter(item => item.conteudo === selectedContent);
     }
 
-    const dificuldades = Array.from(new Set(filteredData.map(item => item.dificuldade)));
+    const dificuldades = sortedUniqueFilterValues(filteredData.map(item => item.dificuldade));
 
     dificuldadeFilter.innerHTML = `<option value="todos">Todos</option>`;
     dificuldades.forEach(d => {
@@ -611,9 +837,9 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
 
   // Convertendo todas as datas para o formato "DD/MM/AAAA"
   const datas = Array.from(new Set(filteredData.map(item => {
-    return item.data_revisao ? new Date(item.data_revisao).toLocaleDateString("pt-BR") : null;
+    return formatFilterDate(item.data_revisao) || null;
   }))).filter(Boolean) // Remove valores nulos ou inválidos
-  .sort();
+  .sort(compareFilterDateLabels);
 
   // Atualiza as opções do filtro de data
   dataFilter.innerHTML = `<option value="todos">Todos</option>`;
@@ -638,7 +864,7 @@ function applyFilters() {
     (disciplina === "todos" || item.disciplina === disciplina) &&
     (conteudo === "todos" || item.conteudo === conteudo) &&
     (dificuldade === "todos" || item.dificuldade === dificuldade) &&
-    (dataRevisao === "todos" || (item.data_revisao && new Date(item.data_revisao).toLocaleDateString("pt-BR") === dataRevisao)) // Ajustando a comparação
+    (dataRevisao === "todos" || (item.data_revisao && formatFilterDate(item.data_revisao) === dataRevisao)) // Ajustando a comparação
   );
 
   // EMBARALHAR OS CARTÕES FILTRADOS
@@ -658,12 +884,25 @@ function applyFilters() {
     alert("Nenhum cartão encontrado com os filtros aplicados.");
   }
 
-  counterButton.style.display = "flow";
-  dataButton.style.display = "flow";
-  excluirButton.style.display = "flow";
+  counterButton.style.display = "inline-block";
+  dataButton.style.display = "inline-block";
+  excluirButton.style.display = "inline-block";
 }
 
 
+
+  // Monta o cabeçalho no cliente usando a disciplina e o conteúdo do mesmo cartão.
+  function renderCardHeading(elementId, side, card) {
+    const heading = document.getElementById(elementId);
+    const span = document.createElement("span");
+    const bold = document.createElement("b");
+
+    span.style.fontFamily = "system-ui";
+    span.style.color = "#656565";
+    bold.textContent = `${side}# ${card.disciplina || ""} ➞ ${card.conteudo || ""}`;
+    span.appendChild(bold);
+    heading.replaceChildren(span);
+  }
 
   function renderCard() {
     if (data.length === 0) return;
@@ -672,8 +911,8 @@ function applyFilters() {
     document.getElementById("front-content").innerHTML = card.frente;
     document.getElementById("back-content").innerHTML = card.tras;
     document.getElementById("back-content").style.display = "none";
-    document.getElementById("cabecalho-frente").innerHTML = card.cabecalho_frente;
-    document.getElementById("cabecalho-verso").innerHTML = card.cabecalho_tras;
+    renderCardHeading("cabecalho-frente", "FRENTE", card);
+    renderCardHeading("cabecalho-verso", "VERSO", card);
     document.getElementById("cabecalho-verso").style.display = "none";
 
 
@@ -719,10 +958,8 @@ dataButton.addEventListener("click", async () => {
     // const dataRevisao = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
     const dataRevisao = new Date().toLocaleDateString("pt-BR"); // Formato DD/MM/AAAA
 
-    const saveUrl = `${apiUrl}?linha=${card.linha}&dataRevisao=${dataRevisao}`;
-
-     try {
-        await fetch(saveUrl);
+    try {
+        await sendApiMutation({ ...cardMutationReference(card), dataRevisao });
         alert(`Data de revisão ${dataRevisao} salva!`);
 
         // Atualizar a data no botão
@@ -759,11 +996,9 @@ excluirButton.addEventListener("click", async () => {
     }
 
     // Monta a URL da requisição
-    const excluirUrl = `${apiUrl}?linha=${card.linha}&marcarExcluir=${marcarExcluir}`;
-
-
     try {
-        await fetch(excluirUrl);
+        await sendApiMutation({ ...cardMutationReference(card), marcarExcluir });
+        card.marcar_excluir = marcarExcluir;
         alert("cartão marcado para exclusão!");
 
         // Atualiza o texto do botão
@@ -867,7 +1102,10 @@ document.getElementById("dificuldade-filter").addEventListener("change", functio
 
   document.getElementById("menu-toggle").addEventListener("click", toggleSideMenu);
   document.getElementById("close-menu").addEventListener("click", closeSideMenu);
-  document.getElementById("apply-filters").addEventListener("click", applyFilters);
+  document.getElementById("apply-filters").addEventListener("click", () => {
+    applyFilters();
+    closeSideMenu();
+  });
   document.getElementById("clear-filters").addEventListener("click", clearFilters);
 
   document.getElementById("mostrar-btn").addEventListener("click", () => {
@@ -910,20 +1148,38 @@ document.getElementById("dificuldade-filter").addEventListener("change", functio
 
 
 
-  fetchFilters();
+  fetchFilters().catch(error => {
+    console.error("Error loading cards:", error);
+    alert("Não foi possível carregar os cartões. Verifique a conexão e tente novamente.");
+  });
 
 
 // CÓDIGO PARA EDITAR E SALVAR ALTERAÇÕES
+
+  fetchAddCardOptions().catch(error => {
+    console.error("Erro ao carregar disciplinas e matérias da aba APOIO:", error);
+    const disciplineSelect = document.getElementById("disciplina-form-add-card");
+    disciplineSelect.replaceChildren();
+    const option = document.createElement("option");
+    option.value = "";
+    const detail = error instanceof Error ? error.message : String(error);
+    option.textContent = `Falha na API: ${detail}`;
+    option.title = detail;
+    disciplineSelect.appendChild(option);
+  });
 
   document.getElementById("edit-button").addEventListener("click", toggleEditMode);
   document.getElementById("cancel-button").addEventListener("click", cancelEditMode); //escuta o botão para cancelar a ação
 
 
 let isEditing = false;
+let isSavingEdit = false;
 let originalFrontText = ""; //mantém as informações atuais do card frente
 let originalBackText = ""; //mantém as informações atuais do card trás
 
-function toggleEditMode() {
+async function toggleEditMode() {
+  if (isSavingEdit) return;
+
   const frontContent = document.getElementById("front-content");
   const backContent = document.getElementById("back-content");
   const editButton = document.getElementById("edit-button");
@@ -951,30 +1207,39 @@ function toggleEditMode() {
     // Modo de edição
     const frontText = frontContent.innerHTML;
     const backText = backContent.innerHTML;
+    originalFrontText = frontText;
+    originalBackText = backText;
 
     // Transformar conteúdo em campos editáveis
-    frontContent.innerHTML = `<textarea id="front-edit">${frontText}</textarea>`;
-    backContent.innerHTML = `<textarea id="back-edit">${backText}</textarea>`;
+    const frontEditor = document.createElement("textarea");
+    frontEditor.id = "front-edit";
+    frontEditor.value = frontText;
+    frontContent.replaceChildren(frontEditor);
+
+    const backEditor = document.createElement("textarea");
+    backEditor.id = "back-edit";
+    backEditor.value = backText;
+    backContent.replaceChildren(backEditor);
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
 
     // Itera por todos os botões dentro do container e altera o valor do flex
     buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "0 0 20%";
+        button.style.flex = "0 0 46%";
     });
 
     // Alterar texto do botão
     editButton.textContent = "💾";
 
     // Mostrar botões
-    cancelButton.style.display = "flow"; // botão "Voltar"
-    brCopyButton.style.display = "flow"; // botão copiar <br>
-      boldButton.style.display = "flow"; // botão bold <b>
-      italicButton.style.display = "flow"; // botão itáliico <i>
-      underlineButton.style.display = "flow"; // botão sublinhado
-      markButton.style.display = "flow"; // botão marcador
-      bordaButton.style.display = "flow"; // botão inserir borda
-    pppCopyButton.style.display = "flow"; // botão copiar ...
-    linkCopyButton.style.display = "flow"; // botão copiar link
+    cancelButton.style.display = "inline-block"; // botão "Voltar"
+    brCopyButton.style.display = "inline-block"; // botão copiar <br>
+      boldButton.style.display = "inline-block"; // botão bold <b>
+      italicButton.style.display = "inline-block"; // botão itáliico <i>
+      underlineButton.style.display = "inline-block"; // botão sublinhado
+      markButton.style.display = "inline-block"; // botão marcador
+      bordaButton.style.display = "inline-block"; // botão inserir borda
+    pppCopyButton.style.display = "inline-block"; // botão copiar ...
+    linkCopyButton.style.display = "inline-block"; // botão copiar link
 
 
 
@@ -1153,10 +1418,34 @@ function toggleEditMode() {
     // Salvar alterações
     const newFrontText = document.getElementById("front-edit").value;
     const newBackText = document.getElementById("back-edit").value;
+    const currentCard = data[currentCardIndex];
+
+    try {
+      isSavingEdit = true;
+      editButton.disabled = true;
+      cancelButton.disabled = true;
+      await sendApiMutation({
+        ...cardMutationReference(currentCard),
+        frente: newFrontText,
+        tras: newBackText
+      });
+    } catch (error) {
+      console.error("Error saving card:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      alert(`Não foi possível salvar as alterações. O cartão continua em modo de edição. ${detail}`);
+      return;
+    } finally {
+      isSavingEdit = false;
+      editButton.disabled = false;
+      cancelButton.disabled = false;
+    }
+
+    currentCard.frente = newFrontText;
+    currentCard.tras = newBackText;
 
     // Itera por todos os botões dentro do container e altera o valor do flex
     buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "1";
+        button.style.flex = "0 0 46%";
     });
 
     // Atualizar conteúdos
@@ -1180,22 +1469,13 @@ function toggleEditMode() {
 
 
     // Mostrar botões e footer
-    addButton.style.display = "flow"; // botão adicionar cartão
-    counterButton.style.display = "flow"; // contador
+    addButton.style.display = "inline-block"; // botão adicionar cartão
+    counterButton.style.display = "inline-block"; // contador
     divFooter.style.display = "flex"; // footer
     difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
-    const currentCard = data[currentCardIndex];
-    const updateUrl = `${apiUrl}?linha=${currentCard.linha}&frente=${encodeURIComponent(newFrontText)}&tras=${encodeURIComponent(newBackText)}`;
-
-
-
-fetch(updateUrl)
-  //.then(response => response.text())
-  //.then(data => console.log(data));
-  .then(() => alert("Alterações salvas com sucesso!"))
-  .catch(() => alert("Erro ao salvar as alterações."));
+    alert("Alterações salvas com sucesso!");
 
 }
 
@@ -1207,6 +1487,8 @@ fetch(updateUrl)
 // FUNÇÃO SOBRE O BOTÃO CANCELAR
 
 function cancelEditMode() {
+  if (isSavingEdit) return;
+
   const frontContent = document.getElementById("front-content");
   const backContent = document.getElementById("back-content");
   const editButton = document.getElementById("edit-button");
@@ -1231,7 +1513,7 @@ function cancelEditMode() {
   
     // Itera por todos os botões dentro do container e altera o valor do flex
     buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "1";
+        button.style.flex = "0 0 46%";
     });
 
   // Restaurar os textos originais
@@ -1254,8 +1536,8 @@ function cancelEditMode() {
 
 
   // Exibir botões e footer
-  addButton.style.display = "flow"; // botão adicionar cartão
-  counterButton.style.display = "flow"; // contador
+  addButton.style.display = "inline-block"; // botão adicionar cartão
+  counterButton.style.display = "inline-block"; // contador
   divFooter.style.display = "flex"; // footer
   difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
 
@@ -1269,6 +1551,35 @@ function cancelEditMode() {
   const addCardModal = document.getElementById("add-card-modal");
   const addCardForm = document.getElementById("add-card-form");
   const cancelAddCard = document.getElementById("cancel-add-card");
+  const saveAddCardButton = document.getElementById("save-add-card");
+  const disciplineSelect = document.getElementById("disciplina-form-add-card");
+  const matterSelect = document.getElementById("materia-form-add-card");
+  const addCardTextareas = [
+    document.getElementById("frente-form-textarea"),
+    document.getElementById("verso-form-textarea")
+  ];
+
+  function resizeAddCardTextarea(textarea) {
+    textarea.style.height = "auto";
+    const styles = getComputedStyle(textarea);
+    const minHeight = parseFloat(styles.minHeight) || 150;
+    const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
+    textarea.style.height = `${Math.max(textarea.scrollHeight + borderHeight, minHeight)}px`;
+  }
+
+  addCardTextareas.forEach(textarea => {
+    textarea.addEventListener("input", () => resizeAddCardTextarea(textarea));
+    resizeAddCardTextarea(textarea);
+  });
+
+  addCardForm.addEventListener("reset", () => {
+    requestAnimationFrame(() => addCardTextareas.forEach(resizeAddCardTextarea));
+  });
+
+  disciplineSelect.addEventListener("change", () => {
+    matterSelect.value = "";
+    updateAddCardMatterOptions();
+  });
 
   // Mostrar o modal ao clicar no botão "Adicionar"
   addButton.addEventListener("click", () => {
@@ -1279,6 +1590,7 @@ function cancelEditMode() {
   cancelAddCard.addEventListener("click", () => {
     addCardModal.style.display = "none";
     addCardForm.reset(); // Limpar o formulário
+    updateAddCardMatterOptions();
   });
 
   // Salvar os dados ao clicar em "Salvar"
@@ -1286,23 +1598,69 @@ function cancelEditMode() {
     e.preventDefault();
 
     // Coletar os dados do formulário
-    const disciplinaFormAddCard = document.getElementById("disciplina-form-add-card").value;
-    const materiaFormAddCard = document.getElementById("materia-form-add-card").value;
+    const disciplinaFormAddCard = disciplineSelect.value.trim();
+    const materiaFormAddCard = matterSelect.value.trim();
     const frenteFormTextarea = document.getElementById("frente-form-textarea").value;
     const versoFormTextarea = document.getElementById("verso-form-textarea").value;
 
-    // Enviar os dados para a API
-    const saveUrl = `${apiUrl}?action=add&disciplina-form-add-card=${encodeURIComponent(disciplinaFormAddCard)}&materia-form-add-card=${encodeURIComponent(materiaFormAddCard)}&frente-form-textarea=${encodeURIComponent(frenteFormTextarea)}&verso-form-textarea=${encodeURIComponent(versoFormTextarea)}`;
-    try {
-      await fetch(saveUrl);
-      alert("Novo cartão adicionado com sucesso!");
+    if (!disciplinaFormAddCard) {
+      alert("Selecione uma disciplina da lista.");
+      return;
+    }
+    const matterIsListed = addCardOptions.materias.some(item =>
+      item.disciplina === disciplinaFormAddCard &&
+      item.materia.toLocaleLowerCase("pt-BR") === materiaFormAddCard.toLocaleLowerCase("pt-BR")
+    );
+    if (!matterIsListed) {
+      alert("Selecione uma matéria cadastrada para essa disciplina na aba APOIO.");
+      return;
+    }
 
-      // Atualizar os dados e fechar o modal
-      await fetchData();
+    // Enviar os dados para a API
+    saveAddCardButton.disabled = true;
+    cancelAddCard.disabled = true;
+    saveAddCardButton.textContent = "SALVANDO...";
+
+    try {
+      const savedCard = await sendApiMutation({
+        action: "add",
+        "disciplina-form-add-card": disciplinaFormAddCard,
+        "materia-form-add-card": materiaFormAddCard,
+        "frente-form-textarea": frenteFormTextarea,
+        "verso-form-textarea": versoFormTextarea
+      });
+
+      // A confirmação da API significa que a planilha já foi atualizada.
       addCardModal.style.display = "none";
       addCardForm.reset();
+      updateAddCardMatterOptions();
+
+      // Atualizar a lista sem tratar falha de atualização como falha de gravação.
+      try {
+        await fetchAddCardOptions();
+        await fetchFilters();
+        await fetchCards();
+        const savedCardIndex = data.findIndex(card => savedCard.id
+          ? String(card.id) === String(savedCard.id)
+          : Number(card.linha) === Number(savedCard.linha));
+        if (savedCardIndex >= 0) {
+          data.unshift(data.splice(savedCardIndex, 1)[0]);
+          currentCardIndex = 0;
+          renderCard();
+        }
+        alert("Novo cartão adicionado com sucesso!");
+      } catch (refreshError) {
+        console.error("Cartão salvo, mas a lista não pôde ser atualizada:", refreshError);
+        alert("O cartão foi salvo na planilha, mas não foi possível atualizar a lista. Recarregue o app para vê-lo.");
+      }
     } catch (error) {
-      alert("Erro ao adicionar o cartão.");
+      console.error("Erro ao adicionar o cartão:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      alert(`Não foi possível adicionar o cartão. ${detail}`);
+    } finally {
+      saveAddCardButton.disabled = false;
+      cancelAddCard.disabled = false;
+      saveAddCardButton.textContent = "SALVAR";
     }
   });
 
