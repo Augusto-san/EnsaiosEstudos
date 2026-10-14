@@ -301,6 +301,49 @@
       background-color:#477d14;
       color: #FFF;
     }
+
+    #favorite-button {
+      display: none;
+      font-size: 25px;
+    }
+
+    #favorite-button.active {
+      color: #FFD700;
+    }
+
+    #app-notification {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 60px);
+      left: 50%;
+      z-index: 10001;
+      max-width: calc(100vw - 32px);
+      padding: 10px 16px;
+      border: 1px solid #ffe033;
+      border-radius: 8px;
+      background-color: #e6c300;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      color: #424242;
+      font-size: 16px;
+      line-height: 1.4;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(-50%, -8px);
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+      pointer-events: none;
+    }
+
+    #app-notification.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #app-notification {
+        transition: none;
+      }
+    }
     
     .buttons-container button:hover, .buttons-container-header button:hover {
       background-color: #413f3f; /*#6da32e;*/
@@ -459,8 +502,8 @@
           <option value="todos">Todos</option>
         </select>
       <div class="field-divider" aria-hidden="true"></div>
-      <label for="dificuldade-filter">Dificuldade:</label>
-        <select id="dificuldade-filter">
+      <label for="resultado-filter">Resultado:</label>
+        <select id="resultado-filter">
           <option value="todos">Todos</option>
         </select>
       <div class="field-divider" aria-hidden="true"></div>
@@ -468,6 +511,12 @@
         <select id="data-filter"> <!-- // 02-03-2025 -->  
           <option value="todos">Todos</option> <!-- // 02-03-2025 -->  
         </select> <!-- // 02-03-2025 -->  
+      <div class="field-divider" aria-hidden="true"></div>
+      <label for="favoritos-filter">Favoritos:</label>
+        <select id="favoritos-filter">
+          <option value="todos">Todos</option>
+          <option value="sim">Somente favoritos</option>
+        </select>
       <div class="field-divider" aria-hidden="true"></div>
       <button id="apply-filters">Aplicar Filtros</button>
       <button id="clear-filters">Limpar Filtros</button>
@@ -478,6 +527,7 @@
     
     <div class="buttons-container-header">
       <button id="edit-button">✎</button>
+      <button id="favorite-button" type="button" title="Adicionar aos favoritos" aria-label="Adicionar aos favoritos" aria-pressed="false">☆</button>
       <button id="cancel-button">❌</button>
       <button id="add-button">➕</button>
       <button id="counter-button">0</button>
@@ -534,10 +584,10 @@
     </div>
 
 
-    <div id="difficulty-buttons" class="buttons-container">
-      <button data-dificuldade="acertei">ACERTEI</button>
-      <!--<button data-dificuldade="médio">MÉDIO</button>-->
-      <button data-dificuldade="errei">ERREI</button>
+    <div id="result-buttons" class="buttons-container">
+      <button data-resultado="acertei">ACERTEI</button>
+      <!--<button data-resultado="médio">MÉDIO</button>-->
+      <button data-resultado="errei">ERREI</button>
     </div>
   </div>
 
@@ -553,13 +603,35 @@
   </div>
 
 <script>
-const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbxMnC-66uQ286-kPM2iyDKL0qey6Pxx8YykVWeYukKAf51CzlqM_cyeQ5vvzC0OipQZvg/exec";
+const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbxup-Cbvc0nk0ns5plhHjqy0FwKARLOO3qhmIyDpsi_Atl-1qrofpRLIwv2GVjLw4BGkQ/exec";
 
 document.addEventListener("DOMContentLoaded", async function () {
   let originalData = [];
   let data = [];
   let currentCardIndex = 0;
+  const favoriteButton = document.getElementById("favorite-button");
+  const appNotification = document.createElement("div");
+  appNotification.id = "app-notification";
+  appNotification.setAttribute("role", "status");
+  appNotification.setAttribute("aria-live", "polite");
+  appNotification.setAttribute("aria-atomic", "true");
+  document.body.appendChild(appNotification);
+  let appNotificationTimer = null;
   let addCardOptions = { disciplinas: [], materias: [] };
+
+  function showAppNotification(message) {
+    window.clearTimeout(appNotificationTimer);
+    appNotification.classList.remove("visible");
+    appNotification.textContent = "";
+
+    requestAnimationFrame(() => {
+      appNotification.textContent = message;
+      appNotification.classList.add("visible");
+      appNotificationTimer = window.setTimeout(() => {
+        appNotification.classList.remove("visible");
+      }, 2600);
+    });
+  }
 
   async function callAppsScript(method, parameters = {}) {
     if (!APPS_SCRIPT_API_URL.startsWith("https://script.google.com/macros/s/") ||
@@ -625,18 +697,29 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   function cardMutationReference(card) {
-    return card.id ? { id: card.id } : { linha: card.linha };
+    if (!card || card.id == null || String(card.id).trim() === "") {
+      throw new Error("O cartão não possui ID_CARTAO e não pode ser atualizado.");
+    }
+    return { id: card.id };
   }
 
   // AUXILIAR NO CONTADOR DE CARTÕES
   let remainingCards = 0; // * Variável global para rastrear o número de cartões restantes
+  let isSavingFavorite = false;
 
 // Função para buscar os dados e carregar apenas os filtros
   async function fetchFilters() {
-    originalData = await callAppsScript("getCards");
-    if (!Array.isArray(originalData)) {
+    const cards = await callAppsScript("getCards");
+    if (!Array.isArray(cards)) {
       throw new Error("O Apps Script não retornou uma lista de cartões.");
     }
+    if (cards.some(card =>
+      !card || typeof card !== "object" ||
+      !Object.prototype.hasOwnProperty.call(card, "resultado")
+    )) {
+      throw new Error("A API não retornou o campo 'resultado'. Confira se index.html e Apps Script estão na mesma versão.");
+    }
+    originalData = cards.map(card => ({ ...card, resultado: card.resultado ?? "" }));
     populateFilters();
   }
 
@@ -704,19 +787,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     applyFilters();
   }
   
-  // SALVAR DIFICULDADES DOS CARTÕES
-  document.querySelectorAll("[data-dificuldade]").forEach(button => {
+  // SALVAR RESULTADOS DOS CARTÕES
+  document.querySelectorAll("[data-resultado]").forEach(button => {
         button.addEventListener("click", async event => {
-          const dificuldade = event.target.getAttribute("data-dificuldade");
+          const resultado = event.target.getAttribute("data-resultado");
           const card = data[currentCardIndex];
 
           try {
-            await sendApiMutation({ ...cardMutationReference(card), dificuldade });
-            card.dificuldade = dificuldade;
-            alert(`Marcador "${dificuldade}" salvo!`);
+            await sendApiMutation({
+              ...cardMutationReference(card),
+              resultado
+            });
+            card.resultado = resultado;
+            showAppNotification(`Marcador "${resultado}" salvo!`);
           } catch (error) {
-            console.error("Error saving difficulty:", error);
-            alert("Não foi possível salvar a dificuldade. Tente novamente.");
+            console.error("Error saving result:", error);
+            showAppNotification("Não foi possível salvar o resultado. Tente novamente.");
           }
         });
       });
@@ -724,7 +810,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   function populateFilters() {
     updateDisciplineFilter();
     updateContentFilter();
-    updateDifficultyFilter();
+    updateResultFilter();
     updateDataFilter(); //02-03-2025
   }
 
@@ -798,9 +884,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  // ATUALIZAR O FILTRO DE DIFICULDADE BASEADO NA DISCIPLINA E NO CONTEÚDO
-  function updateDifficultyFilter(selectedDiscipline = "todos", selectedContent = "todos") {
-    const dificuldadeFilter = document.getElementById("dificuldade-filter");
+  // ATUALIZAR O FILTRO DE RESULTADO BASEADO NA DISCIPLINA E NO CONTEÚDO
+  function updateResultFilter(selectedDiscipline = "todos", selectedContent = "todos") {
+    const resultadoFilter = document.getElementById("resultado-filter");
     let filteredData = originalData;
 
     if (selectedDiscipline !== "todos") {
@@ -810,17 +896,17 @@ document.addEventListener("DOMContentLoaded", async function () {
       filteredData = filteredData.filter(item => item.conteudo === selectedContent);
     }
 
-    const dificuldades = sortedUniqueFilterValues(filteredData.map(item => item.dificuldade));
+    const resultados = sortedUniqueFilterValues(filteredData.map(item => item.resultado));
 
-    dificuldadeFilter.innerHTML = `<option value="todos">Todos</option>`;
-    dificuldades.forEach(d => {
-      dificuldadeFilter.innerHTML += `<option value="${d}">${d}</option>`;
+    resultadoFilter.innerHTML = `<option value="todos">Todos</option>`;
+    resultados.forEach(d => {
+      resultadoFilter.innerHTML += `<option value="${d}">${d}</option>`;
     });
   }
 
 
-// ATUALIZA O FILTRO DE DATA BASEADO NA DISCIPLINA, CONTEÚDO E DIFICULDADE
-function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos", selectedDifficulty = "todos") {
+// ATUALIZA O FILTRO DE DATA BASEADO NA DISCIPLINA, CONTEÚDO E RESULTADO
+function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos", selectedResult = "todos") {
   const dataFilter = document.getElementById("data-filter");
 
   let filteredData = originalData;
@@ -831,8 +917,8 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
   if (selectedContent !== "todos") {
     filteredData = filteredData.filter(item => item.conteudo === selectedContent);
   }
-  if (selectedDifficulty !== "todos") {
-    filteredData = filteredData.filter(item => item.dificuldade === selectedDifficulty);
+  if (selectedResult !== "todos") {
+    filteredData = filteredData.filter(item => item.resultado === selectedResult);
   }
 
   // Convertendo todas as datas para o formato "DD/MM/AAAA"
@@ -849,11 +935,12 @@ function updateDataFilter(selectedDiscipline = "todos", selectedContent = "todos
 }
 
 // APLICA OS FILTROS
-function applyFilters() {
+function applyFilters(options = {}) {
   const disciplina = document.getElementById("disciplina-filter").value;
   const conteudo = document.getElementById("conteudo-filter").value;
-  const dificuldade = document.getElementById("dificuldade-filter").value;
+  const resultado = document.getElementById("resultado-filter").value;
   const dataRevisao = document.getElementById("data-filter").value; // Novo filtro de data
+  const favoritos = document.getElementById("favoritos-filter").value;
 
   const counterButton = document.getElementById("counter-button");
   const dataButton = document.getElementById("data-button");
@@ -863,8 +950,9 @@ function applyFilters() {
   data = originalData.filter(item =>
     (disciplina === "todos" || item.disciplina === disciplina) &&
     (conteudo === "todos" || item.conteudo === conteudo) &&
-    (dificuldade === "todos" || item.dificuldade === dificuldade) &&
-    (dataRevisao === "todos" || (item.data_revisao && formatFilterDate(item.data_revisao) === dataRevisao)) // Ajustando a comparação
+    (resultado === "todos" || item.resultado === resultado) &&
+    (dataRevisao === "todos" || (item.data_revisao && formatFilterDate(item.data_revisao) === dataRevisao)) &&
+    (favoritos === "todos" || isFavoriteValue(item.favorito))
   );
 
   // EMBARALHAR OS CARTÕES FILTRADOS
@@ -879,9 +967,16 @@ function applyFilters() {
   updateCardCounter();
 
   if (data.length > 0) {
+    favoriteButton.style.display = "inline-block";
     renderCard();
   } else {
-    alert("Nenhum cartão encontrado com os filtros aplicados.");
+    favoriteButton.style.display = "none";
+    ["cabecalho-frente", "front-content", "cabecalho-verso", "back-content"].forEach(elementId => {
+      document.getElementById(elementId).replaceChildren();
+    });
+    if (options.notifyEmpty !== false) {
+      showAppNotification("Nenhum cartão encontrado com os filtros aplicados.");
+    }
   }
 
   counterButton.style.display = "inline-block";
@@ -904,10 +999,27 @@ function applyFilters() {
     heading.replaceChildren(span);
   }
 
+  function isFavoriteValue(value) {
+    if (value === true) return true;
+    const normalized = String(value == null ? "" : value).trim().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    return ["SIM", "TRUE", "YES", "1"].includes(normalized);
+  }
+
+  function updateFavoriteButton(card) {
+    const isFavorite = isFavoriteValue(card.favorito);
+    favoriteButton.textContent = isFavorite ? "★" : "☆";
+    favoriteButton.classList.toggle("active", isFavorite);
+    favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    favoriteButton.setAttribute("aria-label", isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos");
+    favoriteButton.title = isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos";
+  }
+
   function renderCard() {
     if (data.length === 0) return;
 
     const card = data[currentCardIndex];
+    updateFavoriteButton(card);
     document.getElementById("front-content").innerHTML = card.frente;
     document.getElementById("back-content").innerHTML = card.tras;
     document.getElementById("back-content").style.display = "none";
@@ -921,15 +1033,15 @@ function applyFilters() {
     dataButton.textContent = `${dataRevisao}`;
 
 
-      // Remover classe ativa de todos os botões de dificuldade e exclusão
-      document.querySelectorAll("[data-dificuldade],#excluir-button").forEach(button => {
+      // Remover classe ativa de todos os botões de resultado e exclusão
+      document.querySelectorAll("[data-resultado],#excluir-button").forEach(button => {
         button.classList.remove("active");
       });
 
 
       // Aplicar classe ativa com base na classificação
-      if (card.dificuldade) {
-        const button = document.querySelector(`[data-dificuldade="${card.dificuldade}"]`);
+      if (card.resultado) {
+        const button = document.querySelector(`[data-resultado="${card.resultado}"]`);
         if (button) {
           button.classList.add("active");
         }
@@ -942,6 +1054,39 @@ function applyFilters() {
 
 }
 
+  favoriteButton.addEventListener("click", async () => {
+    if (data.length === 0 || isSavingFavorite) return;
+
+    const card = data[currentCardIndex];
+    const nextFavoriteState = !isFavoriteValue(card.favorito);
+    isSavingFavorite = true;
+    favoriteButton.disabled = true;
+
+    try {
+      await sendApiMutation({
+        ...cardMutationReference(card),
+        favorito: nextFavoriteState ? "SIM" : "NÃO"
+      });
+      card.favorito = nextFavoriteState;
+
+      if (!nextFavoriteState && document.getElementById("favoritos-filter").value === "sim") {
+        applyFilters({ notifyEmpty: false });
+      } else {
+        updateFavoriteButton(card);
+      }
+      showAppNotification(nextFavoriteState
+        ? "Cartão adicionado aos favoritos."
+        : "Cartão removido dos favoritos.");
+    } catch (error) {
+      console.error("Erro ao atualizar favorito:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível atualizar o favorito. ${detail}`);
+    } finally {
+      isSavingFavorite = false;
+      favoriteButton.disabled = false;
+    }
+  });
+
 
 // Seleciona o botão de salvar a data - 03-03-2025
 const dataButton = document.getElementById("data-button");
@@ -950,7 +1095,7 @@ const dataButton = document.getElementById("data-button");
 // Adiciona o evento ao botão de salvar a data
 dataButton.addEventListener("click", async () => {
     if (data.length === 0) {
-        alert("Nenhum cartão carregado.");
+        showAppNotification("Nenhum cartão carregado.");
         return;
     }
 
@@ -960,7 +1105,7 @@ dataButton.addEventListener("click", async () => {
 
     try {
         await sendApiMutation({ ...cardMutationReference(card), dataRevisao });
-        alert(`Data de revisão ${dataRevisao} salva!`);
+        showAppNotification(`Data de revisão ${dataRevisao} salva!`);
 
         // Atualizar a data no botão
         dataButton.textContent = `${dataRevisao}`;
@@ -969,7 +1114,7 @@ dataButton.addEventListener("click", async () => {
         card.data_revisao = dataRevisao;
     } catch (error) {
         console.error("Erro ao salvar a data:", error);
-        alert("Erro ao salvar a data. Tente novamente.");
+        showAppNotification("Erro ao salvar a data. Tente novamente.");
     }
 });
 
@@ -980,7 +1125,7 @@ const excluirButton = document.getElementById("excluir-button");
 
 excluirButton.addEventListener("click", async () => {
     if (data.length === 0) {
-        alert("Nenhum cartão carregado.");
+        showAppNotification("Nenhum cartão carregado.");
         return;
     }
 
@@ -989,17 +1134,11 @@ excluirButton.addEventListener("click", async () => {
     const marcarExcluir = "Excluir";
 
 
-    // Verifica se o cartão possui um número de linha válido
-    if (!card.linha) {
-        alert("Erro: Número da linha não encontrado.");
-        return;
-    }
-
     // Monta a URL da requisição
     try {
         await sendApiMutation({ ...cardMutationReference(card), marcarExcluir });
         card.marcar_excluir = marcarExcluir;
-        alert("cartão marcado para exclusão!");
+        showAppNotification("cartão marcado para exclusão!");
 
         // Atualiza o texto do botão
         //excluirButton.textContent = Excluir;
@@ -1008,7 +1147,7 @@ excluirButton.addEventListener("click", async () => {
         // card.data_revisao = dataRevisao;
     } catch (error) {
         console.error("Erro ao marcar o cartão!", error);
-        alert("Não foi possível salvar a alteração!");
+        showAppNotification("Não foi possível salvar a alteração!");
     }
 
 });
@@ -1037,8 +1176,9 @@ excluirButton.addEventListener("click", async () => {
 function clearFilters() {
     document.getElementById("disciplina-filter").value = "todos";
     document.getElementById("conteudo-filter").value = "todos";
-    document.getElementById("dificuldade-filter").value = "todos";
+    document.getElementById("resultado-filter").value = "todos";
     document.getElementById("data-filter").value = "todos";
+    document.getElementById("favoritos-filter").value = "todos";
 
     // Limpa os dados e reseta o índice dos cartões
     data = [];
@@ -1053,6 +1193,7 @@ function clearFilters() {
         document.getElementById("data-button").style.display = "none"; // Oculta botão de data
 
         document.getElementById("excluir-button").style.display = "none"; // Ocultar botão excluir
+        document.getElementById("favorite-button").style.display = "none";
 
     }
 
@@ -1082,22 +1223,22 @@ function clearFilters() {
 document.getElementById("disciplina-filter").addEventListener("change", function () {
     const selectedDiscipline = this.value;
     updateContentFilter(selectedDiscipline);
-    updateDifficultyFilter(selectedDiscipline, "todos");
+    updateResultFilter(selectedDiscipline, "todos");
     updateDataFilter(selectedDiscipline, "todos", "todos"); // Atualiza o filtro de data
 });
 
 document.getElementById("conteudo-filter").addEventListener("change", function () {
     const selectedDiscipline = document.getElementById("disciplina-filter").value;
     const selectedContent = this.value;
-    updateDifficultyFilter(selectedDiscipline, selectedContent);
+    updateResultFilter(selectedDiscipline, selectedContent);
     updateDataFilter(selectedDiscipline, selectedContent, "todos"); // Atualiza o filtro de data
 });
 
-document.getElementById("dificuldade-filter").addEventListener("change", function () {
+document.getElementById("resultado-filter").addEventListener("change", function () {
     const selectedDiscipline = document.getElementById("disciplina-filter").value;
     const selectedContent = document.getElementById("conteudo-filter").value;
-    const selectedDificuldade = this.value;
-    updateDataFilter(selectedDiscipline, selectedContent, selectedDificuldade); // Atualiza o filtro de data
+    const selectedResultado = this.value;
+    updateDataFilter(selectedDiscipline, selectedContent, selectedResultado); // Atualiza o filtro de data
 });
 
   document.getElementById("menu-toggle").addEventListener("click", toggleSideMenu);
@@ -1128,7 +1269,7 @@ document.getElementById("dificuldade-filter").addEventListener("change", functio
       updateCardCounter(); // Atualizar o contador na tela
       renderCard();
     } else {
-      alert("Este é o último cartão!");
+      showAppNotification("Este é o último cartão!");
     }
   });
 
@@ -1142,15 +1283,16 @@ document.getElementById("dificuldade-filter").addEventListener("change", functio
       updateCardCounter(); // Atualizar o contador na tela
       renderCard();
     } else {
-      alert("Este é o primeiro cartão!");
+      showAppNotification("Este é o primeiro cartão!");
     }
   });
 
 
 
-  fetchFilters().catch(error => {
+  fetchFilters().then(fetchCards).catch(error => {
     console.error("Error loading cards:", error);
-    alert("Não foi possível carregar os cartões. Verifique a conexão e tente novamente.");
+    const detail = error instanceof Error ? error.message : String(error);
+    showAppNotification(`Não foi possível carregar os cartões. ${detail}`);
   });
 
 
@@ -1196,7 +1338,7 @@ async function toggleEditMode() {
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
   const divFooter = document.querySelector(".footer");
-  const difficultyButtons = document.getElementById("difficulty-buttons");
+  const resultButtons = document.getElementById("result-buttons");
 
 
   // VARIÁVEIS PARA AS FUNÇÕES DOS BOTÕES DE EDIÇÃO
@@ -1246,7 +1388,7 @@ async function toggleEditMode() {
     // Ocultar botões e footer
     addButton.style.display = "none"; // botão adicionar cartão
     counterButton.style.display = "none"; // contador
-    difficultyButtons.style.display = "none"; // botões de classificação de dificuldade
+    resultButtons.style.display = "none"; // botões de classificação de resultado
     divFooter.style.display = "none"; // footer
     
 
@@ -1311,7 +1453,7 @@ async function toggleEditMode() {
       document.getElementById("bold-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes de aplicar o negrito.");
+          showAppNotification("Selecione um campo antes de aplicar o negrito.");
           return; // Impede que o código continue se lastFocusedTextarea for null
         }
 
@@ -1331,7 +1473,7 @@ async function toggleEditMode() {
       document.getElementById("italic-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes de aplicar o itálico.");
+          showAppNotification("Selecione um campo antes de aplicar o itálico.");
           return; // Impede que o código continue se lastFocusedTextarea for null
         }
 
@@ -1350,7 +1492,7 @@ async function toggleEditMode() {
       document.getElementById("underline-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes de aplicar o sublinhado.");
+          showAppNotification("Selecione um campo antes de aplicar o sublinhado.");
           return; // Impede que o código continue se lastFocusedTextarea for null
         }
 
@@ -1369,7 +1511,7 @@ async function toggleEditMode() {
       document.getElementById("mark-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes de aplicar o marcador.");
+          showAppNotification("Selecione um campo antes de aplicar o marcador.");
           return; // Impede que o código continue se lastFocusedTextarea for null
         }
 
@@ -1388,7 +1530,7 @@ async function toggleEditMode() {
       document.getElementById("borda-button").addEventListener("click", () => {
         
         if (!lastFocusedTextarea) {
-          alert("Selecione um campo antes de aplicar o marcador.");
+          showAppNotification("Selecione um campo antes de aplicar o marcador.");
           return; // Impede que o código continue se lastFocusedTextarea for null
         }
 
@@ -1432,7 +1574,7 @@ async function toggleEditMode() {
     } catch (error) {
       console.error("Error saving card:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      alert(`Não foi possível salvar as alterações. O cartão continua em modo de edição. ${detail}`);
+      showAppNotification(`Não foi possível salvar as alterações. O cartão continua em modo de edição. ${detail}`);
       return;
     } finally {
       isSavingEdit = false;
@@ -1472,10 +1614,10 @@ async function toggleEditMode() {
     addButton.style.display = "inline-block"; // botão adicionar cartão
     counterButton.style.display = "inline-block"; // contador
     divFooter.style.display = "flex"; // footer
-    difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
+    resultButtons.style.display = "flex"; // botões de classificação de resultado
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
-    alert("Alterações salvas com sucesso!");
+    showAppNotification("Alterações salvas com sucesso!");
 
 }
 
@@ -1505,7 +1647,7 @@ function cancelEditMode() {
   const linkCopyButton = document.getElementById("link-copy-button");
   const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
   const divFooter = document.querySelector(".footer");
-  const difficultyButtons = document.getElementById("difficulty-buttons");
+  const resultButtons = document.getElementById("result-buttons");
 
   // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
@@ -1539,7 +1681,7 @@ function cancelEditMode() {
   addButton.style.display = "inline-block"; // botão adicionar cartão
   counterButton.style.display = "inline-block"; // contador
   divFooter.style.display = "flex"; // footer
-  difficultyButtons.style.display = "flex"; // botões de classificação de dificuldade
+  resultButtons.style.display = "flex"; // botões de classificação de resultado
 
   isEditing = false;
 }
@@ -1604,7 +1746,7 @@ function cancelEditMode() {
     const versoFormTextarea = document.getElementById("verso-form-textarea").value;
 
     if (!disciplinaFormAddCard) {
-      alert("Selecione uma disciplina da lista.");
+      showAppNotification("Selecione uma disciplina da lista.");
       return;
     }
     const matterIsListed = addCardOptions.materias.some(item =>
@@ -1612,7 +1754,7 @@ function cancelEditMode() {
       item.materia.toLocaleLowerCase("pt-BR") === materiaFormAddCard.toLocaleLowerCase("pt-BR")
     );
     if (!matterIsListed) {
-      alert("Selecione uma matéria cadastrada para essa disciplina na aba APOIO.");
+      showAppNotification("Selecione uma matéria cadastrada para essa disciplina na aba APOIO.");
       return;
     }
 
@@ -1640,23 +1782,23 @@ function cancelEditMode() {
         await fetchAddCardOptions();
         await fetchFilters();
         await fetchCards();
-        const savedCardIndex = data.findIndex(card => savedCard.id
-          ? String(card.id) === String(savedCard.id)
-          : Number(card.linha) === Number(savedCard.linha));
+        const savedCardIndex = data.findIndex(card =>
+          String(card.id) === String(savedCard.id)
+        );
         if (savedCardIndex >= 0) {
           data.unshift(data.splice(savedCardIndex, 1)[0]);
           currentCardIndex = 0;
           renderCard();
         }
-        alert("Novo cartão adicionado com sucesso!");
+        showAppNotification("Novo cartão adicionado com sucesso!");
       } catch (refreshError) {
         console.error("Cartão salvo, mas a lista não pôde ser atualizada:", refreshError);
-        alert("O cartão foi salvo na planilha, mas não foi possível atualizar a lista. Recarregue o app para vê-lo.");
+        showAppNotification("O cartão foi salvo na planilha, mas não foi possível atualizar a lista. Recarregue o app para vê-lo.");
       }
     } catch (error) {
       console.error("Erro ao adicionar o cartão:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      alert(`Não foi possível adicionar o cartão. ${detail}`);
+      showAppNotification(`Não foi possível adicionar o cartão. ${detail}`);
     } finally {
       saveAddCardButton.disabled = false;
       cancelAddCard.disabled = false;
