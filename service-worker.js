@@ -1,4 +1,4 @@
-const CACHE_NAME = "memofull-shell-v10";
+const CACHE_NAME = "memofull-shell-v14";
 const APP_SHELL = [
   "./",
   "./index.html",
