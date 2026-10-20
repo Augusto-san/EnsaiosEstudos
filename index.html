@@ -22,6 +22,57 @@
   -->
   
   <style>
+    :root {
+      --color-page-background: #3a3a3a;
+      --color-panel-background: #2a2a2a;
+      --color-card-background: #313131;
+      --color-field-background: #4a4a4a;
+      --color-control-background: #555555;
+      --color-control-hover: #413f3f;
+      --color-control-active: #477d14;
+      --color-action-background: #3f7f04;
+      --color-overlay: rgba(0, 0, 0, 0.65);
+      --color-access-overlay: rgba(42, 42, 42, 0.98);
+      --color-filter-background: #fff;
+      --color-notification-background: #e6c300;
+
+      --color-text-primary: #c5c5c5;
+      --color-text-secondary: #e5e5e5;
+      --color-text-muted: #bdbdbd;
+      --color-text-heading: #656565;
+      --color-text-on-accent: #2a2a2a;
+      --color-text-on-notification: #424242;
+      --color-text-filter: #0063cb;
+      --color-link: #6495ed;
+
+      --color-accent: #81ce39;
+      --color-accent-yellow: #ffc100;
+      --color-accent-gold: #ffd700;
+      --color-notification-border: #ffe033;
+      --color-danger: #ff0202;
+
+      --color-border: #ccc;
+      --color-border-medium: #777;
+      --color-border-dark: #666;
+
+      --radius-scrollbar: 4px;
+      --radius-button: 5px;
+      --radius-control: 6px;
+      --radius-field: 7px;
+      --radius-surface: 8px;
+      --radius-dialog: 10px;
+      --radius-circle: 50%;
+
+      --shadow-header: 0 2px 5px rgba(0, 0, 0, 0.1);
+      --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.45);
+      --shadow-input-focus: 0 0 0 2px rgba(129, 206, 57, 0.2);
+      --shadow-button: 0 2px 5px rgba(0, 0, 0, 0.32);
+      --shadow-button-hover: 0 4px 8px rgba(0, 0, 0, 0.4);
+      --shadow-button-active: 0 1px 3px rgba(0, 0, 0, 0.35);
+      --shadow-notification: 0 3px 12px rgba(0, 0, 0, 0.35);
+      --shadow-side-menu: 2px 0 5px rgba(0, 0, 0, 0.5);
+    }
+
     /* Reset básico */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -34,8 +85,8 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background-color: #3a3a3a;
-      color: #FFF;
+      background-color: var(--color-page-background);
+      color: var(--color-text-primary);
       font-size: clamp(1rem, 2.5vw, 2rem);
       line-height: 1.5;
     }
@@ -44,9 +95,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #2a2a2a;
+      background-color: var(--color-panel-background);
       padding: 2px/*15px*/;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-header);
       z-index: 1000;
       position: fixed;
       width: 100%;
@@ -67,7 +118,7 @@
       height: 44px;
       background: none;
       border: none;
-      color: #FFF;
+      color: var(--color-text-primary);
       cursor: pointer;
       padding: 8px;
     }
@@ -100,8 +151,8 @@
       justify-content: center;
       overflow-y: auto;
       padding: 24px;
-      background: rgba(42, 42, 42, 0.98);
-      color: #fff;
+      background: var(--color-access-overlay);
+      color: var(--color-text-primary);
     }
 
     #api-access-gate[hidden],
@@ -112,38 +163,38 @@
     .api-access-panel {
       width: min(100%, 460px);
       padding: clamp(20px, 5vw, 32px);
-      border: 1px solid #81ce39;
-      border-radius: 10px;
-      background: #2a2a2a;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--color-accent);
+      border-radius: var(--radius-dialog);
+      background: var(--color-panel-background);
+      box-shadow: var(--shadow-panel);
       font-size: 16px;
       line-height: 1.45;
     }
 
     .api-access-brand {
       margin: 0 0 18px;
-      color: #fff;
+      color: var(--color-text-primary);
       font-size: 24px;
       text-align: center;
     }
 
     #api-access-title {
       margin: 0 0 8px;
-      color: #81ce39;
+      color: var(--color-accent);
       font-size: 21px;
       text-align: center;
     }
 
     .api-access-copy {
       margin: 0 0 20px;
-      color: #e5e5e5;
+      color: var(--color-text-secondary);
       text-align: center;
     }
 
     #api-access-form label {
       display: block;
       margin-bottom: 6px;
-      color: #81ce39;
+      color: var(--color-accent);
       font-size: 14px;
     }
 
@@ -157,27 +208,27 @@
       width: 0;
       min-width: 0;
       padding: 11px 12px;
-      border: 1px solid #777;
-      border-radius: 6px;
+      border: 1px solid var(--color-border-medium);
+      border-radius: var(--radius-control);
       outline: none;
-      background: #4a4a4a;
-      color: #fff;
+      background: var(--color-field-background);
+      color: var(--color-text-primary);
       font: inherit;
       font-size: 14px;
     }
 
     #api-link-input:focus {
-      border-color: #81ce39;
-      box-shadow: 0 0 0 2px rgba(129, 206, 57, 0.2);
+      border-color: var(--color-accent);
+      box-shadow: var(--shadow-input-focus);
     }
 
     #api-link-visibility {
       flex: 0 0 auto;
       padding: 0 12px;
-      border: 1px solid #666;
-      border-radius: 6px;
-      background: #4a4a4a;
-      color: #fff;
+      border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-control);
+      background: var(--color-field-background);
+      color: var(--color-text-primary);
       font-size: 13px;
       cursor: pointer;
     }
@@ -187,9 +238,9 @@
       margin-top: 14px;
       padding: 12px;
       border: 0;
-      border-radius: 6px;
-      background: #ffc100;
-      color: #2a2a2a;
+      border-radius: var(--radius-control);
+      background: var(--color-accent-yellow);
+      color: var(--color-text-on-accent);
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
@@ -208,17 +259,17 @@
     }
 
     #api-access-status {
-      color: #e5e5e5;
+      color: var(--color-text-secondary);
     }
 
     #api-access-error {
-      color: #ffc100;
+      color: var(--color-accent-yellow);
     }
 
     .api-access-note {
       display: block;
       margin-top: 16px;
-      color: #bdbdbd;
+      color: var(--color-text-muted);
       font-size: 12px;
       text-align: center;
     }
@@ -230,19 +281,21 @@
 
     .content.no-review-session .buttons-container-header #add-button {
       flex: 1 1 0;
+      width: auto;
+      min-width: 0;
     }
 
     a {
-      color: #6495ed;
+      color: var(--color-link);
     }
     
     .flashcard {
-      border: 1px solid #81ce39;
+      border: 1px solid var(--color-accent);
       padding: 15px;
       margin: 10px 0px;
       text-align: center; /*justify;*/
-      background-color: #4a4a4a;
-      border-radius: 8px;
+      background-color: var(--color-card-background);
+      border-radius: var(--radius-surface);
       width: 90%;
       /*max-width: 95%;*/
       font-size: clamp(1.1rem, 2vw, 1.3rem);
@@ -257,27 +310,44 @@
       left: 0; 
       width: 100%; 
       height: 100%; 
+      height: 100dvh;
+      box-sizing: border-box;
+      overflow-x: hidden;
       overflow-y: auto;
-      background: #3a3a3a; /*rgba(0, 0, 0, 0.8);*/ 
-      color: white; 
+      background: var(--color-page-background);
+      color: var(--color-text-primary);
       z-index: 9999;
     }
 
     #disciplina-form-add-card, #materia-form-add-card{
-      border-radius: 7px;
+      border-radius: var(--radius-field);
     }
 
     #add-card-modal-in{
-      max-width: 500px; 
-      /*margin: 50px auto;*/ 
-      padding: 20px; 
-      background: #2a2a2a; /*black;*/ 
-      border-radius: 5px;
+      width: 100%;
+      max-width: none;
+      min-height: 100%;
+      min-height: 100dvh;
+      box-sizing: border-box;
+      padding: 20px 16px 0;
+      background: var(--color-panel-background);
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
     }
 
 
     #add-card-modal-in > h2 {
       text-align: center;
+      margin-top: 0;
+    }
+
+    #add-card-form {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      width: 100%;
+      min-width: 0;
     }
 
     #frente-form-textarea, #verso-form-textarea {
@@ -286,14 +356,14 @@
      box-sizing: border-box;
      overflow-y: hidden;
      resize: none;
-     border-radius: 7px;
+      border-radius: var(--radius-field);
      font: inherit;
      line-height: inherit;
      text-align: justify;
     }
 
     .label-add-card-form, #add-card-modal-in > h2 {
-      color: #81ce39;
+      color: var(--color-accent);
     }
 
     #front-content, #back-content {
@@ -304,14 +374,14 @@
 
     .front, .back {
       border: none;
-      color: #FFF;
+      color: var(--color-text-primary);
     }
 
     .card-heading {
       display: block;
       width: 100%;
       font-family: system-ui;
-      color: #656565;
+      color: var(--color-text-heading);
       font-weight: 700;
       line-height: 1.3;
     }
@@ -347,7 +417,7 @@
     .card-metadata-field label {
       display: block;
       margin-bottom: 5px;
-      color: #81ce39;
+      color: var(--color-accent);
       font-size: 14px;
     }
 
@@ -356,10 +426,10 @@
       width: 100%;
       box-sizing: border-box;
       padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      background-color: #fff;
-      color: #0063cb;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-field);
+      background-color: var(--color-card-background);
+      color: var(--color-text-primary);
       font: inherit;
     }
 
@@ -367,7 +437,7 @@
       width: 100%;
       border: none;
       height: 1px;
-      background-color: #81ce39;
+      background-color: var(--color-accent);
       margin: 20px 0;
     }
 
@@ -381,22 +451,22 @@
     #back-edit, #front-edit{
       width: 100%;
       height: 400px;
-      color: #000000;
-      background-color: #ffffff;
+      color: var(--color-text-primary);
+      background-color: var(--color-card-background);
       font-family: Arial, sans-serif;
       overflow-y: scroll;
       max-width: 100%;
       min-width: 100%;
       line-height: 1.5;
       font-size: clamp(1rem, 2.5vw, 2rem);
-      border-radius: 5px;
+      border-radius: var(--radius-button);
       padding: 15px;
       text-align: justify;
     }
 
 
     .footer {
-      background-color: #2a2a2a;
+      background-color: var(--color-panel-background);
       padding: 15px 0;
       display: flex;
       flex-direction: column;
@@ -404,6 +474,41 @@
       position: sticky;
       bottom: 0;
       width: 100%;
+    }
+
+    body.add-card-modal-open #review-footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.add-card-modal-open #mostrar-btn,
+    body.add-card-modal-open #navigation-buttons,
+    body.card-edit-open #mostrar-btn,
+    body.card-edit-open #navigation-buttons {
+      display: none;
+    }
+
+    .footer-action-buttons {
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .footer-action-buttons[hidden] {
+      display: none;
+    }
+
+    .footer-action-buttons button {
+      flex: 1 1 0;
+      min-width: 0;
+      margin: 2%;
+    }
+
+    body.add-card-modal-open #add-card-modal-in {
+      padding-bottom: var(--add-card-footer-space, 120px);
     }
 
     .flashcard[hidden],
@@ -448,12 +553,12 @@
     }
 
     .buttons-container-header::-webkit-scrollbar-thumb {
-      background: #81ce39; /* Cor da barra de rolagem */
-      border-radius: 4px;
+      background: var(--color-accent); /* Cor da barra de rolagem */
+      border-radius: var(--radius-scrollbar);
     }
 
     .buttons-container-header::-webkit-scrollbar-track {
-      background: #555555; /* Cor do fundo da barra de rolagem */
+      background: var(--color-control-background); /* Cor do fundo da barra de rolagem */
     }
 
 
@@ -486,10 +591,10 @@
       font-size: 16px;
       line-height: 24px;
       border: none;
-      border-radius: 5px;
+      border-radius: var(--radius-button);
       cursor: pointer;
-      background-color: #555555; /*#81ce39;*/
-      color: #FFF;
+      background-color: var(--color-control-background);
+      color: var(--color-text-primary);
       transition: background-color 0.3s;
     }
 
@@ -518,17 +623,17 @@
       font-size: 16px;
       line-height: 24px;
       border: none;
-      border-radius: 5px;
+      border-radius: var(--radius-button);
       cursor: pointer;
-      background-color: #555555; /*#81ce39;*/
-      color: #FFF;
+      background-color: var(--color-control-background);
+      color: var(--color-text-primary);
       transition: background-color 0.3s;
       scroll-snap-align: start;
     }
 
     .buttons-container button.active, .buttons-container-header button.active {
-      background-color:#477d14;
-      color: #FFF;
+      background-color: var(--color-control-active);
+      color: var(--color-text-primary);
     }
 
     .buttons-container button.review-locked {
@@ -543,7 +648,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: rgba(0, 0, 0, 0.65);
+      background-color: var(--color-overlay);
       opacity: 0;
       visibility: hidden;
       transition: opacity 180ms ease, visibility 180ms;
@@ -557,15 +662,15 @@
     }
 
     .loader {
-      --color-1: #fff;
-      --color-2: #FFC100;
+      --color-1: var(--color-text-primary);
+      --color-2: var(--color-accent-yellow);
       --size: 1px;
 
       width: calc(48 * var(--size));
       height: calc(48 * var(--size));
       border: calc(5 * var(--size)) solid var(--color-1);
       border-bottom-color: var(--color-2);
-      border-radius: 50%;
+      border-radius: var(--radius-circle);
       display: inline-block;
       box-sizing: border-box;
       animation: rotation 1s linear infinite;
@@ -592,7 +697,7 @@
     }
 
     #favorite-button.active {
-      color: #FFD700;
+      color: var(--color-accent-gold);
     }
 
     #app-notification {
@@ -602,11 +707,11 @@
       z-index: 10001;
       max-width: calc(100vw - 32px);
       padding: 10px 16px;
-      border: 1px solid #ffe033;
-      border-radius: 8px;
-      background-color: #e6c300;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
-      color: #424242;
+      border: 1px solid var(--color-notification-border);
+      border-radius: var(--radius-surface);
+      background-color: var(--color-notification-background);
+      box-shadow: var(--shadow-notification);
+      color: var(--color-text-on-notification);
       font-size: 16px;
       line-height: 1.4;
       text-align: center;
@@ -630,8 +735,8 @@
     }
     
     .buttons-container button:hover, .buttons-container-header button:hover {
-      background-color: #413f3f; /*#6da32e;*/
-      border: 2px dotted #81ce39;
+      background-color: var(--color-control-hover);
+      border: 2px dotted var(--color-accent);
     }
 
     .add-card-formulario {
@@ -639,6 +744,20 @@
       max-width: 100%;
       min-width: 100%;
       margin-bottom: 10px;
+      background-color: var(--color-card-background);
+      color: var(--color-text-primary);
+    }
+
+    .add-card-formulario::placeholder,
+    .card-metadata-field input::placeholder {
+      color: var(--color-text-primary);
+      opacity: 1;
+    }
+
+    #add-card-form .add-card-formulario option,
+    .card-metadata-field select option {
+      background-color: var(--color-card-background);
+      color: var(--color-text-primary);
     }
 
     input.add-card-formulario,
@@ -675,15 +794,15 @@
       padding: 10px;
       font-size: 21px;
       border: none;
-      border-radius: 5px;
+      border-radius: var(--radius-button);
       cursor: pointer;
-      background-color: #555;
-      color: #FFF;
+      background-color: var(--color-control-background);
+      color: var(--color-text-primary);
     }
 
     .navigation-buttons button:hover {
-      background-color: #413f3f; /*#444;*/
-      border: 2px dotted #81ce39;
+      background-color: var(--color-control-hover);
+      border: 2px dotted var(--color-accent);
     }
 
     .side-menu {
@@ -692,9 +811,10 @@
       left: -300px;
       width: 300px;
       height: 100%;
-      background-color: #2a2a2a;
-      color: #FFF;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+      background-color: var(--color-panel-background);
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-side-menu);
       padding: 20px;
       transition: left 0.3s ease;
       z-index: 1000;
@@ -712,14 +832,14 @@
 
     .menu-header h3 {
       margin: 0;
-      color: #81ce39;
+      color: var(--color-accent);
     }
 
     #close-menu {
       font-size: 20px;
       background: none;
       border: none;
-      color: #ff0202;
+      color: var(--color-danger);
       cursor: pointer;
     }
 
@@ -731,7 +851,7 @@
       display: block;
       margin-bottom: 5px;
       font-size: 14px;
-      color: #81ce39;
+      color: var(--color-accent);
     }
 
     .filters select,
@@ -740,16 +860,16 @@
       margin-bottom: 8px;
       padding: 8px;
       font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      color: #0063cb; /*000;*/
+      border-radius: var(--radius-button);
+      border: 1px solid var(--color-border);
+      background-color: var(--color-filter-background);
+      color: var(--color-text-filter);
     }
 
     .filters .filter-help {
       display: block;
       margin: -2px 0 10px;
-      color: #fff;
+      color: var(--color-text-primary);
       font-size: 12px;
       line-height: 1.35;
     }
@@ -758,17 +878,17 @@
       width: 100%;
       height: 1px;
       margin: 0 0 14px;
-      background-color: #81ce39;
+      background-color: var(--color-accent);
     }
 
     #apply-filters, #clear-filters {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-      background-color: #3f7f04; /*81ce39;*/
-      color: #FFF;
+      background-color: var(--color-action-background);
+      color: var(--color-text-primary);
       border: none;
-      border-radius: 5px;
+      border-radius: var(--radius-button);
       cursor: pointer;
       transition: background-color 0.3s;
       margin-bottom: 10px;
@@ -777,7 +897,31 @@
     #apply-filters:hover, #clear-filters:hover,
     #apply-filters:focus, #clear-filters:focus,
     #apply-filters:active, #clear-filters:active {
-      background-color: #3f7f04;
+      background-color: var(--color-action-background);
+    }
+
+    button,
+    .buttons-container button,
+    .buttons-container-header button,
+    .navigation-buttons button,
+    .footer-action-buttons button,
+    #apply-filters,
+    #clear-filters {
+      box-shadow: var(--shadow-button);
+      transition: background-color 0.3s, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    button:not(:disabled):hover {
+      box-shadow: var(--shadow-button-hover);
+    }
+
+    button:not(:disabled):active {
+      transform: translateY(1px);
+      box-shadow: var(--shadow-button-active);
+    }
+
+    button:disabled {
+      box-shadow: none;
     }
 
 
@@ -840,6 +984,11 @@
           <option value="todos">Todos</option>
         </select>
       <div class="field-divider" aria-hidden="true"></div>
+      <label for="assunto-filter">Assunto:</label>
+        <select id="assunto-filter">
+          <option value="todos">Todos</option>
+        </select>
+      <div class="field-divider" aria-hidden="true"></div>
       <label for="resultado-filter">Resultado:</label>
         <select id="resultado-filter">
           <option value="todos">Todos</option>
@@ -892,8 +1041,8 @@
           <select id="edit-card-matter"></select>
         </div>
         <div class="card-metadata-field">
-          <label for="edit-card-content">Conteúdo do cabeçalho</label>
-          <input id="edit-card-content" type="text" autocomplete="off" placeholder="Opcional">
+          <label for="edit-card-assunto">Assunto</label>
+          <input id="edit-card-assunto" type="text" autocomplete="off" placeholder="Opcional">
         </div>
       </div>
       <div class="front" id="cabecalho-frente"></div>
@@ -920,6 +1069,9 @@
             <option value="">Selecione uma disciplina primeiro</option>
           </select>
           <div class="field-divider" aria-hidden="true"></div>
+          <label class="label-add-card-form" for="assunto-form-add-card">Assunto</label>
+          <input id="assunto-form-add-card" name="assunto-form-add-card" type="text" autocomplete="off" class="add-card-formulario" placeholder="Opcional">
+          <div class="field-divider" aria-hidden="true"></div>
           <label class="label-add-card-form" for="frente-form-textarea">Frente</label>
             <textarea id="frente-form-textarea" name="frente-form-textarea" required class="add-card-formulario"></textarea>
           <div class="field-divider" aria-hidden="true"></div>
@@ -927,10 +1079,6 @@
             <textarea id="verso-form-textarea" name="verso-form-textarea" required class="add-card-formulario"></textarea>
           <div class="field-divider" aria-hidden="true"></div>
 
-          <div class="buttons-container">
-            <button type="button" id="cancel-add-card" style="margin-right: 10px;">CANCELAR</button>
-            <button type="submit" id="save-add-card">SALVAR</button>
-          </div>
         </form>
       </div>
     </div>
@@ -951,6 +1099,11 @@
     <div class="navigation-buttons" id="navigation-buttons" hidden>
       <button id="anterior-btn">ᐊ</button>
       <button id="proximo-btn">ᐅ</button>
+    </div>
+    <div class="buttons-container footer-action-buttons" id="edit-footer-actions" hidden></div>
+    <div class="buttons-container footer-action-buttons" id="add-card-footer-actions" hidden>
+      <button type="button" id="cancel-add-card">❌</button>
+      <button type="submit" id="save-add-card" form="add-card-form">💾</button>
     </div>
   </div>
 
@@ -1301,7 +1454,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   function setReviewSurfaceVisible(isVisible) {
-    document.querySelector(".content").classList.toggle("no-review-session", !isVisible);
+    const content = document.querySelector(".content");
+    content.classList.toggle("no-review-session", !isVisible);
+    document.getElementById("add-button").style.removeProperty("flex");
     document.getElementById("flashcard").hidden = !isVisible;
     document.getElementById("review-footer").hidden = !isVisible;
   }
@@ -1441,7 +1596,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (page.cards.length > 75 || page.cards.some(card =>
       !card || typeof card !== "object" ||
       !Object.prototype.hasOwnProperty.call(card, "materia") ||
-      !Object.prototype.hasOwnProperty.call(card, "conteudo") ||
+      !Object.prototype.hasOwnProperty.call(card, "assunto") ||
       !Object.prototype.hasOwnProperty.call(card, "resultado") ||
       !Object.prototype.hasOwnProperty.call(card, "qtd_acertos") ||
       !Object.prototype.hasOwnProperty.call(card, "qtd_erros") ||
@@ -1457,6 +1612,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return options &&
       Array.isArray(options.disciplinas) &&
       Array.isArray(options.materias) &&
+      Array.isArray(options.assuntos) &&
       Array.isArray(options.resultados) &&
       Array.isArray(options.datas);
   }
@@ -1614,6 +1770,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     updateDisciplineFilter(options.disciplinas, selected.disciplina);
     updateMatterFilter(options.materias, selected.materia);
+    updateAssuntoFilter(options.assuntos, selected.assunto);
     updateResultFilter(options.resultados, selected.resultado);
     updateDataFilter(options.datas, selected.dataRevisao);
     const favoritesFilter = document.getElementById("favoritos-filter");
@@ -1710,6 +1867,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     populateFilterSelect("materia-filter", values, selectedValue);
   }
 
+  function updateAssuntoFilter(values, selectedValue) {
+    populateFilterSelect("assunto-filter", values, selectedValue);
+  }
+
   function updateResultFilter(values, selectedValue) {
     populateFilterSelect("resultado-filter", values, selectedValue);
   }
@@ -1722,6 +1883,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return {
       disciplina: document.getElementById("disciplina-filter").value,
       materia: document.getElementById("materia-filter").value,
+      assunto: document.getElementById("assunto-filter").value,
       resultado: document.getElementById("resultado-filter").value,
       dataRevisao: document.getElementById("data-filter").value,
       favoritos: document.getElementById("favoritos-filter").value
@@ -1753,9 +1915,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   async function refreshDependentFilterOptions(changedFilter) {
     if (changedFilter === "disciplina") {
       document.getElementById("materia-filter").value = "todos";
+      document.getElementById("assunto-filter").value = "todos";
       document.getElementById("resultado-filter").value = "todos";
       document.getElementById("data-filter").value = "todos";
     } else if (changedFilter === "materia") {
+      document.getElementById("assunto-filter").value = "todos";
+      document.getElementById("resultado-filter").value = "todos";
+      document.getElementById("data-filter").value = "todos";
+    } else if (changedFilter === "assunto") {
       document.getElementById("resultado-filter").value = "todos";
       document.getElementById("data-filter").value = "todos";
     } else if (changedFilter === "resultado") {
@@ -1765,10 +1932,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const requestId = ++filterOptionsRequestId;
     const selections = getSelectedReviewFilters();
     const dependentIds = changedFilter === "disciplina"
-      ? ["materia-filter", "resultado-filter", "data-filter"]
+      ? ["materia-filter", "assunto-filter", "resultado-filter", "data-filter"]
       : changedFilter === "materia"
-        ? ["resultado-filter", "data-filter"]
-        : ["data-filter"];
+        ? ["assunto-filter", "resultado-filter", "data-filter"]
+        : changedFilter === "assunto"
+          ? ["resultado-filter", "data-filter"]
+          : ["data-filter"];
     dependentIds.forEach(id => { document.getElementById(id).disabled = true; });
     try {
       const options = await callAppsScript("getFilterOptions", selections);
@@ -1791,7 +1960,7 @@ async function applyFilters(options = {}) {
   if (isChangingReviewContext) return false;
   const idCartaoFilter = readCardIdFilter();
   if (idCartaoFilter === undefined) return false;
-  if (["materia-filter", "resultado-filter", "data-filter"].some(id =>
+  if (["materia-filter", "assunto-filter", "resultado-filter", "data-filter"].some(id =>
     document.getElementById(id).disabled
   )) {
     showAppNotification("Aguarde a atualização das opções dos filtros.");
@@ -1838,7 +2007,7 @@ async function applyFilters(options = {}) {
     const container = document.createElement("span");
     const label = document.createElement("span");
     const dataLines = document.createElement("span");
-    const headingParts = [card.disciplina, card.materia, card.conteudo]
+    const headingParts = [card.disciplina, card.materia, card.assunto]
       .map(value => String(value == null ? "" : value).trim())
       .filter(Boolean);
 
@@ -2062,23 +2231,26 @@ async function clearFilters() {
 
     document.getElementById("disciplina-filter").value = "todos";
     document.getElementById("materia-filter").value = "todos";
+    document.getElementById("assunto-filter").value = "todos";
     document.getElementById("resultado-filter").value = "todos";
     document.getElementById("data-filter").value = "todos";
     document.getElementById("favoritos-filter").value = "todos";
     document.getElementById("id-cartao-filter").value = "";
     filterOptionsRequestId += 1;
-    ["materia-filter", "resultado-filter", "data-filter"].forEach(id => {
+    ["materia-filter", "assunto-filter", "resultado-filter", "data-filter"].forEach(id => {
       document.getElementById(id).disabled = false;
     });
     try {
       const filterOptions = await callAppsScript("getFilterOptions", {
         disciplina: "todos",
         materia: "todos",
+        assunto: "todos",
         resultado: "todos"
       });
       populateFilters(filterOptions, {
         disciplina: "todos",
         materia: "todos",
+        assunto: "todos",
         resultado: "todos",
         dataRevisao: "todos",
         favoritos: "todos"
@@ -2160,6 +2332,10 @@ async function clearFilters() {
 
   document.getElementById("materia-filter").addEventListener("change", () => {
     refreshDependentFilterOptions("materia");
+  });
+
+  document.getElementById("assunto-filter").addEventListener("change", () => {
+    refreshDependentFilterOptions("assunto");
   });
 
   document.getElementById("resultado-filter").addEventListener("change", () => {
@@ -2261,6 +2437,28 @@ let isEditing = false;
 let isSavingEdit = false;
 let originalFrontText = ""; //mantém as informações atuais do card frente
 let originalBackText = ""; //mantém as informações atuais do card trás
+const editFooterActions = document.getElementById("edit-footer-actions");
+const editActionPlaceholders = new Map();
+
+function moveEditActionToFooter(button) {
+  const headerActions = document.querySelector(".buttons-container-header");
+  if (button.parentElement === headerActions) {
+    const placeholder = document.createComment(`restore-${button.id}`);
+    headerActions.insertBefore(placeholder, button);
+    editActionPlaceholders.set(button, placeholder);
+  }
+  editFooterActions.appendChild(button);
+}
+
+function restoreEditActionToHeader(button) {
+  const placeholder = editActionPlaceholders.get(button);
+  if (placeholder && placeholder.parentNode) {
+    placeholder.parentNode.replaceChild(button, placeholder);
+  } else {
+    document.querySelector(".buttons-container-header").appendChild(button);
+  }
+  editActionPlaceholders.delete(button);
+}
 
 function classificationValueKey(value) {
   return normalizeFilterOptionLabel(value).toLocaleLowerCase("pt-BR");
@@ -2340,7 +2538,7 @@ function populateEditCardMetadata(card) {
   );
   disciplineSelect.value = matchingDiscipline ? matchingDiscipline.value : "";
   updateEditCardMatterOptions(card, currentMatter);
-  document.getElementById("edit-card-content").value = String(card.conteudo == null ? "" : card.conteudo);
+  document.getElementById("edit-card-assunto").value = String(card.assunto == null ? "" : card.assunto);
   disciplineSelect.onchange = () => updateEditCardMatterOptions(card);
   editor.hidden = false;
 }
@@ -2375,9 +2573,6 @@ async function toggleEditMode() {
     const bordaButton = document.getElementById("borda-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
-  const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
-  const divFooter = document.querySelector(".footer");
-  const resultButtons = document.getElementById("result-buttons");
   const metadataEditor = document.getElementById("card-metadata-editor");
   let refreshFiltersAfterSave = false;
 
@@ -2406,16 +2601,14 @@ async function toggleEditMode() {
     backContent.replaceChildren(backEditor);
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
 
-    // Itera por todos os botões dentro do container e altera o valor do flex
-    buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "0 0 46%";
-    });
-
     // Alterar texto do botão
     editButton.textContent = "💾";
 
     // Mostrar botões
     cancelButton.style.display = "inline-block"; // botão "Voltar"
+    moveEditActionToFooter(cancelButton);
+    moveEditActionToFooter(editButton);
+    editFooterActions.hidden = false;
     brCopyButton.style.display = "inline-block"; // botão copiar <br>
       boldButton.style.display = "inline-block"; // botão bold <b>
       italicButton.style.display = "inline-block"; // botão itáliico <i>
@@ -2427,11 +2620,8 @@ async function toggleEditMode() {
 
 
 
-    // Ocultar botões e footer
+    // Ocultar apenas os controles da barra superior que não fazem parte da edição.
     addButton.style.display = "none"; // botão adicionar cartão
-    counterButton.style.display = "none"; // contador
-    resultButtons.hidden = true; // botões de classificação de resultado
-    divFooter.style.display = "none"; // footer
     
 
 
@@ -2605,7 +2795,7 @@ async function toggleEditMode() {
     const currentCard = data[currentCardIndex];
     const newDiscipline = document.getElementById("edit-card-discipline").value.trim();
     const newMatter = document.getElementById("edit-card-matter").value.trim();
-    const newContent = document.getElementById("edit-card-content").value;
+    const newAssunto = document.getElementById("edit-card-assunto").value;
 
     if (!newDiscipline || !newMatter) {
       showAppNotification("Selecione uma disciplina e uma matéria para o cartão.");
@@ -2625,13 +2815,13 @@ async function toggleEditMode() {
         ...cardMutationReference(currentCard),
         disciplina: newDiscipline,
         materia: newMatter,
-        conteudo: newContent,
+        assunto: newAssunto,
         frente: newFrontText,
         tras: newBackText
       });
       if (!Object.prototype.hasOwnProperty.call(savedCard, "disciplina") ||
           !Object.prototype.hasOwnProperty.call(savedCard, "materia") ||
-          !Object.prototype.hasOwnProperty.call(savedCard, "conteudo")) {
+          !Object.prototype.hasOwnProperty.call(savedCard, "assunto")) {
         throw new Error("A API não devolveu a classificação atualizada. Publique a versão atual do Apps Script.");
       }
       refreshFiltersAfterSave =
@@ -2639,7 +2829,7 @@ async function toggleEditMode() {
         classificationValueKey(currentCard.materia) !== classificationValueKey(savedCard.materia);
       currentCard.disciplina = savedCard.disciplina;
       currentCard.materia = savedCard.materia;
-      currentCard.conteudo = savedCard.conteudo;
+      currentCard.assunto = savedCard.assunto;
     } catch (error) {
       console.error("Error saving card:", error);
       const detail = error instanceof Error ? error.message : String(error);
@@ -2655,11 +2845,6 @@ async function toggleEditMode() {
     currentCard.frente = newFrontText;
     currentCard.tras = newBackText;
 
-    // Itera por todos os botões dentro do container e altera o valor do flex
-    buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "0 0 46%";
-    });
-
     // Atualizar conteúdos
     frontContent.innerHTML = newFrontText;
     backContent.innerHTML = newBackText;
@@ -2669,6 +2854,10 @@ async function toggleEditMode() {
 
     // Alterar texto do botão
     editButton.textContent = "✎";
+    restoreEditActionToHeader(cancelButton);
+    restoreEditActionToHeader(editButton);
+    editFooterActions.hidden = true;
+    addButton.style.removeProperty("flex");
 
     // Ocultar botões
     cancelButton.style.display = "none"; // botão "cancelar" na ação de edição
@@ -2686,7 +2875,6 @@ async function toggleEditMode() {
     // Mostrar botões e footer
     addButton.style.display = "inline-block"; // botão adicionar cartão
     counterButton.style.display = "inline-block"; // contador
-    divFooter.style.display = "flex"; // footer
     setAnswerVisibility(false);
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
@@ -2696,6 +2884,7 @@ async function toggleEditMode() {
 
 
   isEditing = !isEditing;
+  document.body.classList.toggle("card-edit-open", isEditing);
 
   if (!isEditing && refreshFiltersAfterSave) {
     refreshFiltersAfterSave = false;
@@ -2731,20 +2920,12 @@ function cancelEditMode() {
     const bordaButton = document.getElementById("borda-button");
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
-  const buttonsDivContainerHeader = document.querySelectorAll(".buttons-container-header button");
-  const divFooter = document.querySelector(".footer");
-  const resultButtons = document.getElementById("result-buttons");
   const metadataEditor = document.getElementById("card-metadata-editor");
 
   // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
   if (!confirmCancel) return;
   
-    // Itera por todos os botões dentro do container e altera o valor do flex
-    buttonsDivContainerHeader.forEach(button => {
-        button.style.flex = "0 0 46%";
-    });
-
   // Restaurar os textos originais
   frontContent.innerHTML = originalFrontText;
   backContent.innerHTML = originalBackText;
@@ -2752,6 +2933,10 @@ function cancelEditMode() {
 
   // Alterar texto do botão e esconder botão "Voltar"
   editButton.textContent = "✎";
+  restoreEditActionToHeader(cancelButton);
+  restoreEditActionToHeader(editButton);
+  editFooterActions.hidden = true;
+  addButton.style.removeProperty("flex");
 
   // Ocultar botões
   cancelButton.style.display = "none";
@@ -2768,10 +2953,10 @@ function cancelEditMode() {
   // Exibir botões e footer
   addButton.style.display = "inline-block"; // botão adicionar cartão
   counterButton.style.display = "inline-block"; // contador
-  divFooter.style.display = "flex"; // footer
   setAnswerVisibility(false);
 
   isEditing = false;
+  document.body.classList.remove("card-edit-open");
 }
 
 
@@ -2779,15 +2964,50 @@ function cancelEditMode() {
 
   const addButton = document.getElementById("add-button");
   const addCardModal = document.getElementById("add-card-modal");
+  const addCardModalIn = document.getElementById("add-card-modal-in");
   const addCardForm = document.getElementById("add-card-form");
   const cancelAddCard = document.getElementById("cancel-add-card");
   const saveAddCardButton = document.getElementById("save-add-card");
+  const addCardFooterActions = document.getElementById("add-card-footer-actions");
+  const reviewFooter = document.getElementById("review-footer");
   const disciplineSelect = document.getElementById("disciplina-form-add-card");
   const matterSelect = document.getElementById("materia-form-add-card");
+  const assuntoInput = document.getElementById("assunto-form-add-card");
   const addCardTextareas = [
     document.getElementById("frente-form-textarea"),
     document.getElementById("verso-form-textarea")
   ];
+
+  function updateAddCardFooterSpace() {
+    if (!document.body.classList.contains("add-card-modal-open")) return;
+    const footerHeight = reviewFooter.getBoundingClientRect().height;
+    addCardModalIn.style.setProperty(
+      "--add-card-footer-space",
+      `${Math.ceil(footerHeight + 12)}px`
+    );
+  }
+
+  function setAddCardModalOpen(isOpen) {
+    addCardModal.style.display = isOpen ? "block" : "none";
+    reviewFooter.style.removeProperty("display");
+    document.body.classList.toggle("add-card-modal-open", isOpen);
+
+    if (isOpen) {
+      reviewFooter.hidden = false;
+      addCardFooterActions.hidden = false;
+      requestAnimationFrame(updateAddCardFooterSpace);
+      return;
+    }
+
+    addCardFooterActions.hidden = true;
+    addCardModalIn.style.removeProperty("--add-card-footer-space");
+    reviewFooter.hidden = !activeReviewSessionId;
+  }
+
+  window.addEventListener("resize", updateAddCardFooterSpace);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateAddCardFooterSpace);
+  }
 
   function resizeAddCardTextarea(textarea) {
     textarea.style.height = "auto";
@@ -2811,14 +3031,14 @@ function cancelEditMode() {
     updateAddCardMatterOptions();
   });
 
-  // Mostrar o modal ao clicar no botão "Adicionar"
+  // Mostrar o modal e as ações no rodapé comum.
   addButton.addEventListener("click", () => {
-    addCardModal.style.display = "block";
+    setAddCardModalOpen(true);
   });
 
   // Fechar o modal ao clicar em "Cancelar"
   cancelAddCard.addEventListener("click", () => {
-    addCardModal.style.display = "none";
+    setAddCardModalOpen(false);
     addCardForm.reset(); // Limpar o formulário
     updateAddCardMatterOptions();
   });
@@ -2830,6 +3050,7 @@ function cancelEditMode() {
     // Coletar os dados do formulário
     const disciplinaFormAddCard = disciplineSelect.value.trim();
     const materiaFormAddCard = matterSelect.value.trim();
+    const assuntoFormAddCard = assuntoInput.value.trim();
     const frenteFormTextarea = document.getElementById("frente-form-textarea").value;
     const versoFormTextarea = document.getElementById("verso-form-textarea").value;
 
@@ -2849,19 +3070,20 @@ function cancelEditMode() {
     // Enviar os dados para a API
     saveAddCardButton.disabled = true;
     cancelAddCard.disabled = true;
-    saveAddCardButton.textContent = "SALVANDO...";
+    saveAddCardButton.textContent = "💾";
 
     try {
       const savedCard = await sendApiMutation({
         action: "add",
         disciplina: disciplinaFormAddCard,
         materia: materiaFormAddCard,
+        assunto: assuntoFormAddCard,
         frente: frenteFormTextarea,
         tras: versoFormTextarea
       });
 
       // A confirmação da API significa que a planilha já foi atualizada.
-      addCardModal.style.display = "none";
+      setAddCardModalOpen(false);
       addCardForm.reset();
       updateAddCardMatterOptions();
 
@@ -2886,7 +3108,7 @@ function cancelEditMode() {
     } finally {
       saveAddCardButton.disabled = false;
       cancelAddCard.disabled = false;
-      saveAddCardButton.textContent = "SALVAR";
+      saveAddCardButton.textContent = "💾";
     }
   });
 
