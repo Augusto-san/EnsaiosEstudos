@@ -68,7 +68,10 @@
       --radius-dialog: 10px;
       --radius-circle: 50%;
 
-      --shadow-header: 0 2px 5px rgba(0, 0, 0, 0.1);
+      --review-card-width: 90%;
+
+      --shadow-header: 0 3px 8px rgba(0, 0, 0, 0.38);
+      --shadow-footer: 0 -3px 8px rgba(0, 0, 0, 0.38);
       --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.45);
       --shadow-flashcard: 0 4px 12px rgba(0, 0, 0, 0.38);
       --shadow-input-focus: 0 0 0 2px rgba(197, 197, 197, 0.2);
@@ -113,6 +116,43 @@
       margin: 0;
       flex: 1;
       text-align: center;
+    }
+
+    .header,
+    .menu-header {
+      height: max(48px, calc(2.25em + 4px));
+    }
+
+    #review-result-status {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 60px);
+      left: 50%;
+      z-index: 10007;
+      width: min(var(--review-card-width), calc(100vw - 24px));
+      min-width: 0;
+      margin: 0;
+      padding: 6px 10px;
+      border: 1px solid var(--color-notification-border);
+      border-radius: var(--radius-surface);
+      background-color: var(--color-notification-background);
+      box-shadow: var(--shadow-notification);
+      color: var(--color-text-on-notification);
+      font-size: 14px;
+      line-height: 1.35;
+      text-align: center;
+      transform: translateX(-50%);
+    }
+
+    #review-result-status[hidden] {
+      display: none;
+    }
+
+    #review-result-status[data-state="error"] {
+      border-color: var(--color-danger);
+    }
+
+    #api-access-gate:not([hidden]) ~ #review-result-status {
+      visibility: hidden;
     }
 
     .menu-toggle {
@@ -231,7 +271,7 @@
     #api-link-visibility {
       flex: 0 0 auto;
       padding: 0 12px;
-      border: 1px solid var(--color-border-dark);
+      border: 0;
       border-radius: var(--radius-control);
       background: var(--color-field-background);
       color: var(--color-text-primary);
@@ -243,7 +283,7 @@
       width: 100%;
       margin-top: 14px;
       padding: 12px;
-      border: 0;
+      border: 1px solid var(--color-border-dark);
       border-radius: var(--radius-control);
       background: var(--color-accent-yellow);
       color: var(--color-text-on-accent);
@@ -281,13 +321,13 @@
     }
 
     .content.no-review-session .buttons-container-header {
-      overflow: hidden;
+      overflow: visible;
       padding-bottom: 0;
     }
 
     .content.no-review-session .buttons-container-header #add-button {
-      flex: 1 1 0;
-      width: auto;
+      grid-column: 1 / -1;
+      width: 100%;
       min-width: 0;
     }
 
@@ -317,7 +357,7 @@
       background-color: var(--color-card-background);
       border-radius: var(--radius-surface);
       box-shadow: var(--shadow-flashcard);
-      width: 90%;
+      width: var(--review-card-width);
       /*max-width: 95%;*/
       font-size: clamp(1.1rem, 2vw, 1.3rem);
     }
@@ -341,6 +381,7 @@
       height: 100%; 
       height: 100dvh;
       box-sizing: border-box;
+      padding-top: var(--review-result-status-space, 0px);
       overflow-x: hidden;
       overflow-y: auto;
       background: var(--color-page-background);
@@ -531,6 +572,15 @@
       font: inherit;
     }
 
+    #card-metadata-editor select,
+    #card-metadata-editor input {
+      border-color: var(--color-border-dark);
+    }
+
+    #card-metadata-editor .card-classification-field > label {
+      font-weight: 700;
+    }
+
     .card-classification-field:last-child {
       margin-bottom: 4px;
     }
@@ -540,10 +590,14 @@
     }
 
     .card-metadata-editor {
-      width: 90%;
+      width: var(--review-card-width);
       margin: 14px 0;
+      padding: 15px;
       text-align: left;
+      border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-surface);
       background-color: var(--color-card-background);
+      box-shadow: var(--shadow-flashcard);
     }
 
     .card-image-manager {
@@ -695,6 +749,7 @@
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
+      margin-top: var(--review-result-status-gap, 0px);
       width: 100%;
       min-width: 0;
       min-height: 0;
@@ -752,6 +807,12 @@
 
     .image-manager-dialog .card-image-manager {
       margin: auto 12px;
+      border-color: var(--color-border-dark);
+    }
+
+    .image-manager-dialog .card-image-side,
+    .image-manager-dialog .card-image-file {
+      border-color: var(--color-border-dark);
     }
 
     #image-viewer[hidden] {
@@ -766,6 +827,7 @@
       align-items: center;
       justify-content: center;
       padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
+      padding-top: max(12px, env(safe-area-inset-top, 0px), var(--review-result-status-space, 0px));
       box-sizing: border-box;
       background: rgba(0, 0, 0, 0.88);
     }
@@ -909,6 +971,7 @@
 
     .footer {
       background-color: var(--color-panel-background);
+      box-shadow: var(--shadow-footer);
       padding: 15px 0;
       display: flex;
       flex-direction: column;
@@ -949,9 +1012,20 @@
       display: none;
     }
 
+    body.card-edit-open #favorite-button,
+    body.card-edit-open #counter-button,
+    body.card-edit-open #data-button,
+    body.card-edit-open #excluir-button {
+      display: none !important;
+    }
+
+    body.add-card-modal-open #show-answer-actions,
+    body.add-card-modal-open #hide-answer-actions,
     body.add-card-modal-open #mostrar-btn,
     body.add-card-modal-open #result-buttons,
     body.add-card-modal-open #navigation-buttons,
+    body.card-edit-open #show-answer-actions,
+    body.card-edit-open #hide-answer-actions,
     body.card-edit-open #mostrar-btn,
     body.card-edit-open #result-buttons,
     body.card-edit-open #ocultar-btn,
@@ -993,40 +1067,21 @@
     }
 
     #result-buttons[hidden],
-    #ocultar-btn[hidden] {
+    #ocultar-btn[hidden],
+    #show-answer-actions[hidden],
+    #hide-answer-actions[hidden] {
       display: none;
     }
 
     .buttons-container-header {
-      display: flex;
-      flex-direction: row; /*column;*/
-      flex-wrap: nowrap;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 10px;
       width: 100%;
-      max-width: 95%;
+      max-width: var(--review-card-width);
       margin: 0 auto;
-      /*margin-bottom: 10px;*/
-      overflow-x: auto;
-      overflow-y: hidden;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 10px; /*Para evitar que a barra de rolagem sobreponha os botões*/
-    }
-
-    .buttons-container-header::-webkit-scrollbar {
-      height: 8px; /* Altura da barra de rolagem */
-    }
-
-    .buttons-container-header::-webkit-scrollbar-thumb {
-      background: var(--color-accent); /* Cor da barra de rolagem */
-      border-radius: var(--radius-scrollbar);
-    }
-
-    .buttons-container-header::-webkit-scrollbar-track {
-      background: var(--color-control-background); /* Cor do fundo da barra de rolagem */
+      overflow: visible;
     }
 
 
@@ -1077,16 +1132,10 @@
      */
 
     .buttons-container-header button {
-      flex: 0 0 46%;
-      min-width: 48px;
-      /*0 0 20%;  
-      FLEX-GROW: 0; o item não crescerá mesmo que haja espaço extra no container 
-
-      FLEX-SHRINK: 0; o item não encolherá mesmo que o container não tenha espaço suficiente
-
-      FLEX-BASIS: 25%; define o tamanho inicial do item como 25% proporcional ao container
-      */
-      margin: 2% 2%;
+      width: 100%;
+      min-width: 0;
+      min-height: 54px;
+      margin: 0;
       padding: 15px;
       font-size: 16px;
       line-height: 24px;
@@ -1096,7 +1145,6 @@
       background-color: var(--color-control-background);
       color: var(--color-text-primary);
       transition: background-color 0.3s;
-      scroll-snap-align: start;
     }
 
     .buttons-container button.active, .buttons-container-header button.active {
@@ -1225,6 +1273,11 @@
       background-color: var(--color-review-error-hover);
     }
 
+    #result-buttons button[aria-pressed="true"] {
+      outline: 3px solid var(--color-text-primary);
+      outline-offset: 2px;
+    }
+
     .add-card-formulario {
       width: 100%;
       max-width: 100%;
@@ -1293,44 +1346,90 @@
 
     .side-menu {
       position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100%;
-      overflow-y: auto;
-      background-color: var(--color-panel-background);
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      max-width: none;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--color-page-background);
       color: var(--color-text-primary);
       box-shadow: var(--shadow-side-menu);
-      padding: 20px;
-      transition: left 0.3s ease;
-      z-index: 1000;
+      padding: 0;
+      padding-top: var(--review-result-status-menu-space, env(safe-area-inset-top, 0px));
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 10001;
     }
 
     .side-menu.open {
-      left: 0;
+      transform: translateX(0);
+    }
+
+    body.filters-menu-open {
+      overflow: hidden;
     }
 
     .menu-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      flex: 0 0 auto;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      min-height: 0;
+      padding: 2px calc(64px + env(safe-area-inset-right, 0px)) 2px calc(64px + env(safe-area-inset-left, 0px));
+      background-color: var(--color-panel-background);
+      box-shadow: var(--shadow-header);
     }
 
     .menu-header h3 {
       margin: 0;
+      flex: 1 1 auto;
       color: var(--color-accent);
+      text-align: center;
+      font-size: 1.5em;
+      line-height: inherit;
     }
 
     #close-menu {
+      position: absolute;
+      top: 50%;
+      right: calc(12px + env(safe-area-inset-right, 0px));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: var(--radius-button);
       font-size: 20px;
       background: none;
       border: none;
       color: var(--color-danger);
       cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    #close-menu,
+    #close-menu:hover,
+    #close-menu:focus,
+    #close-menu:active {
+      box-shadow: none;
     }
 
     .filters {
-      margin-top: 16px;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: min(100%, 680px);
+      margin: 0 auto;
+      padding: 18px 24px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     .filters label {
@@ -1372,7 +1471,10 @@
     }
 
     #apply-filters, #clear-filters {
-      width: 100%;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 48px;
+      width: auto;
       padding: 10px;
       font-size: 16px;
       background-color: var(--color-action-background);
@@ -1381,7 +1483,24 @@
       border-radius: var(--radius-button);
       cursor: pointer;
       transition: background-color 0.3s;
-      margin-bottom: 10px;
+      margin: 0;
+    }
+
+    .filter-menu-footer {
+      position: relative;
+      flex: 0 0 auto;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      gap: 12px;
+      padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+      background-color: var(--color-panel-background);
+    }
+
+    .filter-menu-footer > #apply-filters,
+    .filter-menu-footer > #clear-filters {
+      flex: 0 0 auto;
+      width: 100%;
     }
 
     #apply-filters:hover, #clear-filters:hover,
@@ -1414,6 +1533,12 @@
       box-shadow: none;
     }
 
+    .header .menu-toggle,
+    .header .menu-toggle:hover,
+    .header .menu-toggle:focus,
+    .header .menu-toggle:active {
+      box-shadow: none;
+    }
 
   </style>
 </head>
@@ -1452,13 +1577,14 @@
       </svg>
     </button>
   </div>
+  <div id="review-result-status" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 
 
-  <div class="side-menu" id="side-menu">
-    <div class="menu-header">
-      <h3>Filtros</h3>
-      <button id="close-menu">✖</button>
-    </div>
+  <div class="side-menu" id="side-menu" aria-hidden="true" inert>
+    <header class="menu-header">
+      <h3 id="filters-title">Filtros</h3>
+      <button id="close-menu" type="button" aria-label="Fechar filtros" title="Fechar filtros">✖</button>
+    </header>
     <div class="filters">
       <label for="id-cartao-filter">ID do cartão:</label>
       <input id="id-cartao-filter" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-describedby="id-cartao-filter-help" placeholder="Ex.: 123 ou QID123">
@@ -1496,9 +1622,18 @@
           <option value="nao">NÃO</option>
         </select>
       <div class="field-divider" aria-hidden="true"></div>
+      <label for="id-imagem-filter">Imagens:</label>
+        <select id="id-imagem-filter">
+          <option value="todos">Todos</option>
+          <option value="sim">SIM</option>
+          <option value="nao">NÃO</option>
+        </select>
+      <div class="field-divider" aria-hidden="true"></div>
+    </div>
+    <footer class="footer filter-menu-footer" id="filter-menu-footer">
       <button id="apply-filters">Aplicar Filtros</button>
       <button id="clear-filters">Limpar Filtros</button>
-    </div>
+    </footer>
   </div>
 
   <div class="content no-review-session">
@@ -1652,12 +1787,14 @@
 
   <div class="footer" id="review-footer" hidden>
     <div id="result-buttons" class="buttons-container" hidden>
-      <button data-resultado="ACERTEI">ACERTEI (0)</button>
+      <button data-resultado="ACERTEI" aria-pressed="false">ACERTEI (0)</button>
       <!--<button data-resultado="médio">MÉDIO</button>-->
-      <button data-resultado="ERREI">ERREI (0)</button>
+      <button data-resultado="ERREI" aria-pressed="false">ERREI (0)</button>
     </div>
-    <div class="buttons-container">
+    <div class="buttons-container" id="show-answer-actions" hidden>
       <button id="mostrar-btn" hidden>MOSTRAR VERSO</button>
+    </div>
+    <div class="buttons-container" id="hide-answer-actions" hidden>
       <button id="ocultar-btn" hidden>OCULTAR VERSO</button>
     </div>
     <div class="navigation-buttons" id="navigation-buttons" hidden>
@@ -1689,6 +1826,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   let nextReviewPageRequest = null;
   let filterOptionsRequestId = 0;
   let remainingCards = 0;
+  let reviewResultNotice = null;
+  const reviewResultStatus = document.getElementById("review-result-status");
   const favoriteButton = document.getElementById("favorite-button");
   const appNotification = document.createElement("div");
   appNotification.id = "app-notification";
@@ -1724,7 +1863,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function setApiAccessGateOpen(isOpen) {
     apiAccessGate.hidden = !isOpen;
-    appElementsToLock.forEach(element => { element.inert = isOpen; });
+    appElementsToLock.forEach(element => {
+      element.inert = isOpen ||
+        (element.id === "side-menu" && !element.classList.contains("open"));
+    });
   }
 
   const activeApiRequests = new Set();
@@ -2138,6 +2280,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     restoreAppHeaderFromImageManager();
     document.body.classList.remove("image-manager-open");
     restoreReviewFooterFromImageManager();
+    syncReviewResultStatus();
     imageManagerModal.style.removeProperty("--image-manager-footer-space");
     imageFooterActions.hidden = true;
     cardImageManager.busy = false;
@@ -2205,6 +2348,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     attachReviewFooterToImageManager();
     imageManagerModal.hidden = false;
     document.body.classList.add("image-manager-open");
+    syncReviewResultStatus(card);
     reviewFooter.hidden = false;
     reviewFooter.style.removeProperty("display");
     imageFooterActions.hidden = false;
@@ -2259,6 +2403,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
+    const dataRevisao = getReviewDateAtClick();
     isSavingImageChanges = true;
     cardImageManager.busy = true;
     updateImageManagerActionButtons();
@@ -2267,9 +2412,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
       if (cardImageManager.pendingUploads.length > 0) {
         await callAppsScript("getImageStorageStatus");
-        await uploadPendingCardImages(cardImageManager, cardId);
+        await uploadPendingCardImages(cardImageManager, cardId, dataRevisao);
       }
-      await deletePendingCardImages(cardImageManager, cardId);
+      await deletePendingCardImages(cardImageManager, cardId, dataRevisao);
       await refreshDisplayedCardImages(cardId);
       resetImageManager(cardImageManager);
       closeImageManager(true);
@@ -2447,10 +2592,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         !Object.prototype.hasOwnProperty.call(response, "tras")) {
       throw new Error("A API não devolveu Frente e Verso atualizados. Publique a versão atual do Apps Script.");
     }
+    if (typeof response.data_revisao !== "string" || !response.data_revisao.trim()) {
+      throw new Error("A API não confirmou a data de revisão. Publique a versão atual do Apps Script.");
+    }
 
     const card = data.find(item => String(item.id) === String(cardId));
     if (!card) return;
 
+    applyCardReviewDateMutation(card, response);
     card.frente = String(response.frente == null ? "" : response.frente);
     card.tras = String(response.tras == null ? "" : response.tras);
     if (isEditing && data[currentCardIndex] === card) {
@@ -2600,7 +2749,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  async function uploadPendingCardImages(manager, cardId) {
+  async function uploadPendingCardImages(manager, cardId, dataRevisao = getReviewDateAtClick()) {
     const uploaded = [];
     while (manager.pendingUploads.length > 0) {
       const item = manager.pendingUploads[0];
@@ -2612,6 +2761,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         name: file.name,
         mimeType: file.type,
         lado: item.side,
+        dataRevisao,
         imageData
       });
       if (!response || response.success !== true || !response.image || !response.image.id) {
@@ -2629,7 +2779,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return uploaded;
   }
 
-  async function deletePendingCardImages(manager, cardId) {
+  async function deletePendingCardImages(manager, cardId, dataRevisao = getReviewDateAtClick()) {
     const deleted = [];
     for (const image of manager.existingImages) {
       if (!manager.pendingDeleteIds.has(image.id)) continue;
@@ -2638,7 +2788,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         imageId: image.id,
         name: image.nome,
         lado: image.lado,
-        ordem: image.ordem
+        ordem: image.ordem,
+        dataRevisao
       });
       if (!response || response.success !== true) {
         throw new Error("A API não confirmou a remoção da imagem " + image.nome + ".");
@@ -2828,6 +2979,75 @@ document.addEventListener("DOMContentLoaded", async function () {
   let pendingReviewResult = null;
   let isChangingReviewContext = false;
 
+  function syncReviewResultStatus(card = data[currentCardIndex] || null) {
+    const cardId = card && card.id != null ? String(card.id) : "";
+    if (reviewResultNotice && cardId !== reviewResultNotice.cardId) {
+      reviewResultNotice = null;
+    }
+
+    if (!reviewResultNotice) {
+      reviewResultStatus.hidden = true;
+      reviewResultStatus.removeAttribute("data-state");
+      reviewResultStatus.textContent = "";
+      reviewResultStatus.style.removeProperty("top");
+      document.querySelector(".content").style.removeProperty("padding-top");
+      appNotification.style.removeProperty("top");
+      document.getElementById("side-menu").style.removeProperty("--review-result-status-menu-space");
+      document.getElementById("add-card-modal").style.removeProperty("--review-result-status-space");
+      document.getElementById("image-viewer").style.removeProperty("--review-result-status-space");
+      document.getElementById("image-manager-modal").style.removeProperty("--review-result-status-gap");
+      if (document.body.classList.contains("card-edit-open")) updateCardEditTitlePosition();
+      return;
+    }
+
+    const resultLabel = reviewResultNotice.result;
+    const messages = {
+      pending: `Resultado pendente: ${resultLabel} — será salvo ao sair deste cartão.`,
+      saving: `Salvando o resultado ${resultLabel}…`,
+      saved: `Resultado salvo: ${resultLabel} — esta confirmação permanece até mudar de cartão.`,
+      error: `Não foi possível salvar ${resultLabel}; a escolha continua pendente.`
+    };
+    reviewResultStatus.dataset.state = reviewResultNotice.state;
+    const message = messages[reviewResultNotice.state] || messages.pending;
+    if (reviewResultStatus.textContent !== message) {
+      reviewResultStatus.textContent = message;
+    }
+    reviewResultStatus.hidden = false;
+
+    const appHeader = document.querySelector(".header");
+    const content = document.querySelector(".content");
+    if (appHeader && content) {
+      const headerBottom = Math.ceil(appHeader.getBoundingClientRect().bottom);
+      const statusTop = headerBottom + 8;
+      reviewResultStatus.style.top = `${statusTop}px`;
+      const statusBottom = statusTop + Math.ceil(reviewResultStatus.getBoundingClientRect().height);
+      const cardEditTitle = document.getElementById("card-edit-title");
+      const editTitleSpace = document.body.classList.contains("card-edit-open")
+        ? Math.ceil(cardEditTitle.getBoundingClientRect().height) + 20
+        : 16;
+      const reservedSpace = statusBottom + editTitleSpace;
+      content.style.paddingTop = `${Math.max(100, reservedSpace)}px`;
+      appNotification.style.top = `${statusBottom + 8}px`;
+      document.getElementById("side-menu").style.setProperty(
+        "--review-result-status-menu-space",
+        `${reservedSpace}px`
+      );
+      document.getElementById("add-card-modal").style.setProperty(
+        "--review-result-status-space",
+        `${reservedSpace}px`
+      );
+      document.getElementById("image-viewer").style.setProperty(
+        "--review-result-status-space",
+        `${reservedSpace}px`
+      );
+      document.getElementById("image-manager-modal").style.setProperty(
+        "--review-result-status-gap",
+        `${Math.ceil(reviewResultStatus.getBoundingClientRect().height) + 24}px`
+      );
+      if (document.body.classList.contains("card-edit-open")) updateCardEditTitlePosition();
+    }
+  }
+
   function setReviewContextChanging(isChanging) {
     isChangingReviewContext = isChanging;
     if (data.length > 0) {
@@ -2853,6 +3073,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     cardImagesButton.hidden = !isVisible;
     manageImagesButton.hidden = !isVisible;
     if (!isVisible) {
+      syncReviewResultStatus(null);
       if (!imageManagerModal.hidden) {
         resetImageManager(cardImageManager);
         closeImageManager(false, false);
@@ -2942,6 +3163,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!pending) return true;
     if (pending.commitPromise) return pending.commitPromise;
 
+    reviewResultNotice = {
+      cardId: pending.cardId,
+      result: pending.result,
+      state: "saving"
+    };
+    syncReviewResultStatus(pending.card);
+
     pending.commitPromise = (async () => {
       try {
         const savedCard = await sendApiMutation({
@@ -2965,6 +3193,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (dateWasSaved) pending.card.data_revisao = savedCard.data_revisao;
         reviewedResultCardIds.add(pending.cardId);
         if (pendingReviewResult === pending) pendingReviewResult = null;
+        reviewResultNotice = {
+          cardId: pending.cardId,
+          result: pending.result,
+          state: "saved"
+        };
+        syncReviewResultStatus(pending.card);
 
         if (data[currentCardIndex] === pending.card) {
           updateResultCounters(pending.card);
@@ -2977,6 +3211,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         return true;
       } catch (error) {
         console.error("Error saving result:", error);
+        reviewResultNotice = {
+          cardId: pending.cardId,
+          result: pending.result,
+          state: "error"
+        };
+        syncReviewResultStatus(pending.card);
         const detail = error instanceof Error ? error.message : String(error);
         showAppNotification(`Não foi possível salvar o resultado. ${detail}`);
         pending.commitPromise = null;
@@ -3135,6 +3375,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     dataButton.title = accessibleLabel;
   }
 
+  function applyCardReviewDateMutation(card, response) {
+    if (!card) return "";
+    const responseDate = response && typeof response.data_revisao === "string"
+      ? response.data_revisao.trim()
+      : "";
+    if (!responseDate) {
+      throw new Error("A API não confirmou a data de revisão. Publique a versão atual do Apps Script.");
+    }
+
+    card.data_revisao = responseDate;
+    if (pendingReviewResult && pendingReviewResult.cardId === String(card.id)) {
+      pendingReviewResult.dataRevisao = responseDate;
+    }
+    if (data[currentCardIndex] === card) updateReviewDateButton(card);
+    return responseDate;
+  }
+
 
   // SALVAR RESULTADOS DOS CARTÕES
   document.querySelectorAll("[data-resultado]").forEach(button => {
@@ -3162,10 +3419,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       if (pendingReviewResult.usedResults.has(resultado)) return;
 
+      pendingReviewResult.dataRevisao = getReviewDateAtClick();
       pendingReviewResult.usedResults.add(resultado);
       pendingReviewResult.result = resultado;
       card.resultado = resultado;
+      reviewResultNotice = {
+        cardId,
+        result: resultado,
+        state: "pending"
+      };
       updateResultButtonStates(card);
+      syncReviewResultStatus(card);
       showAppNotification(`Resultado selecionado. A escolha final e a data de revisão serão salvas ao sair deste cartão.`);
     });
   });
@@ -3183,6 +3447,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (selected.favoritos != null &&
         Array.from(favoritesFilter.options).some(option => option.value === String(selected.favoritos))) {
       favoritesFilter.value = String(selected.favoritos);
+    }
+    const imageFilter = document.getElementById("id-imagem-filter");
+    if (selected.idImagem != null &&
+        Array.from(imageFilter.options).some(option => option.value === String(selected.idImagem))) {
+      imageFilter.value = String(selected.idImagem);
     }
   }
 
@@ -3292,7 +3561,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       assunto: document.getElementById("assunto-filter").value,
       resultado: document.getElementById("resultado-filter").value,
       dataRevisao: document.getElementById("data-filter").value,
-      favoritos: document.getElementById("favoritos-filter").value
+      favoritos: document.getElementById("favoritos-filter").value,
+      idImagem: document.getElementById("id-imagem-filter").value
     };
   }
 
@@ -3486,17 +3756,16 @@ async function applyFilters(options = {}) {
       ? pendingReviewResult
       : null;
     const cardAlreadyReviewed = reviewedResultCardIds.has(cardId);
+    const selectedResult = pending ? pending.result : card.resultado;
     document.querySelectorAll("[data-resultado]").forEach(button => {
+      const isSelected = button.dataset.resultado === selectedResult;
       button.disabled = isChangingReviewContext ||
         Boolean(pending && pending.usedResults.has(button.dataset.resultado));
       button.classList.toggle("review-locked", cardAlreadyReviewed);
+      button.classList.toggle("active", isSelected);
       button.setAttribute("aria-disabled", String(cardAlreadyReviewed));
+      button.setAttribute("aria-pressed", String(isSelected));
     });
-
-    const selectedButton = Array.from(document.querySelectorAll("[data-resultado]")).find(button =>
-      button.dataset.resultado === card.resultado
-    );
-    if (selectedButton) selectedButton.classList.add("active");
 
     updateDeletionButton(card);
   }
@@ -3511,6 +3780,8 @@ async function applyFilters(options = {}) {
     document.getElementById("cabecalho-verso").style.display = answerDisplay;
     backCardImagesContainer.style.display = showAnswer ? "" : "none";
     document.getElementById("result-buttons").hidden = !showAnswer;
+    document.getElementById("show-answer-actions").hidden = !hasCard || showAnswer;
+    document.getElementById("hide-answer-actions").hidden = !showAnswer;
     document.getElementById("mostrar-btn").hidden = !hasCard || showAnswer;
     document.getElementById("ocultar-btn").hidden = !showAnswer;
     if (showAnswer) {
@@ -3522,6 +3793,7 @@ async function applyFilters(options = {}) {
     if (data.length === 0) return;
 
     const card = data[currentCardIndex];
+    syncReviewResultStatus(card);
     cardImagesButton.hidden = false;
     const imageRenderVersion = ++cardFaceImageRenderVersion;
     frontCardImagesContainer.replaceChildren();
@@ -3550,14 +3822,17 @@ async function applyFilters(options = {}) {
 
     const card = data[currentCardIndex];
     const nextFavoriteState = !isFavoriteValue(card.favorito);
+    const dataRevisao = getReviewDateAtClick();
     isSavingFavorite = true;
     favoriteButton.disabled = true;
 
     try {
-      await sendApiMutation({
+      const savedCard = await sendApiMutation({
         ...cardMutationReference(card),
-        favorito: nextFavoriteState ? "SIM" : "NÃO"
+        favorito: nextFavoriteState ? "SIM" : "NÃO",
+        dataRevisao
       });
+      applyCardReviewDateMutation(card, savedCard);
       card.favorito = nextFavoriteState;
       updateFavoriteButton(card);
 
@@ -3592,16 +3867,12 @@ dataButton.addEventListener("click", async () => {
     }
 
     const card = data[currentCardIndex];
-    // const dataRevisao = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
-    const dataRevisao = new Date().toLocaleDateString("pt-BR"); // Formato DD/MM/AAAA
+    const dataRevisao = getReviewDateAtClick();
 
     try {
-        await sendApiMutation({ ...cardMutationReference(card), dataRevisao });
-        showAppNotification(`Data de revisão ${dataRevisao} salva!`);
-
-        // Atualizar a data no objeto do cartão atual
-        card.data_revisao = dataRevisao;
-        updateReviewDateButton(card);
+        const savedCard = await sendApiMutation({ ...cardMutationReference(card), dataRevisao });
+        const savedDate = applyCardReviewDateMutation(card, savedCard);
+        showAppNotification(`Data de revisão ${formatReviewDateForDisplay(savedDate)} salva!`);
     } catch (error) {
         console.error("Erro ao salvar a data:", error);
         showAppNotification("Erro ao salvar a data. Tente novamente.");
@@ -3619,10 +3890,16 @@ excluirButton.addEventListener("click", async () => {
     const card = data[currentCardIndex];
     const nextMarkedState = !isMarkedForDeletion(card.marcar_excluir);
     const marcarExcluir = nextMarkedState ? "SIM" : "NÃO";
+    const dataRevisao = getReviewDateAtClick();
     isSavingDeletionMarker = true;
     excluirButton.disabled = true;
     try {
-        await sendApiMutation({ ...cardMutationReference(card), marcarExcluir });
+        const savedCard = await sendApiMutation({
+          ...cardMutationReference(card),
+          marcarExcluir,
+          dataRevisao
+        });
+        applyCardReviewDateMutation(card, savedCard);
         card.marcar_excluir = marcarExcluir;
         updateDeletionButton(card);
         showAppNotification(nextMarkedState
@@ -3662,6 +3939,7 @@ async function clearFilters() {
     document.getElementById("resultado-filter").value = "todos";
     document.getElementById("data-filter").value = "todos";
     document.getElementById("favoritos-filter").value = "todos";
+    document.getElementById("id-imagem-filter").value = "todos";
     document.getElementById("id-cartao-filter").value = "";
     filterOptionsRequestId += 1;
     ["materia-filter", "assunto-filter", "resultado-filter", "data-filter"].forEach(id => {
@@ -3680,7 +3958,8 @@ async function clearFilters() {
         assunto: "todos",
         resultado: "todos",
         dataRevisao: "todos",
-        favoritos: "todos"
+        favoritos: "todos",
+        idImagem: "todos"
       });
     } catch (error) {
       console.error("Erro ao restaurar as opções dos filtros:", error);
@@ -3732,14 +4011,29 @@ async function clearFilters() {
 
   function toggleSideMenu() {
     const sideMenu = document.getElementById("side-menu");
-    sideMenu.classList.toggle("open");
-    document.getElementById("menu-toggle").setAttribute("aria-expanded", String(sideMenu.classList.contains("open")));
+    const isOpen = !sideMenu.classList.contains("open");
+    const menuToggle = document.getElementById("menu-toggle");
+    sideMenu.classList.toggle("open", isOpen);
+    sideMenu.inert = !isOpen;
+    sideMenu.setAttribute("aria-hidden", String(!isOpen));
+    document.body.classList.toggle("filters-menu-open", isOpen);
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+    if (isOpen) {
+      document.getElementById("close-menu").focus();
+    } else {
+      menuToggle.focus();
+    }
   }
 
   function closeSideMenu() {
     const sideMenu = document.getElementById("side-menu");
     sideMenu.classList.remove("open");
-    document.getElementById("menu-toggle").setAttribute("aria-expanded", "false");
+    sideMenu.inert = true;
+    sideMenu.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("filters-menu-open");
+    const menuToggle = document.getElementById("menu-toggle");
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.focus();
   }
 
   async function returnToHome() {
@@ -4256,13 +4550,15 @@ async function toggleEditMode() {
       cancelButton.disabled = true;
       cardTextEditors.forEach(field => { field.disabled = true; });
       metadataEditor.querySelectorAll("select, input, button").forEach(field => { field.disabled = true; });
+      const dataRevisao = getReviewDateAtClick();
       const savedCard = await sendApiMutation({
         ...cardMutationReference(currentCard),
         disciplina: newDiscipline,
         materia: newMatter,
         assunto: newAssunto,
         frente: newFrontText,
-        tras: newBackText
+        tras: newBackText,
+        dataRevisao
       });
       if (!Object.prototype.hasOwnProperty.call(savedCard, "disciplina") ||
           !Object.prototype.hasOwnProperty.call(savedCard, "materia") ||
@@ -4337,8 +4633,12 @@ async function toggleEditMode() {
   isEditing = !isEditing;
   document.body.classList.toggle("card-edit-open", isEditing);
   if (isEditing) {
+    syncReviewResultStatus(data[currentCardIndex]);
     updateCardEditTitlePosition();
     requestAnimationFrame(resizeActiveCardEditors);
+  } else if (data.length > 0) {
+    updateResultButtonStates(data[currentCardIndex]);
+    syncReviewResultStatus(data[currentCardIndex]);
   }
 
   if (!isEditing && shouldRefreshFiltersAfterEdit) {
@@ -4415,6 +4715,10 @@ function cancelEditMode() {
 
   isEditing = false;
   document.body.classList.remove("card-edit-open");
+  if (data.length > 0) {
+    updateResultButtonStates(data[currentCardIndex]);
+    syncReviewResultStatus(data[currentCardIndex]);
+  }
   if (shouldRefreshFiltersAfterEdit) {
     shouldRefreshFiltersAfterEdit = false;
     fetchFilters(getSelectedReviewFilters())
@@ -4533,10 +4837,15 @@ function cancelEditMode() {
     const appHeader = document.querySelector(".header");
     const cardEditTitle = document.getElementById("card-edit-title");
     if (!appHeader || !cardEditTitle) return;
-    cardEditTitle.style.top = `${Math.ceil(appHeader.getBoundingClientRect().bottom)}px`;
+    const reviewStatus = document.getElementById("review-result-status");
+    const statusBottom = reviewStatus && !reviewStatus.hidden
+      ? Math.ceil(reviewStatus.getBoundingClientRect().bottom) + 8
+      : Math.ceil(appHeader.getBoundingClientRect().bottom);
+    cardEditTitle.style.top = `${statusBottom}px`;
   }
 
   window.addEventListener("resize", () => {
+    if (reviewResultNotice) syncReviewResultStatus();
     updateCardEditTitlePosition();
     requestAnimationFrame(resizeActiveCardEditors);
   });
@@ -4626,28 +4935,46 @@ function cancelEditMode() {
         if (addImageManager.pendingUploads.length > 0) {
           await callAppsScript("getImageStorageStatus");
         }
+        const dataRevisao = getReviewDateAtClick();
         const savedCard = await sendApiMutation({
           action: "add",
           disciplina: disciplineSelect.value.trim(),
           materia: matterSelect.value.trim(),
           assunto: assuntoInput.value.trim(),
           frente: document.getElementById("frente-form-textarea").value,
-          tras: document.getElementById("verso-form-textarea").value
+          tras: document.getElementById("verso-form-textarea").value,
+          dataRevisao
         });
         if (!savedCard || !Number.isSafeInteger(Number(savedCard.id)) || Number(savedCard.id) < 1) {
           throw new Error("A API não devolveu o ID do cartão criado.");
         }
-        pendingAddCard = { ...savedCard, id: Number(savedCard.id) };
+        pendingAddCard = {
+          ...savedCard,
+          id: Number(savedCard.id),
+          requestedReviewDate: dataRevisao
+        };
         setAddCardFieldsDisabled(true);
+      }
+      if (!pendingAddCard.data_revisao) {
+        const requestedReviewDate = pendingAddCard.requestedReviewDate || getReviewDateAtClick();
+        const dateResponse = await sendApiMutation({
+          ...cardMutationReference(pendingAddCard),
+          dataRevisao: requestedReviewDate
+        });
+        applyCardReviewDateMutation(pendingAddCard, dateResponse);
       }
       await uploadPendingCardImages(addImageManager, pendingAddCard.id);
       await finishAddedCardFlow(pendingAddCard, "Novo cartão adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar o cartão:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      const message = pendingAddCard
-        ? "O cartão " + pendingAddCard.id + " foi salvo, mas há imagens pendentes. Tente salvar novamente. "
-        : "Não foi possível adicionar o cartão. ";
+      const message = !pendingAddCard
+        ? "Não foi possível adicionar o cartão. "
+        : !pendingAddCard.data_revisao
+          ? "O cartão " + pendingAddCard.id + " foi criado, mas a data de revisão não foi confirmada. Tente salvar novamente. "
+          : addImageManager.pendingUploads.length > 0
+            ? "O cartão " + pendingAddCard.id + " foi salvo, mas há imagens pendentes. Tente salvar novamente. "
+            : "O cartão " + pendingAddCard.id + " foi salvo, mas uma etapa final falhou. Tente salvar novamente. ";
       showAppNotification(message + detail);
     } finally {
       saveAddCardButton.disabled = false;
