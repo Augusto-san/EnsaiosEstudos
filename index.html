@@ -31,9 +31,14 @@
       --color-control-hover: #413f3f;
       --color-control-active: #477d14;
       --color-action-background: #3f7f04;
+      --color-button-accent: #81ce39;
+      --color-review-correct: #477d14;
+      --color-review-correct-hover: #3b6810;
+      --color-review-error: #a34848;
+      --color-review-error-hover: #843a3a;
       --color-overlay: rgba(0, 0, 0, 0.65);
       --color-access-overlay: rgba(42, 42, 42, 0.98);
-      --color-filter-background: #fff;
+      --color-filter-background: #3a3a3a;
       --color-notification-background: #e6c300;
 
       --color-text-primary: #c5c5c5;
@@ -42,10 +47,10 @@
       --color-text-heading: #656565;
       --color-text-on-accent: #2a2a2a;
       --color-text-on-notification: #424242;
-      --color-text-filter: #0063cb;
+      --color-text-filter: var(--color-text-primary);
       --color-link: #6495ed;
 
-      --color-accent: #81ce39;
+      --color-accent: var(--color-text-primary);
       --color-accent-yellow: #ffc100;
       --color-accent-gold: #ffd700;
       --color-notification-border: #ffe033;
@@ -65,7 +70,8 @@
 
       --shadow-header: 0 2px 5px rgba(0, 0, 0, 0.1);
       --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.45);
-      --shadow-input-focus: 0 0 0 2px rgba(129, 206, 57, 0.2);
+      --shadow-flashcard: 0 4px 12px rgba(0, 0, 0, 0.38);
+      --shadow-input-focus: 0 0 0 2px rgba(197, 197, 197, 0.2);
       --shadow-button: 0 2px 5px rgba(0, 0, 0, 0.32);
       --shadow-button-hover: 0 4px 8px rgba(0, 0, 0, 0.4);
       --shadow-button-active: 0 1px 3px rgba(0, 0, 0, 0.35);
@@ -289,16 +295,39 @@
       color: var(--color-link);
     }
     
+    .flashcard-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    body:not(.card-edit-open) .flashcard-stack {
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+
     .flashcard {
-      border: 1px solid var(--color-accent);
+      border: 1px solid var(--color-border-dark);
       padding: 15px;
-      margin: 10px 0px;
+      margin: 0;
       text-align: center; /*justify;*/
       background-color: var(--color-card-background);
       border-radius: var(--radius-surface);
+      box-shadow: var(--shadow-flashcard);
       width: 90%;
       /*max-width: 95%;*/
       font-size: clamp(1.1rem, 2vw, 1.3rem);
+    }
+
+    body.card-edit-open #back-flashcard:not([hidden]) {
+      margin-bottom: 24px;
+    }
+
+    body.card-edit-open .flashcard {
+      padding: 15px 0;
     }
 
     /*#front-content, #back-content, #cabecalho-frente, #cabecalho-verso*/
@@ -372,6 +401,59 @@
       white-space: pre-wrap;
     }
 
+    .card-face-field {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .card-face-content-field {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    body.card-edit-open .card-face-content-field {
+      padding: 8px;
+    }
+
+    body.card-edit-open #front-edit,
+    body.card-edit-open #back-edit {
+      box-sizing: border-box;
+    }
+
+    body.card-edit-open #front-edit,
+    body.card-edit-open #back-edit {
+      border: 1px solid var(--color-border-dark);
+    }
+
+    .card-face-images {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin: 12px auto 0;
+    }
+
+    .card-face-images:empty {
+      display: none;
+    }
+
+    .card-face-image {
+      display: block;
+      max-width: 100%;
+      max-height: 45vh;
+      max-height: 45dvh;
+      object-fit: contain;
+      border-radius: var(--radius-surface);
+    }
+
+    .card-image-load-error {
+      margin: 0;
+      color: var(--color-accent-yellow);
+      font-size: 0.9em;
+    }
+
     .front, .back {
       border: none;
       color: var(--color-text-primary);
@@ -390,6 +472,10 @@
       display: block;
       width: 100%;
       text-align: center;
+      letter-spacing: normal;
+    }
+
+    .card-heading-side {
       letter-spacing: 0.22em;
     }
 
@@ -405,38 +491,392 @@
       text-align: center;
     }
 
-    .card-metadata-editor {
+    .card-classification-group {
+      width: 100%;
+      min-width: 0;
       margin: 0 0 14px;
+      padding: 8px 12px 2px;
+      border: 1px solid var(--color-accent);
+      border-radius: var(--radius-surface);
       text-align: left;
     }
 
-    .card-metadata-field {
+    .card-classification-group > legend {
+      padding: 0 6px;
+      color: var(--color-accent);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .card-classification-field {
       margin-bottom: 10px;
     }
 
-    .card-metadata-field label {
+    .card-classification-field > label {
       display: block;
       margin-bottom: 5px;
       color: var(--color-accent);
       font-size: 14px;
     }
 
-    .card-metadata-field input,
-    .card-metadata-field select {
+    .card-classification-field input,
+    .card-classification-field select {
       width: 100%;
       box-sizing: border-box;
       padding: 8px;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-accent);
       border-radius: var(--radius-field);
       background-color: var(--color-card-background);
       color: var(--color-text-primary);
       font: inherit;
     }
 
+    .card-classification-field:last-child {
+      margin-bottom: 4px;
+    }
+
+    #add-card-form .card-classification-field .add-card-formulario {
+      margin-bottom: 0;
+    }
+
+    .card-metadata-editor {
+      width: 90%;
+      margin: 14px 0;
+      text-align: left;
+      background-color: var(--color-card-background);
+    }
+
+    .card-image-manager {
+      margin: 12px 0;
+      padding: 12px;
+      border: 1px solid var(--color-accent);
+      border-radius: var(--radius-surface);
+      background: var(--color-panel-background);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .card-image-manager > label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+
+    .card-image-controls {
+      display: grid;
+      grid-template-columns: minmax(110px, 0.75fr) minmax(0, 1.25fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .image-manager-dialog .card-image-controls {
+      gap: 12px;
+    }
+
+    .card-image-side,
+    .card-image-file {
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid var(--color-accent);
+      border-radius: var(--radius-field);
+      background: var(--color-card-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .card-image-file::file-selector-button {
+      max-width: 100%;
+      margin-right: 8px;
+      padding: 6px 8px;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: var(--color-notification-background);
+      color: var(--color-text-on-notification);
+      font: inherit;
+    }
+
+    .card-image-list {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .card-image-list:empty {
+      display: none;
+    }
+
+    .card-image-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      padding: 7px 8px;
+      border-radius: var(--radius-control);
+      background: var(--color-card-background);
+    }
+
+    .card-image-name {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .card-image-list button {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border: 1px solid var(--color-button-accent);
+      border-radius: var(--radius-control);
+      background: var(--color-control-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .card-image-list button:not([aria-pressed="true"]) {
+      border-color: var(--color-button-accent);
+      background: var(--color-danger);
+      color: #000;
+    }
+
+    #image-manager-modal .card-image-list button:not([aria-pressed="true"]) {
+      background: var(--color-danger);
+      color: #fff;
+    }
+
+    .card-image-list button[aria-pressed="true"] {
+      border-color: var(--color-button-accent);
+      color: var(--color-accent-yellow);
+    }
+
+    #card-images-button[hidden] {
+      display: none;
+    }
+
+    #manage-images-button[hidden] {
+      display: none;
+    }
+
+    body.image-manager-open {
+      overflow: hidden;
+    }
+
+    body.image-manager-open #image-manager-modal > .header {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+    }
+
+    #image-manager-modal[hidden] {
+      display: none;
+    }
+
+    #image-manager-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10003;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) var(--image-manager-footer-space, 120px) env(safe-area-inset-left, 0px);
+      box-sizing: border-box;
+      overflow: hidden;
+      background-color: var(--color-page-background);
+    }
+
+    .image-manager-dialog {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+      border: 0;
+      border-radius: 0;
+      background-color: var(--color-page-background);
+      box-shadow: none;
+      color: var(--color-text-primary);
+    }
+
+    .image-manager-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-accent);
+      background-color: var(--color-page-background);
+    }
+
+    .image-manager-title,
+    .card-edit-title {
+      min-width: 0;
+      margin: 0;
+      color: var(--color-accent);
+      font-size: 16px;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .image-manager-title {
+      flex: 1 1 auto;
+    }
+
+    .card-edit-title {
+      display: none;
+      position: fixed;
+      top: 48px;
+      right: 0;
+      left: 0;
+      z-index: 999;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-accent);
+      background-color: var(--color-page-background);
+    }
+
+    body.card-edit-open .card-edit-title {
+      display: block;
+    }
+
+    .image-manager-dialog .card-image-manager {
+      margin: auto 12px;
+    }
+
+    #image-viewer[hidden] {
+      display: none;
+    }
+
+    #image-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 10002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.88);
+    }
+
+    .image-viewer-dialog {
+      display: flex;
+      flex-direction: column;
+      width: min(100%, 1000px);
+      max-height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--color-border-medium);
+      border-radius: var(--radius-dialog);
+      background: var(--color-panel-background);
+      box-shadow: var(--shadow-panel);
+      color: var(--color-text-primary);
+    }
+
+    .image-viewer-header,
+    .image-viewer-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+    }
+
+    .image-viewer-header {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .image-viewer-title {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+      color: var(--color-accent);
+      font-size: 16px;
+    }
+
+    .image-viewer-header button,
+    .image-viewer-controls button {
+      flex: 0 0 auto;
+      min-width: 42px;
+      min-height: 42px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      background: var(--color-control-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .image-viewer-stage {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) 48px;
+      align-items: center;
+      gap: 6px;
+      min-height: 120px;
+      padding: 8px;
+      background: var(--color-card-background);
+    }
+
+    #card-image-viewer-image {
+      display: block;
+      width: 100%;
+      max-height: min(68dvh, 760px);
+      object-fit: contain;
+    }
+
+    .image-viewer-caption {
+      min-height: 24px;
+      margin: 0;
+      padding: 8px 12px 0;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .image-viewer-controls {
+      justify-content: center;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+
+    .image-viewer-controls button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    @media (max-width: 520px) {
+      .card-image-controls {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .image-viewer-stage {
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+        gap: 4px;
+        padding: 4px;
+      }
+
+      .image-viewer-header,
+      .image-viewer-controls {
+        padding-right: 8px;
+        padding-left: 8px;
+      }
+    }
+
     hr {
       width: 100%;
       border: none;
-      height: 1px;
+      height: 5px;
       background-color: var(--color-accent);
       margin: 20px 0;
     }
@@ -450,17 +890,19 @@
     /* TEXTAREA EDITAR FRENTE e TEXTAREA EDITAR VERSO */
     #back-edit, #front-edit{
       width: 100%;
-      height: 400px;
+      height: auto;
+      min-height: 96px;
       color: var(--color-text-primary);
       background-color: var(--color-card-background);
       font-family: Arial, sans-serif;
-      overflow-y: scroll;
+      overflow-y: hidden;
+      resize: none;
       max-width: 100%;
       min-width: 100%;
       line-height: 1.5;
       font-size: clamp(1rem, 2.5vw, 2rem);
       border-radius: var(--radius-button);
-      padding: 15px;
+      padding: 10px;
       text-align: justify;
     }
 
@@ -485,9 +927,34 @@
       padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
     }
 
+    body.image-manager-open #review-footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10004;
+      padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body.image-manager-open #review-footer > .buttons-container:not(#image-footer-actions),
+    body.image-manager-open #review-footer > #navigation-buttons {
+      display: none !important;
+    }
+
+    body.image-manager-open #image-footer-actions {
+      display: flex;
+    }
+
+    body.card-edit-open #manage-images-button {
+      display: none;
+    }
+
     body.add-card-modal-open #mostrar-btn,
+    body.add-card-modal-open #result-buttons,
     body.add-card-modal-open #navigation-buttons,
     body.card-edit-open #mostrar-btn,
+    body.card-edit-open #result-buttons,
+    body.card-edit-open #ocultar-btn,
     body.card-edit-open #navigation-buttons {
       display: none;
     }
@@ -511,6 +978,7 @@
       padding-bottom: var(--add-card-footer-space, 120px);
     }
 
+    #flashcard[hidden],
     .flashcard[hidden],
     .footer[hidden] {
       display: none;
@@ -562,7 +1030,7 @@
     }
 
 
-    #excluir-button, #edit-button {
+    #excluir-button, #edit-button, #manage-images-button {
       font-size: 25px;
     }
 
@@ -644,7 +1112,7 @@
     #api-loading-indicator {
       position: fixed;
       inset: 0;
-      z-index: 10002;
+      z-index: 10005;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -704,7 +1172,7 @@
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 60px);
       left: 50%;
-      z-index: 10001;
+      z-index: 10006;
       max-width: calc(100vw - 32px);
       padding: 10px 16px;
       border: 1px solid var(--color-notification-border);
@@ -736,7 +1204,25 @@
     
     .buttons-container button:hover, .buttons-container-header button:hover {
       background-color: var(--color-control-hover);
-      border: 2px dotted var(--color-accent);
+      border: 2px dotted var(--color-button-accent);
+    }
+
+    #result-buttons button[data-resultado="ACERTEI"] {
+      background-color: var(--color-review-correct);
+      color: #fff;
+    }
+
+    #result-buttons button[data-resultado="ERREI"] {
+      background-color: var(--color-review-error);
+      color: #fff;
+    }
+
+    #result-buttons button[data-resultado="ACERTEI"]:hover {
+      background-color: var(--color-review-correct-hover);
+    }
+
+    #result-buttons button[data-resultado="ERREI"]:hover {
+      background-color: var(--color-review-error-hover);
     }
 
     .add-card-formulario {
@@ -749,13 +1235,13 @@
     }
 
     .add-card-formulario::placeholder,
-    .card-metadata-field input::placeholder {
+    .card-classification-field input::placeholder {
       color: var(--color-text-primary);
       opacity: 1;
     }
 
     #add-card-form .add-card-formulario option,
-    .card-metadata-field select option {
+    .card-classification-field select option {
       background-color: var(--color-card-background);
       color: var(--color-text-primary);
     }
@@ -802,7 +1288,7 @@
 
     .navigation-buttons button:hover {
       background-color: var(--color-control-hover);
-      border: 2px dotted var(--color-accent);
+      border: 2px dotted var(--color-button-accent);
     }
 
     .side-menu {
@@ -861,7 +1347,7 @@
       padding: 8px;
       font-size: 14px;
       border-radius: var(--radius-button);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-accent);
       background-color: var(--color-filter-background);
       color: var(--color-text-filter);
     }
@@ -879,6 +1365,10 @@
       height: 1px;
       margin: 0 0 14px;
       background-color: var(--color-accent);
+    }
+
+    .filters .field-divider {
+      background-color: transparent;
     }
 
     #apply-filters, #clear-filters {
@@ -971,23 +1461,23 @@
     </div>
     <div class="filters">
       <label for="id-cartao-filter">ID do cartão:</label>
-      <input id="id-cartao-filter" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-describedby="id-cartao-filter-help" placeholder="Ex.: 123">
-      <small class="filter-help" id="id-cartao-filter-help">Ao informar um ID, os outros filtros serão ignorados.</small>
+      <input id="id-cartao-filter" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-describedby="id-cartao-filter-help" placeholder="Ex.: 123 ou QID123">
+      <small class="filter-help" id="id-cartao-filter-help">Informe 123 ou QID123. Ao usar o ID, os outros filtros serão ignorados.</small>
       <div class="field-divider" aria-hidden="true"></div>
       <label for="disciplina-filter">Disciplina:</label>
-        <select id="disciplina-filter">
-          <option value="todos">Todos</option>
-        </select>
+      <select id="disciplina-filter">
+        <option value="todos">Todos</option>
+      </select>
       <div class="field-divider" aria-hidden="true"></div>
       <label for="materia-filter">Matéria:</label>
-        <select id="materia-filter">
-          <option value="todos">Todos</option>
-        </select>
+      <select id="materia-filter">
+        <option value="todos">Todos</option>
+      </select>
       <div class="field-divider" aria-hidden="true"></div>
       <label for="assunto-filter">Assunto:</label>
-        <select id="assunto-filter">
-          <option value="todos">Todos</option>
-        </select>
+      <select id="assunto-filter">
+        <option value="todos">Todos</option>
+      </select>
       <div class="field-divider" aria-hidden="true"></div>
       <label for="resultado-filter">Resultado:</label>
         <select id="resultado-filter">
@@ -1002,7 +1492,8 @@
       <label for="favoritos-filter">Favoritos:</label>
         <select id="favoritos-filter">
           <option value="todos">Todos</option>
-          <option value="sim">Somente favoritos</option>
+          <option value="sim">SIM</option>
+          <option value="nao">NÃO</option>
         </select>
       <div class="field-divider" aria-hidden="true"></div>
       <button id="apply-filters">Aplicar Filtros</button>
@@ -1011,10 +1502,13 @@
   </div>
 
   <div class="content no-review-session">
-    
+    <h2 class="card-edit-title" id="card-edit-title"></h2>
+
     <div class="buttons-container-header">
       <button id="edit-button">✎</button>
+      <button id="manage-images-button" type="button" title="Gerenciar imagens do cartão" aria-label="Gerenciar imagens do cartão" aria-haspopup="dialog" aria-expanded="false" hidden>📷</button>
       <button id="favorite-button" type="button" title="Adicionar aos favoritos" aria-label="Adicionar aos favoritos" aria-pressed="false">☆</button>
+      <button id="card-images-button" type="button" title="Abrir imagens do cartão" aria-label="Abrir imagens do cartão" hidden>&#128444;</button>
       <button id="cancel-button">❌</button>
       <button id="add-button">➕</button>
       <button id="counter-button">0</button>
@@ -1030,26 +1524,40 @@
       <button id="excluir-button" type="button" title="Marcar para exclusão" aria-label="Marcar para exclusão" aria-pressed="false">🗑</button>
     </div>    
 
-    <div class="flashcard" id="flashcard" hidden>
-      <div id="card-metadata-editor" class="card-metadata-editor" hidden>
-        <div class="card-metadata-field">
-          <label for="edit-card-discipline">Disciplina</label>
-          <select id="edit-card-discipline"></select>
-        </div>
-        <div class="card-metadata-field">
-          <label for="edit-card-matter">Matéria</label>
-          <select id="edit-card-matter"></select>
-        </div>
-        <div class="card-metadata-field">
-          <label for="edit-card-assunto">Assunto</label>
-          <input id="edit-card-assunto" type="text" autocomplete="off" placeholder="Opcional">
+    <fieldset id="card-metadata-editor" class="card-classification-group card-metadata-editor" aria-label="Disciplina, matéria e assunto do cartão" hidden>
+      <div class="card-classification-field">
+        <label for="edit-card-discipline">Disciplina</label>
+        <select id="edit-card-discipline"></select>
+      </div>
+      <div class="card-classification-field">
+        <label for="edit-card-matter">Matéria</label>
+        <select id="edit-card-matter"></select>
+      </div>
+      <div class="card-classification-field">
+        <label for="edit-card-assunto">Assunto</label>
+        <input id="edit-card-assunto" type="text" autocomplete="off" placeholder="Opcional">
+      </div>
+    </fieldset>
+
+    <div class="flashcard-stack" id="flashcard" hidden>
+      <div class="flashcard" id="front-flashcard">
+        <div class="card-face-field front" id="front-card-field" role="group" aria-label="Campo da frente">
+          <div class="front" id="cabecalho-frente"></div>
+          <div class="card-face-content-field">
+            <div class="front" id="front-content"></div>
+            <div class="card-face-images" id="front-card-images" aria-label="Imagens da frente"></div>
+          </div>
         </div>
       </div>
-      <div class="front" id="cabecalho-frente"></div>
-      <div class="front" id="front-content"></div>
-      <hr>
-      <div class="back" id="cabecalho-verso"></div>
-      <div class="back" id="back-content"></div>
+      <div class="flashcard" id="back-flashcard" hidden>
+        <div class="card-face-field back" id="back-card-field" role="group" aria-label="Campo do verso" style="display: none;">
+          <div class="back" id="cabecalho-verso"></div>
+          <div class="card-face-content-field">
+            <div class="back" id="back-content"></div>
+            <div class="card-face-images" id="back-card-images" aria-label="Imagens do verso" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- FORM PARA ADICIONAR NOVO CARTÃO -->
@@ -1059,18 +1567,25 @@
         <h2>ADICIONAR NOVO CARTÃO</h2>
 
         <form id="add-card-form">
-          <label class="label-add-card-form" for="disciplina-form-add-card">Disciplina</label>
-          <select id="disciplina-form-add-card" name="disciplina-form-add-card" required class="add-card-formulario">
-            <option value="">Selecione uma disciplina</option>
-          </select>
-          <div class="field-divider" aria-hidden="true"></div>
-          <label class="label-add-card-form" for="materia-form-add-card">Matéria</label>
-          <select id="materia-form-add-card" name="materia-form-add-card" required class="add-card-formulario" disabled>
-            <option value="">Selecione uma disciplina primeiro</option>
-          </select>
-          <div class="field-divider" aria-hidden="true"></div>
-          <label class="label-add-card-form" for="assunto-form-add-card">Assunto</label>
-          <input id="assunto-form-add-card" name="assunto-form-add-card" type="text" autocomplete="off" class="add-card-formulario" placeholder="Opcional">
+          <fieldset class="card-classification-group">
+            <legend>Classificação</legend>
+            <div class="card-classification-field">
+              <label class="label-add-card-form" for="disciplina-form-add-card">Disciplina</label>
+              <select id="disciplina-form-add-card" name="disciplina-form-add-card" required class="add-card-formulario">
+                <option value="">Selecione uma disciplina</option>
+              </select>
+            </div>
+            <div class="card-classification-field">
+              <label class="label-add-card-form" for="materia-form-add-card">Matéria</label>
+              <select id="materia-form-add-card" name="materia-form-add-card" required class="add-card-formulario" disabled>
+                <option value="">Selecione uma disciplina primeiro</option>
+              </select>
+            </div>
+            <div class="card-classification-field">
+              <label class="label-add-card-form" for="assunto-form-add-card">Assunto</label>
+              <input id="assunto-form-add-card" name="assunto-form-add-card" type="text" autocomplete="off" class="add-card-formulario" placeholder="Opcional">
+            </div>
+          </fieldset>
           <div class="field-divider" aria-hidden="true"></div>
           <label class="label-add-card-form" for="frente-form-textarea">Frente</label>
             <textarea id="frente-form-textarea" name="frente-form-textarea" required class="add-card-formulario"></textarea>
@@ -1078,20 +1593,69 @@
           <label class="label-add-card-form" for="verso-form-textarea">Verso</label>
             <textarea id="verso-form-textarea" name="verso-form-textarea" required class="add-card-formulario"></textarea>
           <div class="field-divider" aria-hidden="true"></div>
+          <div class="card-image-manager">
+            <label for="add-image-file">Imagens do cartão</label>
+            <div class="card-image-controls">
+              <select id="add-image-side" class="card-image-side" aria-label="Lado do cartão para as novas imagens">
+                <option value="FRENTE">Frente</option>
+                <option value="VERSO">Verso</option>
+                <option value="ANEXO">Anexo geral</option>
+              </select>
+              <input id="add-image-file" class="card-image-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecionar imagens para anexar" multiple>
+            </div>
+            <ul id="add-image-queue" class="card-image-list" aria-label="Imagens selecionadas para anexar"></ul>
+          </div>
 
         </form>
       </div>
     </div>
 
+    <div id="image-manager-modal" hidden role="dialog" aria-modal="true" aria-labelledby="image-manager-title">
+      <div class="image-manager-dialog">
+        <div class="image-manager-header">
+          <h2 class="image-manager-title" id="image-manager-title" tabindex="-1">IMAGENS DO CARTÃO</h2>
+        </div>
+        <div class="card-image-manager">
+          <div class="card-image-controls">
+            <select id="image-manager-side" class="card-image-side" aria-label="Lado do cartão para as novas imagens">
+              <option value="FRENTE">Frente</option>
+              <option value="VERSO">Verso</option>
+              <option value="ANEXO">Anexo geral</option>
+            </select>
+            <input id="image-manager-file" class="card-image-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Selecionar imagens para anexar" multiple>
+          </div>
+          <ul id="image-manager-queue" class="card-image-list" aria-label="Novas imagens para anexar"></ul>
+          <ul id="image-manager-existing" class="card-image-list" aria-label="Imagens já anexadas"></ul>
+        </div>
+      </div>
+    </div>
 
+    <div id="image-viewer" hidden role="dialog" aria-modal="true" aria-labelledby="image-viewer-title">
+      <div class="image-viewer-dialog">
+        <div class="image-viewer-header">
+          <h2 class="image-viewer-title" id="image-viewer-title">Imagens do cartão</h2>
+          <button id="close-image-viewer" type="button" aria-label="Fechar visualizador">×</button>
+        </div>
+        <div class="image-viewer-stage">
+          <button id="previous-card-image" type="button" aria-label="Imagem anterior">‹</button>
+          <img id="card-image-viewer-image" alt="">
+          <button id="next-card-image" type="button" aria-label="Próxima imagem">›</button>
+        </div>
+        <p id="image-viewer-caption" class="image-viewer-caption"></p>
+        <div class="image-viewer-controls">
+          <span id="image-viewer-counter" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer" id="review-footer" hidden>
     <div id="result-buttons" class="buttons-container" hidden>
       <button data-resultado="ACERTEI">ACERTEI (0)</button>
       <!--<button data-resultado="médio">MÉDIO</button>-->
       <button data-resultado="ERREI">ERREI (0)</button>
     </div>
-  </div>
-
-  <div class="footer" id="review-footer" hidden>
     <div class="buttons-container">
       <button id="mostrar-btn" hidden>MOSTRAR VERSO</button>
       <button id="ocultar-btn" hidden>OCULTAR VERSO</button>
@@ -1101,6 +1665,10 @@
       <button id="proximo-btn">ᐅ</button>
     </div>
     <div class="buttons-container footer-action-buttons" id="edit-footer-actions" hidden></div>
+    <div class="buttons-container footer-action-buttons" id="image-footer-actions" hidden>
+      <button type="button" id="cancel-image-management" aria-label="Cancelar alterações nas imagens">❌</button>
+      <button type="button" id="save-image-management" aria-label="Salvar alterações nas imagens">💾</button>
+    </div>
     <div class="buttons-container footer-action-buttons" id="add-card-footer-actions" hidden>
       <button type="button" id="cancel-add-card">❌</button>
       <button type="submit" id="save-add-card" form="add-card-form">💾</button>
@@ -1223,7 +1791,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       getBootstrap: "bootstrap",
       getFilterOptions: "filters",
       startReviewSession: "session",
-      getReviewPage: "page"
+      getReviewPage: "page",
+      getImageStorageStatus: "imageStorage",
+      getCardImages: "cardImages",
+      getCardImage: "image"
     };
     if (Object.prototype.hasOwnProperty.call(getActions, method)) {
       const query = new URLSearchParams({ action: getActions[method] });
@@ -1236,10 +1807,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         cache: "no-store",
         redirect: "follow"
       };
-    } else if (method === "addCard" || method === "saveCard" || method === "recordCardResult") {
+    } else if (["addCard", "saveCard", "recordCardResult", "uploadCardImage", "deleteCardImage"].includes(method)) {
+      const postActions = {
+        addCard: "add",
+        saveCard: "update",
+        recordCardResult: "result",
+        uploadCardImage: "uploadImage",
+        deleteCardImage: "deleteImage"
+      };
       const payload = {
         ...parameters,
-        action: method === "addCard" ? "add" : method === "recordCardResult" ? "result" : "update"
+        action: postActions[method]
       };
       const body = new URLSearchParams();
       Object.entries(payload).forEach(([key, value]) => {
@@ -1430,6 +2008,819 @@ document.addEventListener("DOMContentLoaded", async function () {
     return { id: card.id };
   }
 
+  const MAX_CARD_IMAGE_BYTES = 3 * 1024 * 1024;
+  const MAX_INPUT_IMAGE_BYTES = 20 * 1024 * 1024;
+  const MAX_IMAGE_DIMENSION = 1800;
+  const ALLOWED_CARD_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const CARD_IMAGE_SIDE_LABELS = {
+    FRENTE: "Frente",
+    VERSO: "Verso",
+    ANEXO: "Anexo geral"
+  };
+  const cardImageMetadataCache = new Map();
+  const cardImageMetadataRequests = new Map();
+  const cardImageDataCache = new Map();
+  const cardImageDataRequests = new Map();
+  let nextLocalImageId = 0;
+
+  function createCardImageManager(inputId, sideId, queueId, existingId = "") {
+    const manager = {
+      input: document.getElementById(inputId),
+      side: document.getElementById(sideId),
+      queueList: document.getElementById(queueId),
+      existingList: existingId ? document.getElementById(existingId) : null,
+      pendingUploads: [],
+      existingImages: [],
+      pendingDeleteIds: new Set(),
+      busy: false,
+      completedOperations: 0
+    };
+
+    manager.input.addEventListener("change", () => {
+      if (manager.busy) return;
+      let rejectedFiles = 0;
+      Array.from(manager.input.files || []).forEach(file => {
+        const mimeType = String(file.type || "").trim().toLowerCase();
+        if (!ALLOWED_CARD_IMAGE_TYPES.includes(mimeType) || file.size > MAX_INPUT_IMAGE_BYTES) {
+          rejectedFiles += 1;
+          return;
+        }
+        manager.pendingUploads.push({
+          localId: createLocalImageId(),
+          uploadId: createImageRequestId(),
+          file,
+          side: manager.side.value
+        });
+      });
+      manager.input.value = "";
+      renderImageManager(manager);
+      if (rejectedFiles > 0) {
+        const count = rejectedFiles === 1 ? "Uma imagem foi ignorada." : `${rejectedFiles} imagens foram ignoradas.`;
+        showAppNotification(count + " Use JPG, PNG ou WebP com até 20 MB por arquivo.");
+      }
+    });
+
+    return manager;
+  }
+
+  function createLocalImageId() {
+    nextLocalImageId += 1;
+    return "local-image-" + nextLocalImageId;
+  }
+
+  function createImageRequestId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    return "u" + Date.now().toString(36) + "_" +
+      Math.random().toString(36).slice(2) + "_" + Math.random().toString(36).slice(2);
+  }
+
+  const addImageManager = createCardImageManager(
+    "add-image-file",
+    "add-image-side",
+    "add-image-queue"
+  );
+  const cardImageManager = createCardImageManager(
+    "image-manager-file",
+    "image-manager-side",
+    "image-manager-queue",
+    "image-manager-existing"
+  );
+  const manageImagesButton = document.getElementById("manage-images-button");
+  const imageManagerModal = document.getElementById("image-manager-modal");
+  const appHeader = document.querySelector(".header");
+  const imageManagerDialog = imageManagerModal.querySelector(".image-manager-dialog");
+  const imageManagerTitle = document.getElementById("image-manager-title");
+  const imageFooterActions = document.getElementById("image-footer-actions");
+  const cancelImageManagementButton = document.getElementById("cancel-image-management");
+  const saveImageManagementButton = document.getElementById("save-image-management");
+  const reviewFooter = document.getElementById("review-footer");
+  let appHeaderPlaceholder = null;
+  let imageFooterPlaceholder = null;
+  let imageManagerRequestVersion = 0;
+  let imageManagerCardId = "";
+  let isLoadingImageManager = false;
+  let isSavingImageChanges = false;
+
+  function attachAppHeaderToImageManager() {
+    if (appHeaderPlaceholder || appHeader.parentElement === imageManagerModal) return;
+    appHeaderPlaceholder = document.createComment("restore-app-header");
+    appHeader.parentNode.insertBefore(appHeaderPlaceholder, appHeader);
+    imageManagerModal.insertBefore(appHeader, imageManagerDialog);
+  }
+
+  function restoreAppHeaderFromImageManager() {
+    if (!appHeaderPlaceholder || !appHeaderPlaceholder.parentNode) return;
+    appHeaderPlaceholder.parentNode.insertBefore(appHeader, appHeaderPlaceholder);
+    appHeaderPlaceholder.remove();
+    appHeaderPlaceholder = null;
+  }
+
+  function attachReviewFooterToImageManager() {
+    if (imageFooterPlaceholder || reviewFooter.parentElement === imageManagerModal) return;
+    imageFooterPlaceholder = document.createComment("restore-review-footer");
+    reviewFooter.parentNode.insertBefore(imageFooterPlaceholder, reviewFooter);
+    imageManagerModal.appendChild(reviewFooter);
+  }
+
+  function restoreReviewFooterFromImageManager() {
+    if (!imageFooterPlaceholder || !imageFooterPlaceholder.parentNode) return;
+    imageFooterPlaceholder.parentNode.insertBefore(reviewFooter, imageFooterPlaceholder);
+    imageFooterPlaceholder.remove();
+    imageFooterPlaceholder = null;
+  }
+
+  function closeImageManager(restoreFocus = true, restoreReviewFooter = true) {
+    if (imageManagerModal.hidden) return;
+    imageManagerRequestVersion += 1;
+    imageManagerModal.hidden = true;
+    restoreAppHeaderFromImageManager();
+    document.body.classList.remove("image-manager-open");
+    restoreReviewFooterFromImageManager();
+    imageManagerModal.style.removeProperty("--image-manager-footer-space");
+    imageFooterActions.hidden = true;
+    cardImageManager.busy = false;
+    isLoadingImageManager = false;
+    imageManagerTitle.textContent = "IMAGENS DO CARTÃO";
+    manageImagesButton.setAttribute("aria-expanded", "false");
+    if (restoreReviewFooter) reviewFooter.hidden = !activeReviewSessionId;
+    if (restoreFocus && !manageImagesButton.hidden) manageImagesButton.focus();
+  }
+
+  async function cancelImageManager() {
+    if (isSavingImageChanges || imageManagerModal.hidden) return;
+    const pendingCount = cardImageManager.pendingUploads.length + cardImageManager.pendingDeleteIds.size;
+    if (pendingCount > 0) {
+      const message = cardImageManager.completedOperations > 0
+        ? "Algumas operações de imagem já foram salvas. Deseja descartar somente as alterações ainda pendentes?"
+        : "Deseja descartar as alterações de imagem ainda não salvas?";
+      if (!confirm(message)) return;
+    }
+
+    const cardId = imageManagerCardId;
+    const hasCompletedOperations = cardImageManager.completedOperations > 0;
+    resetImageManager(cardImageManager);
+    closeImageManager(true);
+    imageManagerCardId = "";
+    if (hasCompletedOperations) await refreshDisplayedCardImages(cardId);
+  }
+
+  async function closeImageManagerForNavigation() {
+    if (imageManagerModal.hidden) return true;
+    await cancelImageManager();
+    return imageManagerModal.hidden;
+  }
+
+  function updateImageManagerFooterSpace() {
+    if (!document.body.classList.contains("image-manager-open")) return;
+    const footerHeight = reviewFooter.getBoundingClientRect().height;
+    imageManagerModal.style.setProperty(
+      "--image-manager-footer-space",
+      String(Math.ceil(footerHeight + 12)) + "px"
+    );
+  }
+
+  function updateImageManagerActionButtons() {
+    const saving = isSavingImageChanges;
+    cancelImageManagementButton.disabled = saving;
+    saveImageManagementButton.disabled = saving || isLoadingImageManager ||
+      (!imageManagerModal.hidden && cardImageManager.busy);
+  }
+
+  async function openImageManager() {
+    if (isEditing || isSavingEdit || isSavingImageChanges || isLoadingImageManager || data.length === 0) return;
+
+    const card = data[currentCardIndex];
+    const cardId = String(card.id);
+    const requestVersion = ++imageManagerRequestVersion;
+    closeCardImageViewer();
+    resetImageManager(cardImageManager);
+    imageManagerCardId = cardId;
+    imageManagerTitle.textContent = "IMAGENS DO CARTÃO " + card.id;
+    isLoadingImageManager = true;
+    cardImageManager.busy = true;
+    renderImageManager(cardImageManager);
+    attachAppHeaderToImageManager();
+    attachReviewFooterToImageManager();
+    imageManagerModal.hidden = false;
+    document.body.classList.add("image-manager-open");
+    reviewFooter.hidden = false;
+    reviewFooter.style.removeProperty("display");
+    imageFooterActions.hidden = false;
+    manageImagesButton.setAttribute("aria-expanded", "true");
+    updateImageManagerActionButtons();
+    imageManagerTitle.focus();
+    requestAnimationFrame(updateImageManagerFooterSpace);
+
+    try {
+      const existingImages = await getCardImageMetadata(cardId, true);
+      if (requestVersion !== imageManagerRequestVersion || imageManagerModal.hidden) return;
+      cardImageManager.existingImages = existingImages;
+      renderImageManager(cardImageManager);
+    } catch (error) {
+      if (requestVersion !== imageManagerRequestVersion || imageManagerModal.hidden) return;
+      console.error("Não foi possível carregar a lista de imagens:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível carregar as imagens do cartão. " + detail);
+    } finally {
+      if (requestVersion === imageManagerRequestVersion && !imageManagerModal.hidden) {
+        isLoadingImageManager = false;
+        cardImageManager.busy = false;
+        renderImageManager(cardImageManager);
+        updateImageManagerActionButtons();
+      }
+    }
+  }
+
+  async function refreshDisplayedCardImages(cardId) {
+    const card = data.find(item => String(item.id) === String(cardId));
+    if (!card || data[currentCardIndex] !== card) return;
+
+    document.getElementById("front-content").innerHTML = card.frente;
+    document.getElementById("back-content").innerHTML = card.tras;
+    const requestVersion = ++cardFaceImageRenderVersion;
+    const imageRenders = [renderCardFaceImages(card, "FRENTE", requestVersion)];
+    if (backCardField.style.display !== "none") {
+      imageRenders.push(renderCardFaceImages(card, "VERSO", requestVersion));
+    } else {
+      backCardImagesContainer.replaceChildren();
+    }
+    await Promise.all(imageRenders);
+  }
+
+  async function saveImageManagerChanges() {
+    if (isSavingImageChanges || isLoadingImageManager || imageManagerModal.hidden) return;
+    const cardId = imageManagerCardId;
+    const pendingCount = cardImageManager.pendingUploads.length + cardImageManager.pendingDeleteIds.size;
+    if (pendingCount === 0) {
+      showAppNotification("Nenhuma alteração nas imagens para salvar.");
+      await cancelImageManager();
+      return;
+    }
+
+    isSavingImageChanges = true;
+    cardImageManager.busy = true;
+    updateImageManagerActionButtons();
+    renderImageManager(cardImageManager);
+
+    try {
+      if (cardImageManager.pendingUploads.length > 0) {
+        await callAppsScript("getImageStorageStatus");
+        await uploadPendingCardImages(cardImageManager, cardId);
+      }
+      await deletePendingCardImages(cardImageManager, cardId);
+      await refreshDisplayedCardImages(cardId);
+      resetImageManager(cardImageManager);
+      closeImageManager(true);
+      imageManagerCardId = "";
+      showAppNotification("Imagens do cartão atualizadas com sucesso.");
+    } catch (error) {
+      console.error("Erro ao salvar as imagens do cartão:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      const message = cardImageManager.completedOperations > 0
+        ? "Parte das operações foi salva. As operações pendentes continuam no menu para nova tentativa. "
+        : "Não foi possível salvar as imagens. As alterações continuam pendentes. ";
+      try {
+        await refreshDisplayedCardImages(cardId);
+      } catch (refreshError) {
+        console.error("Não foi possível atualizar a exibição das imagens:", refreshError);
+      }
+      showAppNotification(message + detail);
+    } finally {
+      isSavingImageChanges = false;
+      cardImageManager.busy = false;
+      if (!imageManagerModal.hidden) {
+        renderImageManager(cardImageManager);
+        updateImageManagerActionButtons();
+      }
+    }
+  }
+
+  cancelImageManagementButton.addEventListener("click", () => cancelImageManager());
+  saveImageManagementButton.addEventListener("click", () => saveImageManagerChanges());
+  document.addEventListener("keydown", event => {
+    if (imageManagerModal.hidden) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelImageManager();
+      return;
+    }
+    if (event.key !== "Tab") return;
+
+    const focusableElements = Array.from(imageManagerModal.querySelectorAll(
+      'button:not(:disabled), input:not(:disabled), select:not(:disabled)'
+    )).filter(element => element.getClientRects().length > 0);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    if (!focusableElements.includes(document.activeElement)) {
+      event.preventDefault();
+      (event.shiftKey ? lastElement : firstElement).focus();
+      return;
+    }
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  });
+  manageImagesButton.addEventListener("click", openImageManager);
+  window.addEventListener("resize", updateImageManagerFooterSpace);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateImageManagerFooterSpace);
+  }
+
+  function renderImageManager(manager) {
+    manager.input.disabled = manager.busy;
+    manager.side.disabled = manager.busy;
+    manager.queueList.replaceChildren();
+    manager.pendingUploads.forEach((item, index) => {
+      const row = document.createElement("li");
+      const name = document.createElement("span");
+      const removeButton = document.createElement("button");
+      name.className = "card-image-name";
+      name.textContent = item.file.name + " · " + CARD_IMAGE_SIDE_LABELS[item.side];
+      removeButton.type = "button";
+      removeButton.textContent = "Remover";
+      removeButton.disabled = manager.busy;
+      removeButton.setAttribute("aria-label", "Remover " + item.file.name + " da fila");
+      removeButton.addEventListener("click", () => {
+        manager.pendingUploads.splice(index, 1);
+        renderImageManager(manager);
+      });
+      row.append(name, removeButton);
+      manager.queueList.appendChild(row);
+    });
+
+    if (!manager.existingList) return;
+    manager.existingList.replaceChildren();
+    manager.existingImages.forEach(image => {
+      const row = document.createElement("li");
+      const name = document.createElement("span");
+      const toggleButton = document.createElement("button");
+      const pendingRemoval = manager.pendingDeleteIds.has(image.id);
+      name.className = "card-image-name";
+      name.textContent = image.nome + " · " + CARD_IMAGE_SIDE_LABELS[image.lado];
+      toggleButton.type = "button";
+      toggleButton.textContent = pendingRemoval ? "Desfazer" : "Remover";
+      toggleButton.disabled = manager.busy;
+      toggleButton.setAttribute("aria-pressed", String(pendingRemoval));
+      toggleButton.setAttribute(
+        "aria-label",
+        (pendingRemoval ? "Manter " : "Remover ") + image.nome
+      );
+      toggleButton.addEventListener("click", () => {
+        if (manager.pendingDeleteIds.has(image.id)) {
+          manager.pendingDeleteIds.delete(image.id);
+        } else {
+          manager.pendingDeleteIds.add(image.id);
+        }
+        renderImageManager(manager);
+      });
+      row.append(name, toggleButton);
+      manager.existingList.appendChild(row);
+    });
+  }
+
+  function resetImageManager(manager) {
+    manager.pendingUploads = [];
+    manager.existingImages = [];
+    manager.pendingDeleteIds.clear();
+    manager.busy = false;
+    manager.completedOperations = 0;
+    manager.input.value = "";
+    renderImageManager(manager);
+  }
+
+  async function getCardImageMetadata(cardId, forceRefresh = false) {
+    const key = String(cardId);
+    const card = data.find(item => String(item.id) === key);
+    if (!forceRefresh && card && Array.isArray(card.images)) {
+      cardImageMetadataCache.set(key, card.images);
+      return card.images;
+    }
+    if (!forceRefresh && cardImageMetadataCache.has(key)) {
+      return cardImageMetadataCache.get(key);
+    }
+    if (!forceRefresh && cardImageMetadataRequests.has(key)) {
+      return cardImageMetadataRequests.get(key);
+    }
+
+    const request = (async () => {
+      const response = await callAppsScript("getCardImages", { id: key });
+      if (!response || response.success !== true || !Array.isArray(response.images)) {
+        throw new Error("A API não retornou a lista de imagens do cartão.");
+      }
+      return setCardImageMetadataCache(key, response.images);
+    })();
+    if (!forceRefresh) cardImageMetadataRequests.set(key, request);
+    try {
+      return await request;
+    } finally {
+      if (cardImageMetadataRequests.get(key) === request) {
+        cardImageMetadataRequests.delete(key);
+      }
+    }
+  }
+
+  function setCardImageMetadataCache(cardId, images) {
+    const key = String(cardId);
+    const normalizedImages = Array.isArray(images) ? images.slice() : [];
+    cardImageMetadataCache.set(key, normalizedImages);
+    const card = data.find(item => String(item.id) === key);
+    if (card) {
+      card.images = normalizedImages;
+      card.id_imagem = normalizedImages.length > 0 ? "SIM" : "NÃO";
+    }
+    return normalizedImages;
+  }
+
+  function applyCardImageTextResponse(cardId, response) {
+    if (!response || !Object.prototype.hasOwnProperty.call(response, "frente") ||
+        !Object.prototype.hasOwnProperty.call(response, "tras")) {
+      throw new Error("A API não devolveu Frente e Verso atualizados. Publique a versão atual do Apps Script.");
+    }
+
+    const card = data.find(item => String(item.id) === String(cardId));
+    if (!card) return;
+
+    card.frente = String(response.frente == null ? "" : response.frente);
+    card.tras = String(response.tras == null ? "" : response.tras);
+    if (isEditing && data[currentCardIndex] === card) {
+      originalFrontText = card.frente;
+      originalBackText = card.tras;
+      const frontEditor = document.getElementById("front-edit");
+      const backEditor = document.getElementById("back-edit");
+      if (frontEditor) {
+        frontEditor.value = card.frente;
+        resizeTextareaToContent(frontEditor);
+      }
+      if (backEditor) {
+        backEditor.value = card.tras;
+        resizeTextareaToContent(backEditor);
+      }
+    }
+  }
+
+  function updateCardImageMetadataCache(cardId, image) {
+    const key = String(cardId);
+    const card = data.find(item => String(item.id) === key);
+    const currentImages = cardImageMetadataCache.get(key) ||
+      (card && Array.isArray(card.images) ? card.images : []);
+    const images = currentImages
+      .filter(item => item.id !== image.id);
+    images.push(image);
+    images.sort((first, second) => {
+      const sideOrder = { FRENTE: 0, VERSO: 1, ANEXO: 2 };
+      return sideOrder[first.lado] - sideOrder[second.lado] ||
+        first.ordem - second.ordem ||
+        first.nome.localeCompare(second.nome, "pt-BR");
+    });
+    setCardImageMetadataCache(key, images);
+  }
+
+  function cacheCardImageData(imageId, dataUrl) {
+    cardImageDataCache.set(String(imageId), dataUrl);
+    while (cardImageDataCache.size > 3) {
+      cardImageDataCache.delete(cardImageDataCache.keys().next().value);
+    }
+  }
+
+  async function getCardImageDataUrl(cardId, image) {
+    const imageId = String(image.id);
+    const cachedDataUrl = cardImageDataCache.get(imageId);
+    if (cachedDataUrl) return cachedDataUrl;
+    if (cardImageDataRequests.has(imageId)) return cardImageDataRequests.get(imageId);
+
+    const request = (async () => {
+      const response = await callAppsScript("getCardImage", {
+        id: String(cardId),
+        imageId
+      });
+      const dataUrl = response && response.image && response.image.dataUrl;
+      if (typeof dataUrl !== "string" || !/^data:image\/(jpeg|png|webp);base64,/.test(dataUrl)) {
+        throw new Error("A API não retornou um arquivo de imagem válido.");
+      }
+      cacheCardImageData(imageId, dataUrl);
+      return dataUrl;
+    })();
+    cardImageDataRequests.set(imageId, request);
+    try {
+      return await request;
+    } finally {
+      if (cardImageDataRequests.get(imageId) === request) {
+        cardImageDataRequests.delete(imageId);
+      }
+    }
+  }
+
+  async function prepareCardImage(file) {
+    if (!ALLOWED_CARD_IMAGE_TYPES.includes(file.type)) {
+      throw new Error("Use uma imagem JPG, PNG ou WebP.");
+    }
+    if (file.size > MAX_INPUT_IMAGE_BYTES) {
+      throw new Error("O arquivo selecionado excede 20 MB.");
+    }
+    if (typeof window.createImageBitmap !== "function") {
+      if (file.size <= MAX_CARD_IMAGE_BYTES) return file;
+      throw new Error("Este navegador não consegue otimizar a imagem selecionada.");
+    }
+
+    let bitmap;
+    try {
+      bitmap = await window.createImageBitmap(file);
+    } catch (error) {
+      throw new Error("Não foi possível abrir o arquivo de imagem selecionado.");
+    }
+
+    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size <= MAX_CARD_IMAGE_BYTES) {
+      bitmap.close();
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext("2d");
+    if (!context) {
+      bitmap.close();
+      throw new Error("Não foi possível preparar a imagem neste navegador.");
+    }
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const mimeType = file.type;
+    const qualityLevels = mimeType === "image/png" ? [undefined] : [0.84, 0.72, 0.62];
+    let preparedBlob = null;
+    for (const quality of qualityLevels) {
+      preparedBlob = await new Promise(resolve => {
+        canvas.toBlob(resolve, mimeType, quality);
+      });
+      if (preparedBlob && preparedBlob.size <= MAX_CARD_IMAGE_BYTES) break;
+    }
+    if (!preparedBlob || preparedBlob.size > MAX_CARD_IMAGE_BYTES) {
+      throw new Error("A imagem continua maior que 3 MB após otimização. Reduza o arquivo e tente novamente.");
+    }
+
+    const extensionByType = {
+      "image/jpeg": ".jpg",
+      "image/png": ".png",
+      "image/webp": ".webp"
+    };
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+    return new File(
+      [preparedBlob],
+      baseName + extensionByType[preparedBlob.type || mimeType],
+      { type: preparedBlob.type || mimeType, lastModified: file.lastModified }
+    );
+  }
+
+  function readImageAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = String(reader.result || "");
+        const separator = dataUrl.indexOf(",");
+        if (separator < 0) {
+          reject(new Error("Não foi possível ler a imagem selecionada."));
+          return;
+        }
+        resolve(dataUrl.slice(separator + 1));
+      };
+      reader.onerror = () => reject(new Error("Não foi possível ler a imagem selecionada."));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadPendingCardImages(manager, cardId) {
+    const uploaded = [];
+    while (manager.pendingUploads.length > 0) {
+      const item = manager.pendingUploads[0];
+      const file = await prepareCardImage(item.file);
+      const imageData = await readImageAsBase64(file);
+      const response = await callAppsScript("uploadCardImage", {
+        id: cardId,
+        uploadId: item.uploadId,
+        name: file.name,
+        mimeType: file.type,
+        lado: item.side,
+        imageData
+      });
+      if (!response || response.success !== true || !response.image || !response.image.id) {
+        throw new Error("A API não confirmou o envio da imagem.");
+      }
+      applyCardImageTextResponse(cardId, response);
+      manager.pendingUploads.shift();
+      manager.completedOperations += 1;
+      updateCardImageMetadataCache(cardId, response.image);
+      cacheCardImageData(response.image.id, "data:" + file.type + ";base64," + imageData);
+      if (manager.existingList) manager.existingImages.push(response.image);
+      uploaded.push(response.image);
+      renderImageManager(manager);
+    }
+    return uploaded;
+  }
+
+  async function deletePendingCardImages(manager, cardId) {
+    const deleted = [];
+    for (const image of manager.existingImages) {
+      if (!manager.pendingDeleteIds.has(image.id)) continue;
+      const response = await callAppsScript("deleteCardImage", {
+        id: cardId,
+        imageId: image.id,
+        name: image.nome,
+        lado: image.lado,
+        ordem: image.ordem
+      });
+      if (!response || response.success !== true) {
+        throw new Error("A API não confirmou a remoção da imagem " + image.nome + ".");
+      }
+      applyCardImageTextResponse(cardId, response);
+      manager.pendingDeleteIds.delete(image.id);
+      manager.completedOperations += 1;
+      manager.existingImages = manager.existingImages.filter(item => item.id !== image.id);
+      const cachedImages = await getCardImageMetadata(cardId);
+      setCardImageMetadataCache(cardId, cachedImages.filter(item => item.id !== image.id));
+      cardImageDataCache.delete(image.id);
+      deleted.push(image);
+      renderImageManager(manager);
+    }
+    return deleted;
+  }
+
+  const cardImagesButton = document.getElementById("card-images-button");
+  const imageViewer = document.getElementById("image-viewer");
+  const imageViewerImage = document.getElementById("card-image-viewer-image");
+  const imageViewerTitle = document.getElementById("image-viewer-title");
+  const imageViewerCaption = document.getElementById("image-viewer-caption");
+  const imageViewerCounter = document.getElementById("image-viewer-counter");
+  const previousImageButton = document.getElementById("previous-card-image");
+  const nextImageButton = document.getElementById("next-card-image");
+  const frontCardImagesContainer = document.getElementById("front-card-images");
+  const backCardImagesContainer = document.getElementById("back-card-images");
+  const backCardField = document.getElementById("back-card-field");
+  let imageViewerCardId = "";
+  let imageViewerImages = [];
+  let imageViewerIndex = 0;
+  let imageViewerRequestVersion = 0;
+  let cardFaceImageRenderVersion = 0;
+
+  function isCurrentCardFaceImageRender(cardId, requestVersion) {
+    return requestVersion === cardFaceImageRenderVersion &&
+      data.length > 0 &&
+      String(data[currentCardIndex].id) === String(cardId);
+  }
+
+  async function renderCardFaceImages(card, side, requestVersion) {
+    const container = side === "FRENTE" ? frontCardImagesContainer : backCardImagesContainer;
+    container.replaceChildren();
+
+    try {
+      const images = await getCardImageMetadata(card.id);
+      if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+
+      cardImagesButton.hidden = images.length === 0;
+      const faceImages = images.filter(image => image.lado === side);
+      let failedImages = 0;
+
+      for (const image of faceImages) {
+        if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+        const imageElement = document.createElement("img");
+        imageElement.className = "card-face-image";
+        imageElement.alt = image.nome || "Imagem da " + CARD_IMAGE_SIDE_LABELS[side].toLowerCase();
+        imageElement.decoding = "async";
+        container.appendChild(imageElement);
+
+        try {
+          imageElement.src = await getCardImageDataUrl(card.id, image);
+        } catch (error) {
+          if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+          imageElement.remove();
+          failedImages += 1;
+          console.error("Erro ao carregar imagem do cartão:", error);
+        }
+      }
+
+      if (failedImages > 0 && isCurrentCardFaceImageRender(card.id, requestVersion)) {
+        const loadError = document.createElement("p");
+        loadError.className = "card-image-load-error";
+        loadError.textContent = "Não foi possível carregar " +
+          (failedImages === 1 ? "uma imagem desta face." : "algumas imagens desta face.");
+        container.appendChild(loadError);
+      }
+    } catch (error) {
+      if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+      console.error("Erro ao consultar imagens do cartão:", error);
+      const loadError = document.createElement("p");
+      loadError.className = "card-image-load-error";
+      loadError.textContent = "Não foi possível consultar as imagens deste cartão.";
+      container.appendChild(loadError);
+    }
+  }
+
+  function closeCardImageViewer() {
+    imageViewerRequestVersion += 1;
+    imageViewer.hidden = true;
+    imageViewerImage.removeAttribute("src");
+    imageViewerImage.alt = "";
+    imageViewerTitle.textContent = "Imagens do cartão";
+    imageViewerCaption.textContent = "";
+    imageViewerCounter.textContent = "";
+    imageViewerImages = [];
+    imageViewerCardId = "";
+  }
+
+  async function renderCurrentCardImage() {
+    if (imageViewer.hidden || imageViewerImages.length === 0) return;
+    const image = imageViewerImages[imageViewerIndex];
+    const requestVersion = ++imageViewerRequestVersion;
+    const currentCardId = imageViewerCardId;
+    imageViewerImage.removeAttribute("src");
+    imageViewerImage.alt = image.nome;
+    imageViewerCaption.textContent = "Carregando " + image.nome + "...";
+    imageViewerTitle.textContent = CARD_IMAGE_SIDE_LABELS[image.lado];
+    imageViewerCounter.textContent = (imageViewerIndex + 1) + " / " + imageViewerImages.length;
+    previousImageButton.disabled = imageViewerIndex === 0;
+    nextImageButton.disabled = imageViewerIndex === imageViewerImages.length - 1;
+
+    try {
+      const dataUrl = await getCardImageDataUrl(currentCardId, image);
+      if (requestVersion !== imageViewerRequestVersion || imageViewer.hidden) return;
+      imageViewerImage.src = dataUrl;
+      imageViewerCaption.textContent =
+        CARD_IMAGE_SIDE_LABELS[image.lado] + " · " + image.nome;
+    } catch (error) {
+      if (requestVersion !== imageViewerRequestVersion || imageViewer.hidden) return;
+      imageViewerCaption.textContent = "Não foi possível carregar esta imagem.";
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Falha ao abrir a imagem. " + detail);
+    }
+  }
+
+  async function openCardImageViewer() {
+    if (data.length === 0) return;
+    const card = data[currentCardIndex];
+    imageViewerCardId = String(card.id);
+    imageViewerImages = [];
+    imageViewerIndex = 0;
+    imageViewer.hidden = false;
+    imageViewerTitle.textContent = "Imagens do cartão " + card.id;
+    imageViewerCaption.textContent = "Carregando anexos...";
+    imageViewerCounter.textContent = "";
+    imageViewerImage.removeAttribute("src");
+
+    try {
+      imageViewerImages = await getCardImageMetadata(card.id);
+      if (imageViewer.hidden) return;
+      if (imageViewerImages.length === 0) {
+        closeCardImageViewer();
+        showAppNotification("Este cartão ainda não tem imagens anexadas.");
+        return;
+      }
+      await renderCurrentCardImage();
+    } catch (error) {
+      closeCardImageViewer();
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível carregar as imagens do cartão. " + detail);
+    }
+  }
+
+  cardImagesButton.addEventListener("click", openCardImageViewer);
+  document.getElementById("close-image-viewer").addEventListener("click", closeCardImageViewer);
+  imageViewer.addEventListener("click", event => {
+    if (event.target === imageViewer) closeCardImageViewer();
+  });
+  previousImageButton.addEventListener("click", () => {
+    if (imageViewerIndex <= 0) return;
+    imageViewerIndex -= 1;
+    renderCurrentCardImage();
+  });
+  nextImageButton.addEventListener("click", () => {
+    if (imageViewerIndex >= imageViewerImages.length - 1) return;
+    imageViewerIndex += 1;
+    renderCurrentCardImage();
+  });
+  document.addEventListener("keydown", event => {
+    if (imageViewer.hidden) return;
+    if (event.key === "Escape") closeCardImageViewer();
+    if (event.key === "ArrowLeft" && imageViewerIndex > 0) {
+      imageViewerIndex -= 1;
+      renderCurrentCardImage();
+    }
+    if (event.key === "ArrowRight" && imageViewerIndex < imageViewerImages.length - 1) {
+      imageViewerIndex += 1;
+      renderCurrentCardImage();
+    }
+  });
+
   // AUXILIAR NO CONTADOR DE CARTÕES
   let isSavingFavorite = false;
   let isSavingDeletionMarker = false;
@@ -1459,6 +2850,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("add-button").style.removeProperty("flex");
     document.getElementById("flashcard").hidden = !isVisible;
     document.getElementById("review-footer").hidden = !isVisible;
+    cardImagesButton.hidden = !isVisible;
+    manageImagesButton.hidden = !isVisible;
+    if (!isVisible) {
+      if (!imageManagerModal.hidden) {
+        resetImageManager(cardImageManager);
+        closeImageManager(false, false);
+        imageManagerCardId = "";
+      }
+      cardFaceImageRenderVersion += 1;
+      frontCardImagesContainer.replaceChildren();
+      backCardImagesContainer.replaceChildren();
+      closeCardImageViewer();
+    }
   }
 
   function setReviewSessionPage(page, options = {}) {
@@ -1490,7 +2894,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       document.getElementById("data-button").style.display = "none";
       document.getElementById("excluir-button").style.display = "none";
       document.getElementById("navigation-buttons").hidden = true;
-      ["cabecalho-frente", "front-content", "cabecalho-verso", "back-content"].forEach(elementId => {
+      ["cabecalho-frente", "front-content", "front-card-images", "cabecalho-verso", "back-content", "back-card-images"].forEach(elementId => {
         document.getElementById(elementId).replaceChildren();
       });
       if (options.notifyEmpty !== false) {
@@ -1597,6 +3001,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       !card || typeof card !== "object" ||
       !Object.prototype.hasOwnProperty.call(card, "materia") ||
       !Object.prototype.hasOwnProperty.call(card, "assunto") ||
+       !Object.prototype.hasOwnProperty.call(card, "id_imagem") ||
+       !["SIM", "NÃO"].includes(card.id_imagem) ||
       !Object.prototype.hasOwnProperty.call(card, "resultado") ||
       !Object.prototype.hasOwnProperty.call(card, "qtd_acertos") ||
       !Object.prototype.hasOwnProperty.call(card, "qtd_erros") ||
@@ -1895,20 +3301,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     const value = input.value.trim();
     if (!value) return null;
 
-    if (!/^\d+$/.test(value)) {
-      showAppNotification("Informe o ID do cartão usando apenas números inteiros.");
+    const match = value.match(/^(?:QID)?(\d+)$/i);
+    if (!match) {
+      showAppNotification("Informe o ID como número ou no formato QID123.");
       input.focus();
       return undefined;
     }
 
-    const id = Number(value);
+    const id = Number(match[1]);
     if (!Number.isSafeInteger(id) || id < 1) {
       showAppNotification("Informe um ID do cartão inteiro positivo válido.");
       input.focus();
       return undefined;
     }
 
-    input.value = String(id);
+    input.value = "QID" + id;
     return String(id);
   }
 
@@ -2006,6 +3413,8 @@ async function applyFilters(options = {}) {
     const heading = document.getElementById(elementId);
     const container = document.createElement("span");
     const label = document.createElement("span");
+    const idLabel = document.createElement("span");
+    const sideLabel = document.createElement("span");
     const dataLines = document.createElement("span");
     const headingParts = [card.disciplina, card.materia, card.assunto]
       .map(value => String(value == null ? "" : value).trim())
@@ -2013,7 +3422,11 @@ async function applyFilters(options = {}) {
 
     container.className = "card-heading";
     label.className = "card-heading-label";
-    label.textContent = side;
+    idLabel.className = "card-heading-id";
+    idLabel.textContent = "QID" + String(card.id);
+    sideLabel.className = "card-heading-side";
+    sideLabel.textContent = side;
+    label.append(idLabel, document.createTextNode(" - "), sideLabel);
     dataLines.className = "card-heading-data";
     headingParts.forEach(value => {
       const fieldLine = document.createElement("span");
@@ -2092,17 +3505,28 @@ async function applyFilters(options = {}) {
     const hasCard = data.length > 0;
     const showAnswer = hasCard && isVisible;
     const answerDisplay = showAnswer ? "block" : "none";
+    document.getElementById("back-flashcard").hidden = !showAnswer;
+    backCardField.style.display = showAnswer ? "block" : "none";
     document.getElementById("back-content").style.display = answerDisplay;
     document.getElementById("cabecalho-verso").style.display = answerDisplay;
+    backCardImagesContainer.style.display = showAnswer ? "" : "none";
     document.getElementById("result-buttons").hidden = !showAnswer;
     document.getElementById("mostrar-btn").hidden = !hasCard || showAnswer;
     document.getElementById("ocultar-btn").hidden = !showAnswer;
+    if (showAnswer) {
+      renderCardFaceImages(data[currentCardIndex], "VERSO", cardFaceImageRenderVersion);
+    }
   }
 
   function renderCard() {
     if (data.length === 0) return;
 
     const card = data[currentCardIndex];
+    cardImagesButton.hidden = false;
+    const imageRenderVersion = ++cardFaceImageRenderVersion;
+    frontCardImagesContainer.replaceChildren();
+    backCardImagesContainer.replaceChildren();
+    if (!imageViewer.hidden) closeCardImageViewer();
     updateFavoriteButton(card);
     updateResultCounters(card);
     document.getElementById("front-content").innerHTML = card.frente;
@@ -2110,6 +3534,7 @@ async function applyFilters(options = {}) {
     setAnswerVisibility(false);
     renderCardHeading("cabecalho-frente", "FRENTE", card);
     renderCardHeading("cabecalho-verso", "VERSO", card);
+    renderCardFaceImages(card, "FRENTE", imageRenderVersion);
 
 
     updateReviewDateButton(card);
@@ -2136,7 +3561,9 @@ async function applyFilters(options = {}) {
       card.favorito = nextFavoriteState;
       updateFavoriteButton(card);
 
-      if (!nextFavoriteState && document.getElementById("favoritos-filter").value === "sim") {
+      const favoritesFilter = document.getElementById("favoritos-filter").value;
+      if ((favoritesFilter === "sim" && !nextFavoriteState) ||
+          (favoritesFilter === "nao" && nextFavoriteState)) {
         if (!(await applyFilters({ notifyEmpty: false }))) return;
       }
       showAppNotification(nextFavoriteState
@@ -2316,6 +3743,7 @@ async function clearFilters() {
   }
 
   async function returnToHome() {
+    if (!await closeImageManagerForNavigation()) return;
     if (isEditing) {
       showAppNotification("Finalize ou cancele a edição antes de voltar ao início.");
       return;
@@ -2342,7 +3770,10 @@ async function clearFilters() {
     refreshDependentFilterOptions("resultado");
   });
 
-  document.getElementById("menu-toggle").addEventListener("click", toggleSideMenu);
+  document.getElementById("menu-toggle").addEventListener("click", async () => {
+    if (!await closeImageManagerForNavigation()) return;
+    toggleSideMenu();
+  });
   document.getElementById("home-button").addEventListener("click", () => {
     returnToHome().catch(error => {
       console.error("Erro ao voltar ao início:", error);
@@ -2435,6 +3866,7 @@ async function clearFilters() {
 
 let isEditing = false;
 let isSavingEdit = false;
+let shouldRefreshFiltersAfterEdit = false;
 let originalFrontText = ""; //mantém as informações atuais do card frente
 let originalBackText = ""; //mantém as informações atuais do card trás
 const editFooterActions = document.getElementById("edit-footer-actions");
@@ -2574,7 +4006,7 @@ async function toggleEditMode() {
   const pppCopyButton = document.getElementById("ppp-copy-button");
   const linkCopyButton = document.getElementById("link-copy-button");
   const metadataEditor = document.getElementById("card-metadata-editor");
-  let refreshFiltersAfterSave = false;
+  const cardEditTitle = document.getElementById("card-edit-title");
 
 
   // VARIÁVEIS PARA AS FUNÇÕES DOS BOTÕES DE EDIÇÃO
@@ -2583,6 +4015,7 @@ async function toggleEditMode() {
 
   if (!isEditing) {
     // Modo de edição
+    cardEditTitle.textContent = "EDITAR CARTÃO " + data[currentCardIndex].id;
     const frontText = frontContent.innerHTML;
     const backText = backContent.innerHTML;
     originalFrontText = frontText;
@@ -2593,13 +4026,19 @@ async function toggleEditMode() {
     const frontEditor = document.createElement("textarea");
     frontEditor.id = "front-edit";
     frontEditor.value = frontText;
+    frontEditor.addEventListener("input", () => resizeTextareaToContent(frontEditor));
     frontContent.replaceChildren(frontEditor);
 
     const backEditor = document.createElement("textarea");
     backEditor.id = "back-edit";
     backEditor.value = backText;
+    backEditor.addEventListener("input", () => resizeTextareaToContent(backEditor));
     backContent.replaceChildren(backEditor);
+    document.getElementById("back-flashcard").hidden = false;
+    backCardField.style.display = "block";
+    document.getElementById("cabecalho-verso").style.display = "block";
     backContent.style.display = "block"; // Certificar-se de mostrar o verso
+    backCardImagesContainer.style.display = "";
 
     // Alterar texto do botão
     editButton.textContent = "💾";
@@ -2664,6 +4103,7 @@ async function toggleEditMode() {
 
         let newText = value.slice(0, selectionStart) + valueToInsert + value.slice(selectionEnd);
         lastFocusedTextarea.value = newText;
+        resizeTextareaToContent(lastFocusedTextarea);
         lastFocusedTextarea.selectionStart = lastFocusedTextarea.selectionEnd = selectionStart + valueToInsert.length;
         lastFocusedTextarea.focus();
       }
@@ -2792,6 +4232,10 @@ async function toggleEditMode() {
     // Salvar alterações
     const newFrontText = document.getElementById("front-edit").value;
     const newBackText = document.getElementById("back-edit").value;
+    const cardTextEditors = [
+      document.getElementById("front-edit"),
+      document.getElementById("back-edit")
+    ];
     const currentCard = data[currentCardIndex];
     const newDiscipline = document.getElementById("edit-card-discipline").value.trim();
     const newMatter = document.getElementById("edit-card-matter").value.trim();
@@ -2810,7 +4254,8 @@ async function toggleEditMode() {
       isSavingEdit = true;
       editButton.disabled = true;
       cancelButton.disabled = true;
-      metadataEditor.querySelectorAll("select, input").forEach(field => { field.disabled = true; });
+      cardTextEditors.forEach(field => { field.disabled = true; });
+      metadataEditor.querySelectorAll("select, input, button").forEach(field => { field.disabled = true; });
       const savedCard = await sendApiMutation({
         ...cardMutationReference(currentCard),
         disciplina: newDiscipline,
@@ -2824,30 +4269,35 @@ async function toggleEditMode() {
           !Object.prototype.hasOwnProperty.call(savedCard, "assunto")) {
         throw new Error("A API não devolveu a classificação atualizada. Publique a versão atual do Apps Script.");
       }
-      refreshFiltersAfterSave =
+      if (!Object.prototype.hasOwnProperty.call(savedCard, "frente") ||
+          !Object.prototype.hasOwnProperty.call(savedCard, "tras")) {
+        throw new Error("A API não devolveu Frente e Verso atualizados. Publique a versão atual do Apps Script.");
+      }
+      shouldRefreshFiltersAfterEdit = shouldRefreshFiltersAfterEdit ||
         classificationValueKey(currentCard.disciplina) !== classificationValueKey(savedCard.disciplina) ||
         classificationValueKey(currentCard.materia) !== classificationValueKey(savedCard.materia);
       currentCard.disciplina = savedCard.disciplina;
       currentCard.materia = savedCard.materia;
       currentCard.assunto = savedCard.assunto;
+      applyCardImageTextResponse(currentCard.id, savedCard);
     } catch (error) {
       console.error("Error saving card:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      showAppNotification(`Não foi possível salvar as alterações. O cartão continua em modo de edição. ${detail}`);
+      showAppNotification("Não foi possível salvar as alterações. O cartão continua em modo de edição. " + detail);
       return;
     } finally {
       isSavingEdit = false;
       editButton.disabled = false;
       cancelButton.disabled = false;
-      metadataEditor.querySelectorAll("select, input").forEach(field => { field.disabled = false; });
+      cardTextEditors.forEach(field => { field.disabled = false; });
+      metadataEditor.querySelectorAll("select, input, button").forEach(field => { field.disabled = false; });
     }
 
-    currentCard.frente = newFrontText;
-    currentCard.tras = newBackText;
-
     // Atualizar conteúdos
-    frontContent.innerHTML = newFrontText;
-    backContent.innerHTML = newBackText;
+    frontContent.innerHTML = currentCard.frente;
+    backContent.innerHTML = currentCard.tras;
+    originalFrontText = currentCard.frente;
+    originalBackText = currentCard.tras;
     metadataEditor.hidden = true;
     renderCardHeading("cabecalho-frente", "FRENTE", currentCard);
     renderCardHeading("cabecalho-verso", "VERSO", currentCard);
@@ -2876,6 +4326,7 @@ async function toggleEditMode() {
     addButton.style.display = "inline-block"; // botão adicionar cartão
     counterButton.style.display = "inline-block"; // contador
     setAnswerVisibility(false);
+    if (!shouldRefreshFiltersAfterEdit) renderCard();
 
     // Opcional: enviar os dados atualizados para a API ou backend, se necessário
     showAppNotification("Alterações salvas com sucesso!");
@@ -2885,9 +4336,13 @@ async function toggleEditMode() {
 
   isEditing = !isEditing;
   document.body.classList.toggle("card-edit-open", isEditing);
+  if (isEditing) {
+    updateCardEditTitlePosition();
+    requestAnimationFrame(resizeActiveCardEditors);
+  }
 
-  if (!isEditing && refreshFiltersAfterSave) {
-    refreshFiltersAfterSave = false;
+  if (!isEditing && shouldRefreshFiltersAfterEdit) {
+    shouldRefreshFiltersAfterEdit = false;
     try {
       await fetchFilters(getSelectedReviewFilters());
       if (!(await applyFilters({ notifyEmpty: false }))) {
@@ -2922,7 +4377,6 @@ function cancelEditMode() {
   const linkCopyButton = document.getElementById("link-copy-button");
   const metadataEditor = document.getElementById("card-metadata-editor");
 
-  // Confirmação para cancelar alterações
   const confirmCancel = confirm("Tem certeza que deseja cancelar a modificação?");
   if (!confirmCancel) return;
   
@@ -2930,6 +4384,10 @@ function cancelEditMode() {
   frontContent.innerHTML = originalFrontText;
   backContent.innerHTML = originalBackText;
   metadataEditor.hidden = true;
+  if (data.length > 0) {
+    renderCardHeading("cabecalho-frente", "FRENTE", data[currentCardIndex]);
+    renderCardHeading("cabecalho-verso", "VERSO", data[currentCardIndex]);
+  }
 
   // Alterar texto do botão e esconder botão "Voltar"
   editButton.textContent = "✎";
@@ -2957,6 +4415,15 @@ function cancelEditMode() {
 
   isEditing = false;
   document.body.classList.remove("card-edit-open");
+  if (shouldRefreshFiltersAfterEdit) {
+    shouldRefreshFiltersAfterEdit = false;
+    fetchFilters(getSelectedReviewFilters())
+      .then(() => applyFilters({ notifyEmpty: false }))
+      .catch(error => {
+        console.error("Erro ao atualizar os filtros após cancelar a edição:", error);
+        showAppNotification("Os dados salvos foram mantidos, mas os filtros precisam ser reaplicados.");
+      });
+  }
 }
 
 
@@ -2969,7 +4436,6 @@ function cancelEditMode() {
   const cancelAddCard = document.getElementById("cancel-add-card");
   const saveAddCardButton = document.getElementById("save-add-card");
   const addCardFooterActions = document.getElementById("add-card-footer-actions");
-  const reviewFooter = document.getElementById("review-footer");
   const disciplineSelect = document.getElementById("disciplina-form-add-card");
   const matterSelect = document.getElementById("materia-form-add-card");
   const assuntoInput = document.getElementById("assunto-form-add-card");
@@ -2977,6 +4443,38 @@ function cancelEditMode() {
     document.getElementById("frente-form-textarea"),
     document.getElementById("verso-form-textarea")
   ];
+  let pendingAddCard = null;
+  let pendingAddHadActiveReviewSession = false;
+
+  function setAddCardFieldsDisabled(disabled) {
+    [disciplineSelect, matterSelect, assuntoInput, ...addCardTextareas].forEach(field => {
+      field.disabled = disabled;
+    });
+  }
+
+  async function finishAddedCardFlow(savedCard, successMessage) {
+    const hadActiveReviewSession = pendingAddHadActiveReviewSession;
+    pendingAddCard = null;
+    pendingAddHadActiveReviewSession = false;
+    setAddCardModalOpen(false);
+    addCardForm.reset();
+    setAddCardFieldsDisabled(false);
+    resetImageManager(addImageManager);
+    updateAddCardMatterOptions();
+
+    try {
+      const currentFilters = getSelectedReviewFilters();
+      await fetchFilters(currentFilters);
+      if (hadActiveReviewSession) {
+        document.getElementById("id-cartao-filter").value = "";
+        await applyFilters({ prioritizeId: savedCard.id });
+      }
+      showAppNotification(successMessage || "Novo cartão adicionado com sucesso!");
+    } catch (refreshError) {
+      console.error("Cartão salvo, mas a lista não pôde ser atualizada:", refreshError);
+      showAppNotification("O cartão foi salvo na planilha, mas não foi possível atualizar a lista. Recarregue o app para vê-lo.");
+    }
+  }
 
   function updateAddCardFooterSpace() {
     if (!document.body.classList.contains("add-card-modal-open")) return;
@@ -3009,21 +4507,50 @@ function cancelEditMode() {
     window.visualViewport.addEventListener("resize", updateAddCardFooterSpace);
   }
 
-  function resizeAddCardTextarea(textarea) {
+  function resizeTextareaToContent(textarea) {
+    if (!textarea) return;
     textarea.style.height = "auto";
     const styles = getComputedStyle(textarea);
     const minHeight = parseFloat(styles.minHeight) || 96;
-    const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth);
-    textarea.style.height = `${Math.max(textarea.scrollHeight + borderHeight, minHeight)}px`;
+    const borderHeight = (parseFloat(styles.borderTopWidth) || 0) +
+      (parseFloat(styles.borderBottomWidth) || 0);
+    const paddingHeight = (parseFloat(styles.paddingTop) || 0) +
+      (parseFloat(styles.paddingBottom) || 0);
+    const contentHeight = styles.boxSizing === "border-box"
+      ? textarea.scrollHeight + borderHeight
+      : textarea.scrollHeight - paddingHeight;
+    textarea.style.height = `${Math.max(Math.ceil(contentHeight), minHeight)}px`;
   }
 
+  function resizeActiveCardEditors() {
+    if (!document.body.classList.contains("card-edit-open")) return;
+    resizeTextareaToContent(document.getElementById("front-edit"));
+    resizeTextareaToContent(document.getElementById("back-edit"));
+  }
+
+  function updateCardEditTitlePosition() {
+    if (!document.body.classList.contains("card-edit-open")) return;
+    const appHeader = document.querySelector(".header");
+    const cardEditTitle = document.getElementById("card-edit-title");
+    if (!appHeader || !cardEditTitle) return;
+    cardEditTitle.style.top = `${Math.ceil(appHeader.getBoundingClientRect().bottom)}px`;
+  }
+
+  window.addEventListener("resize", () => {
+    updateCardEditTitlePosition();
+    requestAnimationFrame(resizeActiveCardEditors);
+  });
+
   addCardTextareas.forEach(textarea => {
-    textarea.addEventListener("input", () => resizeAddCardTextarea(textarea));
-    resizeAddCardTextarea(textarea);
+    textarea.addEventListener("input", () => resizeTextareaToContent(textarea));
+    resizeTextareaToContent(textarea);
   });
 
   addCardForm.addEventListener("reset", () => {
-    requestAnimationFrame(() => addCardTextareas.forEach(resizeAddCardTextarea));
+    requestAnimationFrame(() => {
+      addCardTextareas.forEach(resizeTextareaToContent);
+      if (!pendingAddCard) resetImageManager(addImageManager);
+    });
   });
 
   disciplineSelect.addEventListener("change", () => {
@@ -3033,13 +4560,33 @@ function cancelEditMode() {
 
   // Mostrar o modal e as ações no rodapé comum.
   addButton.addEventListener("click", () => {
+    if (!pendingAddCard) {
+      setAddCardFieldsDisabled(false);
+      resetImageManager(addImageManager);
+    }
     setAddCardModalOpen(true);
   });
 
   // Fechar o modal ao clicar em "Cancelar"
-  cancelAddCard.addEventListener("click", () => {
+  cancelAddCard.addEventListener("click", async () => {
+    if (pendingAddCard) {
+      const pendingCount = addImageManager.pendingUploads.length;
+      const confirmed = pendingCount === 0 || window.confirm(
+        "O cartão " + pendingAddCard.id + " já foi salvo, mas ainda há " + pendingCount +
+        " imagem(ns) não enviada(s). Sair e descartar essa fila?"
+      );
+      if (!confirmed) return;
+      const savedCard = pendingAddCard;
+      const message = pendingCount
+        ? "Cartão " + savedCard.id + " salvo. As imagens que faltavam foram descartadas."
+        : "Cartão " + savedCard.id + " salvo.";
+      await finishAddedCardFlow(savedCard, message);
+      return;
+    }
+
     setAddCardModalOpen(false);
-    addCardForm.reset(); // Limpar o formulário
+    addCardForm.reset();
+    resetImageManager(addImageManager);
     updateAddCardMatterOptions();
   });
 
@@ -3047,64 +4594,61 @@ function cancelEditMode() {
   addCardForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Coletar os dados do formulário
-    const disciplinaFormAddCard = disciplineSelect.value.trim();
-    const materiaFormAddCard = matterSelect.value.trim();
-    const assuntoFormAddCard = assuntoInput.value.trim();
-    const frenteFormTextarea = document.getElementById("frente-form-textarea").value;
-    const versoFormTextarea = document.getElementById("verso-form-textarea").value;
+    if (!pendingAddCard) {
+      const disciplinaFormAddCard = disciplineSelect.value.trim();
+      const materiaFormAddCard = matterSelect.value.trim();
+      const assuntoFormAddCard = assuntoInput.value.trim();
+      const frenteFormTextarea = document.getElementById("frente-form-textarea").value;
+      const versoFormTextarea = document.getElementById("verso-form-textarea").value;
 
-    if (!disciplinaFormAddCard) {
-      showAppNotification("Selecione uma disciplina da lista.");
-      return;
-    }
-    const matterIsListed = addCardOptions.materias.some(item =>
-      item.disciplina === disciplinaFormAddCard &&
-      item.materia.toLocaleLowerCase("pt-BR") === materiaFormAddCard.toLocaleLowerCase("pt-BR")
-    );
-    if (!matterIsListed) {
-      showAppNotification("Selecione uma matéria cadastrada para essa disciplina no catálogo.");
-      return;
+      if (!disciplinaFormAddCard) {
+        showAppNotification("Selecione uma disciplina da lista.");
+        return;
+      }
+      const matterIsListed = addCardOptions.materias.some(item =>
+        item.disciplina === disciplinaFormAddCard &&
+        item.materia.toLocaleLowerCase("pt-BR") === materiaFormAddCard.toLocaleLowerCase("pt-BR")
+      );
+      if (!matterIsListed) {
+        showAppNotification("Selecione uma matéria cadastrada para essa disciplina no catálogo.");
+        return;
+      }
+
+      pendingAddHadActiveReviewSession = Boolean(activeReviewSessionId);
     }
 
-    // Enviar os dados para a API
     saveAddCardButton.disabled = true;
     cancelAddCard.disabled = true;
     saveAddCardButton.textContent = "💾";
 
     try {
-      const savedCard = await sendApiMutation({
-        action: "add",
-        disciplina: disciplinaFormAddCard,
-        materia: materiaFormAddCard,
-        assunto: assuntoFormAddCard,
-        frente: frenteFormTextarea,
-        tras: versoFormTextarea
-      });
-
-      // A confirmação da API significa que a planilha já foi atualizada.
-      setAddCardModalOpen(false);
-      addCardForm.reset();
-      updateAddCardMatterOptions();
-
-      // Atualizar a lista sem tratar falha de atualização como falha de gravação.
-      try {
-        const hadActiveReviewSession = Boolean(activeReviewSessionId);
-        const currentFilters = getSelectedReviewFilters();
-        await fetchFilters(currentFilters);
-        if (hadActiveReviewSession) {
-          document.getElementById("id-cartao-filter").value = "";
-          await applyFilters({ prioritizeId: savedCard.id });
+      if (!pendingAddCard) {
+        if (addImageManager.pendingUploads.length > 0) {
+          await callAppsScript("getImageStorageStatus");
         }
-        showAppNotification("Novo cartão adicionado com sucesso!");
-      } catch (refreshError) {
-        console.error("Cartão salvo, mas a lista não pôde ser atualizada:", refreshError);
-        showAppNotification("O cartão foi salvo na planilha, mas não foi possível atualizar a lista. Recarregue o app para vê-lo.");
+        const savedCard = await sendApiMutation({
+          action: "add",
+          disciplina: disciplineSelect.value.trim(),
+          materia: matterSelect.value.trim(),
+          assunto: assuntoInput.value.trim(),
+          frente: document.getElementById("frente-form-textarea").value,
+          tras: document.getElementById("verso-form-textarea").value
+        });
+        if (!savedCard || !Number.isSafeInteger(Number(savedCard.id)) || Number(savedCard.id) < 1) {
+          throw new Error("A API não devolveu o ID do cartão criado.");
+        }
+        pendingAddCard = { ...savedCard, id: Number(savedCard.id) };
+        setAddCardFieldsDisabled(true);
       }
+      await uploadPendingCardImages(addImageManager, pendingAddCard.id);
+      await finishAddedCardFlow(pendingAddCard, "Novo cartão adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar o cartão:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      showAppNotification(`Não foi possível adicionar o cartão. ${detail}`);
+      const message = pendingAddCard
+        ? "O cartão " + pendingAddCard.id + " foi salvo, mas há imagens pendentes. Tente salvar novamente. "
+        : "Não foi possível adicionar o cartão. ";
+      showAppNotification(message + detail);
     } finally {
       saveAddCardButton.disabled = false;
       cancelAddCard.disabled = false;
