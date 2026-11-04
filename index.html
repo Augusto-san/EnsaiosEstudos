@@ -1341,6 +1341,49 @@
       transition: background-color 0.3s;
     }
 
+    body.card-edit-open .buttons-container-header {
+      position: fixed;
+      top: 93px;
+      right: 0;
+      left: 0;
+      z-index: 999;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 8px 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      border-bottom: 1px solid var(--color-border);
+      background-color: var(--color-panel-background);
+      box-shadow: var(--shadow-header);
+      scrollbar-color: var(--color-text-muted) transparent;
+      scrollbar-width: thin;
+    }
+
+    body.card-edit-open .buttons-container-header button {
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 54px;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    body.card-edit-open .buttons-container-header::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    body.card-edit-open .buttons-container-header::-webkit-scrollbar-thumb {
+      border-radius: var(--radius-scrollbar);
+      background-color: var(--color-text-muted);
+    }
+
     .buttons-container button.active, .buttons-container-header button.active {
       background-color: var(--color-control-active);
       color: var(--color-text-primary);
@@ -6625,12 +6668,20 @@ function cancelEditMode() {
     if (!document.body.classList.contains("card-edit-open")) return;
     const appHeader = document.querySelector(".header");
     const cardEditTitle = document.getElementById("card-edit-title");
-    if (!appHeader || !cardEditTitle) return;
+    const editToolbar = document.querySelector(".buttons-container-header");
+    const content = document.querySelector(".content");
+    if (!appHeader || !cardEditTitle || !editToolbar || !content) return;
     const reviewStatus = document.getElementById("review-result-status");
-    const statusBottom = reviewStatus && !reviewStatus.hidden
+    const headerBottom = Math.ceil(appHeader.getBoundingClientRect().bottom);
+    const titleTop = reviewStatus && !reviewStatus.hidden
       ? Math.ceil(reviewStatus.getBoundingClientRect().bottom) + 8
-      : Math.ceil(appHeader.getBoundingClientRect().bottom);
-    cardEditTitle.style.top = `${statusBottom}px`;
+      : headerBottom;
+    cardEditTitle.style.top = `${titleTop}px`;
+    const titleBottom = titleTop + Math.ceil(cardEditTitle.getBoundingClientRect().height);
+    const toolbarTop = Math.max(93, titleBottom);
+    editToolbar.style.top = `${toolbarTop}px`;
+    const toolbarBottom = toolbarTop + Math.ceil(editToolbar.getBoundingClientRect().height);
+    content.style.paddingTop = `${Math.max(100, toolbarBottom + 16)}px`;
   }
 
   window.addEventListener("resize", () => {
