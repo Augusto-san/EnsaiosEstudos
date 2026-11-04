@@ -118,6 +118,13 @@
       text-align: center;
     }
 
+    .header-control-spacer {
+      display: block;
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+    }
+
     .header,
     .menu-header {
       height: max(48px, calc(2.25em + 4px));
@@ -209,10 +216,8 @@
     .api-access-panel {
       width: min(100%, 460px);
       padding: clamp(20px, 5vw, 32px);
-      border: 1px solid var(--color-accent);
       border-radius: var(--radius-dialog);
       background: var(--color-panel-background);
-      box-shadow: var(--shadow-panel);
       font-size: 16px;
       line-height: 1.45;
     }
@@ -221,19 +226,6 @@
       margin: 0 0 18px;
       color: var(--color-text-primary);
       font-size: 24px;
-      text-align: center;
-    }
-
-    #api-access-title {
-      margin: 0 0 8px;
-      color: var(--color-accent);
-      font-size: 21px;
-      text-align: center;
-    }
-
-    .api-access-copy {
-      margin: 0 0 20px;
-      color: var(--color-text-secondary);
       text-align: center;
     }
 
@@ -268,26 +260,16 @@
       box-shadow: var(--shadow-input-focus);
     }
 
-    #api-link-visibility {
-      flex: 0 0 auto;
-      padding: 0 12px;
-      border: 0;
-      border-radius: var(--radius-control);
-      background: var(--color-field-background);
-      color: var(--color-text-primary);
-      font-size: 13px;
-      cursor: pointer;
-    }
-
     #api-access-submit {
       width: 100%;
+      min-height: 72px;
       margin-top: 14px;
-      padding: 12px;
+      padding: 16px 48px;
       border: 1px solid var(--color-border-dark);
       border-radius: var(--radius-control);
-      background: var(--color-accent-yellow);
-      color: var(--color-text-on-accent);
-      font-size: 15px;
+      background: var(--color-action-background);
+      color: #fff;
+      font-size: 22px;
       font-weight: 700;
       cursor: pointer;
     }
@@ -312,12 +294,8 @@
       color: var(--color-accent-yellow);
     }
 
-    .api-access-note {
-      display: block;
-      margin-top: 16px;
-      color: var(--color-text-muted);
-      font-size: 12px;
-      text-align: center;
+    #start-reviews-button {
+      display: none;
     }
 
     .content.no-review-session .buttons-container-header {
@@ -325,10 +303,15 @@
       padding-bottom: 0;
     }
 
+    .content.no-review-session .buttons-container-header #start-reviews-button,
     .content.no-review-session .buttons-container-header #add-button {
       grid-column: 1 / -1;
       width: 100%;
       min-width: 0;
+    }
+
+    .content.no-review-session .buttons-container-header #start-reviews-button {
+      display: block;
     }
 
     a {
@@ -480,6 +463,65 @@
       display: none;
     }
 
+    body:not(.card-edit-open) .card-face-images.has-face-image {
+      align-items: stretch;
+      height: clamp(180px, 55dvh, 560px);
+      flex: 0 0 auto;
+    }
+
+    .card-face-image-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-surface);
+      background: transparent;
+      box-shadow: none;
+      line-height: 0;
+      cursor: zoom-in;
+    }
+
+    body:not(.card-edit-open) .card-face-images.has-face-image .card-face-image-trigger {
+      flex: 1 1 0;
+      min-height: 0;
+    }
+
+    button.card-face-image-trigger:not(:disabled):hover,
+    button.card-face-image-trigger:not(:disabled):active {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .card-face-image-trigger:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 3px;
+    }
+
+    .card-general-image-trigger {
+      align-self: center;
+      max-width: 100%;
+      margin-top: 4px;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-control);
+      background: var(--color-card-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 0.85em;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    .card-general-image-trigger:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 3px;
+    }
+
     .card-face-image {
       display: block;
       max-width: 100%;
@@ -487,6 +529,16 @@
       max-height: 45dvh;
       object-fit: contain;
       border-radius: var(--radius-surface);
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    body:not(.card-edit-open) .card-face-images.has-face-image .card-face-image {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     .card-image-load-error {
@@ -709,10 +761,6 @@
       color: var(--color-accent-yellow);
     }
 
-    #card-images-button[hidden] {
-      display: none;
-    }
-
     #manage-images-button[hidden] {
       display: none;
     }
@@ -836,7 +884,9 @@
       display: flex;
       flex-direction: column;
       width: min(100%, 1000px);
+      height: min(90dvh, 900px);
       max-height: 100%;
+      min-height: 0;
       overflow: hidden;
       border: 1px solid var(--color-border-medium);
       border-radius: var(--radius-dialog);
@@ -848,6 +898,7 @@
     .image-viewer-header,
     .image-viewer-controls {
       display: flex;
+      flex: 0 0 auto;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
@@ -855,18 +906,31 @@
     }
 
     .image-viewer-header {
+      position: relative;
+      justify-content: center;
+      min-height: 60px;
       border-bottom: 1px solid var(--color-border);
     }
 
+    #image-viewer .image-viewer-dialog > .image-viewer-header {
+      background: #2a2a2a;
+    }
+
     .image-viewer-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
       min-width: 0;
+      width: max-content;
+      max-width: calc(100% - 120px);
       margin: 0;
       overflow-wrap: anywhere;
       color: var(--color-accent);
       font-size: 16px;
+      text-align: center;
+      transform: translate(-50%, -50%);
     }
 
-    .image-viewer-header button,
     .image-viewer-controls button {
       flex: 0 0 auto;
       min-width: 42px;
@@ -879,24 +943,158 @@
       cursor: pointer;
     }
 
+    .image-viewer-header button {
+      position: absolute;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    .image-viewer-stage .image-viewer-nav-button {
+      position: static;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      justify-self: center;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+      transform: none;
+    }
+
+    #previous-card-image,
+    #next-card-image {
+      color: #000;
+      font-size: 36px;
+      font-weight: 400;
+      line-height: 1;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    #previous-card-image {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    #next-card-image {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    #close-image-viewer {
+      right: 12px;
+      border-radius: var(--radius-button);
+      color: var(--color-danger);
+      font-size: 20px;
+    }
+
+    #previous-card-image:hover,
+    #previous-card-image:focus,
+    #previous-card-image:active,
+    #next-card-image:hover,
+    #next-card-image:focus,
+    #next-card-image:active,
+    #close-image-viewer:hover,
+    #close-image-viewer:focus,
+    #close-image-viewer:active {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      transform: translateY(-50%);
+    }
+
+    #previous-card-image:focus-visible,
+    #next-card-image:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 1px;
+    }
+
+    #previous-card-image:hover,
+    #previous-card-image:focus,
+    #previous-card-image:active,
+    #next-card-image:hover,
+    #next-card-image:focus,
+    #next-card-image:active {
+      transform: none;
+    }
+
+    #close-image-viewer:hover,
+    #close-image-viewer:focus,
+    #close-image-viewer:active {
+      transform: translateY(-50%);
+    }
+
+    #previous-card-image:disabled,
+    #next-card-image:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    #close-image-viewer,
+    #close-image-viewer:hover,
+    #close-image-viewer:focus,
+    #close-image-viewer:active {
+      box-shadow: none;
+    }
+
     .image-viewer-stage {
       display: grid;
-      grid-template-columns: 48px minmax(0, 1fr) 48px;
+      flex: 1 1 0;
+      grid-template-columns: 44px minmax(0, 1fr) 44px;
+      gap: 4px;
       align-items: center;
-      gap: 6px;
-      min-height: 120px;
+      min-height: 0;
+      overflow: hidden;
       padding: 8px;
-      background: var(--color-card-background);
+      background: #fff;
     }
 
     #card-image-viewer-image {
       display: block;
+      grid-column: 2;
+      grid-row: 1;
       width: 100%;
-      max-height: min(68dvh, 760px);
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
+      transform: translate3d(0, 0, 0) scale(1);
+      transform-origin: center center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      cursor: zoom-in;
+    }
+
+    #card-image-viewer-image[data-zoomed="true"] {
+      cursor: grab;
+    }
+
+    #card-image-viewer-image[data-zoomed="true"]:active {
+      cursor: grabbing;
     }
 
     .image-viewer-caption {
+      flex: 0 0 auto;
       min-height: 24px;
       margin: 0;
       padding: 8px 12px 0;
@@ -922,11 +1120,7 @@
         grid-template-columns: minmax(0, 1fr);
       }
 
-      .image-viewer-stage {
-        grid-template-columns: 38px minmax(0, 1fr) 38px;
-        gap: 4px;
-        padding: 4px;
-      }
+      .image-viewer-stage { padding: 4px; }
 
       .image-viewer-header,
       .image-viewer-controls {
@@ -1470,12 +1664,353 @@
       background-color: transparent;
     }
 
+    .menu-navigation {
+      display: block;
+      width: min(100%, 680px);
+      padding: 20px 24px 28px;
+    }
+
+    .menu-home-action,
+    .menu-section-toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 72px;
+      margin: 0;
+      padding: 16px 48px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: none;
+    }
+
+    .menu-home-action::after,
+    .menu-section-toggle::after {
+      position: absolute;
+      right: 9%;
+      bottom: 0;
+      left: 9%;
+      height: 1px;
+      background-color: var(--color-border);
+      content: "";
+    }
+
+    .menu-section-toggle[aria-expanded="true"] {
+      background-color: var(--color-panel-background);
+      color: var(--color-accent);
+      border-radius: var(--radius-dialog);
+    }
+
+    .menu-section-toggle[aria-expanded="true"]::after {
+      display: none;
+    }
+
+    .menu-section-toggle[aria-expanded="true"]::before {
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 0;
+      width: 4px;
+      border-radius: var(--radius-scrollbar);
+      background-color: var(--color-accent);
+      content: "";
+    }
+
+    .menu-section-chevron {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      color: var(--color-text-secondary);
+      font-size: 20px;
+      font-weight: 400;
+      transform: translateY(-50%);
+      transition: transform 180ms ease;
+    }
+
+    .menu-section-toggle[aria-expanded="true"] .menu-section-chevron {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .menu-section-panel {
+      margin: 0 12px 8px;
+      padding: 14px 18px 18px;
+      border-radius: var(--radius-control);
+      background-color: var(--color-panel-background);
+    }
+
+    .menu-section-panel[hidden] {
+      display: none;
+    }
+
+    .menu-subitem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 48px;
+      margin: 0 0 8px;
+      padding: 11px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      background-color: var(--color-filter-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    .menu-subitem:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-subitem:disabled {
+      color: var(--color-text-muted);
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+
+    .menu-subitem-toggle::after {
+      margin-left: auto;
+      color: var(--color-text-secondary);
+      content: "⌄";
+      font-size: 20px;
+      transition: transform 180ms ease;
+    }
+
+    .menu-subitem-toggle[aria-expanded="true"]::after {
+      transform: rotate(180deg);
+    }
+
+    .menu-subitem-toggle[aria-expanded="true"] {
+      margin-bottom: 0;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .menu-subitem-toggle[aria-expanded="true"] + .menu-new-catalog-form:not([hidden]) {
+      border-top: 0;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .menu-subitem-toggle[aria-expanded="true"] + .menu-delete-form:not([hidden]) {
+      border-top: 0;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .menu-new-catalog-form {
+      margin: 0 0 10px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      background-color: var(--color-filter-background);
+    }
+
+    .menu-delete-form {
+      margin: 0 0 10px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      background-color: var(--color-filter-background);
+    }
+
+    .menu-new-catalog-form[hidden],
+    .menu-delete-form[hidden],
+    .menu-new-catalog-field[hidden] {
+      display: none;
+    }
+
+    .menu-new-catalog-form label,
+    .menu-delete-form label {
+      margin-top: 8px;
+      font-weight: 700;
+    }
+
+    .menu-new-catalog-form input,
+    .menu-new-catalog-form select,
+    .menu-delete-form input,
+    .menu-delete-form select {
+      margin-bottom: 12px;
+    }
+
+    .menu-new-catalog-form .menu-inline-action,
+    .menu-delete-form .menu-inline-action {
+      margin: 4px 0 0;
+    }
+
+    #menu-delete-matter-summary {
+      margin: 12px 0;
+      padding: 10px 16px;
+      border: 1px solid var(--color-notification-border);
+      border-radius: var(--radius-surface);
+      background-color: var(--color-notification-background);
+      box-shadow: var(--shadow-notification);
+      color: var(--color-text-on-notification);
+      font-size: 16px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    #menu-delete-matter-summary[hidden] {
+      display: none;
+    }
+
+    .delete-card-preview {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .delete-card-preview[hidden] {
+      display: none;
+    }
+
+    .delete-card-preview-title {
+      margin: 0 0 12px;
+      color: var(--color-accent);
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .delete-card-preview-faces {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .delete-card-preview-face {
+      min-width: 0;
+      padding: 12px;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-surface);
+      background: var(--color-card-background);
+      box-shadow: var(--shadow-flashcard);
+    }
+
+    .delete-card-preview-face .card-heading {
+      margin-bottom: 10px;
+    }
+
+    .delete-card-preview-content {
+      margin-top: 10px;
+      text-align: justify;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .delete-card-preview .card-face-images.has-face-image {
+      height: clamp(120px, 28dvh, 240px);
+      max-height: 240px;
+    }
+
+    .delete-card-preview .card-face-image {
+      max-height: 220px;
+    }
+
+    .delete-card-preview-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .delete-card-preview-actions .menu-inline-action {
+      margin: 0;
+    }
+
+    #side-menu .filters select.menu-selection-active,
+    #side-menu .filters input.menu-selection-active {
+      background-color: var(--color-control-hover);
+      box-shadow: var(--shadow-input-focus);
+    }
+
+    #side-menu .filters select:focus,
+    #side-menu .filters input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: var(--shadow-input-focus);
+    }
+
+    #side-menu .menu-home-action:focus-visible,
+    #side-menu .menu-section-toggle:focus-visible,
+    #side-menu .menu-subitem:focus-visible,
+    #side-menu .menu-inline-action:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: -3px;
+    }
+
+    .menu-subitem-status,
+    .menu-coming-soon-note {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .menu-coming-soon-note {
+      margin: 4px 0;
+      line-height: 1.45;
+    }
+
+    .menu-filter-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .menu-inline-action {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 4px;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: var(--radius-button);
+      background-color: var(--color-action-background);
+      color: var(--color-text-primary);
+      font: inherit;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #side-menu .menu-home-action,
+    #side-menu .menu-section-toggle,
+    #side-menu .menu-home-action:hover,
+    #side-menu .menu-section-toggle:hover,
+    #side-menu .menu-home-action:focus,
+    #side-menu .menu-section-toggle:focus {
+      box-shadow: none;
+    }
+
+    #side-menu .menu-home-action:hover,
+    #side-menu .menu-section-toggle:hover {
+      background-color: var(--color-control-hover);
+    }
+
+    #side-menu .menu-section-toggle[aria-expanded="true"]:hover {
+      background-color: var(--color-panel-background);
+    }
+
+    #side-menu .menu-home-action:active,
+    #side-menu .menu-section-toggle:active {
+      transform: none;
+    }
+
     #apply-filters, #clear-filters {
-      flex: 1 1 0;
+      flex: 0 0 auto;
       min-width: 0;
       min-height: 48px;
-      width: auto;
-      padding: 10px;
+      width: 100%;
+      padding: 10px 14px;
       font-size: 16px;
       background-color: var(--color-action-background);
       color: var(--color-text-primary);
@@ -1484,23 +2019,6 @@
       cursor: pointer;
       transition: background-color 0.3s;
       margin: 0;
-    }
-
-    .filter-menu-footer {
-      position: relative;
-      flex: 0 0 auto;
-      flex-direction: column;
-      justify-content: center;
-      align-items: stretch;
-      gap: 12px;
-      padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-      background-color: var(--color-panel-background);
-    }
-
-    .filter-menu-footer > #apply-filters,
-    .filter-menu-footer > #clear-filters {
-      flex: 0 0 auto;
-      width: 100%;
     }
 
     #apply-filters:hover, #clear-filters:hover,
@@ -1544,36 +2062,29 @@
 </head>
 
 <body>
-  <div id="api-access-gate" role="dialog" aria-modal="true" aria-labelledby="api-access-title">
+  <div id="api-access-gate" role="dialog" aria-modal="true" aria-labelledby="api-access-brand">
     <section class="api-access-panel">
-      <h1 class="api-access-brand">memoFULL 🧠</h1>
-      <h2 id="api-access-title">Acesso ao aplicativo</h2>
-      <p class="api-access-copy">Informe sua chave de acesso para carregar os cartões e iniciar o app.</p>
+      <h1 class="api-access-brand" id="api-access-brand">memoFULL 🧠</h1>
       <form id="api-access-form" novalidate>
         <label for="api-link-input">Chave de acesso</label>
         <div class="api-access-input-row">
           <input id="api-link-input" type="password" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="api-access-error" required>
-          <button id="api-link-visibility" type="button" aria-pressed="false">Mostrar</button>
         </div>
         <button id="api-access-submit" type="submit">ACESSAR APP</button>
         <p id="api-access-status" role="status" aria-live="polite" hidden></p>
         <p id="api-access-error" role="alert" aria-live="assertive" hidden></p>
       </form>
-      <small class="api-access-note">A chave fica nesta sessão da aba e é removida ao encerrá-la.</small>
     </section>
   </div>
 
   <div class="header">
-    <button class="menu-toggle" id="home-button" type="button" aria-label="Início" title="Início">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M3 10.8 12 3l9 7.8"></path>
-        <path d="M5.5 9.5V21h13V9.5M9.5 21v-7h5v7"></path>
-      </svg>
-    </button>
+    <span class="header-control-spacer" aria-hidden="true"></span>
     <h2>&copy; memoFULL 🧠</h2>
-    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir filtros" title="Abrir filtros" aria-controls="side-menu" aria-expanded="false">
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir menu" title="Abrir menu" aria-controls="side-menu" aria-expanded="false">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"></path>
+        <path d="M3 6h18"></path>
+        <path d="M3 12h18"></path>
+        <path d="M3 18h18"></path>
       </svg>
     </button>
   </div>
@@ -1582,58 +2093,164 @@
 
   <div class="side-menu" id="side-menu" aria-hidden="true" inert>
     <header class="menu-header">
-      <h3 id="filters-title">Filtros</h3>
-      <button id="close-menu" type="button" aria-label="Fechar filtros" title="Fechar filtros">✖</button>
+      <h3 id="menu-title">Menu</h3>
+      <button id="close-menu" type="button" aria-label="Fechar menu" title="Fechar menu">✖</button>
     </header>
-    <div class="filters">
-      <label for="id-cartao-filter">ID do cartão:</label>
-      <input id="id-cartao-filter" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-describedby="id-cartao-filter-help" placeholder="Ex.: 123 ou QID123">
-      <small class="filter-help" id="id-cartao-filter-help">Informe 123 ou QID123. Ao usar o ID, os outros filtros serão ignorados.</small>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="disciplina-filter">Disciplina:</label>
-      <select id="disciplina-filter">
-        <option value="todos">Todos</option>
-      </select>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="materia-filter">Matéria:</label>
-      <select id="materia-filter">
-        <option value="todos">Todos</option>
-      </select>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="assunto-filter">Assunto:</label>
-      <select id="assunto-filter">
-        <option value="todos">Todos</option>
-      </select>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="resultado-filter">Resultado:</label>
-        <select id="resultado-filter">
-          <option value="todos">Todos</option>
-        </select>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="data-filter">Data:</label> <!-- // 02-03-2025 -->  
-        <select id="data-filter"> <!-- // 02-03-2025 -->  
-          <option value="todos">Todos</option> <!-- // 02-03-2025 -->  
-        </select> <!-- // 02-03-2025 -->  
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="favoritos-filter">Favoritos:</label>
-        <select id="favoritos-filter">
-          <option value="todos">Todos</option>
-          <option value="sim">SIM</option>
-          <option value="nao">NÃO</option>
-        </select>
-      <div class="field-divider" aria-hidden="true"></div>
-      <label for="id-imagem-filter">Imagens:</label>
-        <select id="id-imagem-filter">
-          <option value="todos">Todos</option>
-          <option value="sim">SIM</option>
-          <option value="nao">NÃO</option>
-        </select>
-      <div class="field-divider" aria-hidden="true"></div>
-    </div>
-    <footer class="footer filter-menu-footer" id="filter-menu-footer">
-      <button id="apply-filters">Aplicar Filtros</button>
-      <button id="clear-filters">Limpar Filtros</button>
-    </footer>
+    <nav class="filters menu-navigation" id="menu-navigation" aria-label="Menu principal">
+      <button class="menu-home-action" id="menu-home-button" type="button">Início</button>
+
+      <section class="menu-section" data-menu-section="new">
+        <button class="menu-section-toggle" id="menu-new-toggle" type="button" aria-expanded="false" aria-controls="menu-new-panel">
+          <span>Novo</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="menu-section-panel" id="menu-new-panel" hidden>
+          <button class="menu-subitem" id="menu-new-card" type="button">Card</button>
+          <button class="menu-subitem menu-subitem-toggle" id="menu-new-discipline-toggle" type="button" aria-expanded="false" aria-controls="menu-new-discipline-form">Disciplina</button>
+          <form class="menu-new-catalog-form" id="menu-new-discipline-form" hidden novalidate>
+            <label for="menu-new-discipline-name">Nome da disciplina</label>
+            <input id="menu-new-discipline-name" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+            <label for="menu-new-discipline-matter">Matéria inicial</label>
+            <input id="menu-new-discipline-matter" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+            <div class="menu-new-catalog-field" id="menu-new-discipline-image-label-field">
+              <label for="menu-new-discipline-image-label">Rótulo de imagem</label>
+              <input id="menu-new-discipline-image-label" type="text" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="menu-new-discipline-image-label-help" required>
+              <small class="filter-help" id="menu-new-discipline-image-label-help">Obrigatório; máximo de 5 caracteres.</small>
+            </div>
+            <button class="menu-inline-action" id="save-new-discipline" type="submit">Gravar</button>
+          </form>
+          <button class="menu-subitem menu-subitem-toggle" id="menu-new-matter-toggle" type="button" aria-expanded="false" aria-controls="menu-new-matter-form">Matéria</button>
+          <form class="menu-new-catalog-form" id="menu-new-matter-form" hidden novalidate>
+            <label for="menu-new-matter-discipline">Disciplina</label>
+            <select id="menu-new-matter-discipline" required>
+              <option value="">Selecione uma disciplina</option>
+            </select>
+            <label for="menu-new-matter-name">Nome da matéria</label>
+            <input id="menu-new-matter-name" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+            <div class="menu-new-catalog-field" id="menu-new-matter-image-label-field">
+              <label for="menu-new-matter-image-label">Rótulo de imagem</label>
+              <input id="menu-new-matter-image-label" type="text" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="menu-new-matter-image-label-help" required>
+              <small class="filter-help" id="menu-new-matter-image-label-help">Obrigatório; máximo de 5 caracteres.</small>
+            </div>
+            <button class="menu-inline-action" id="save-new-matter" type="submit">Gravar</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="menu-section" data-menu-section="filters">
+        <button class="menu-section-toggle" id="menu-filters-toggle" type="button" aria-expanded="false" aria-controls="menu-filters-panel">
+          <span>Filtros</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="menu-section-panel" id="menu-filters-panel" hidden>
+          <label for="disciplina-filter">Disciplina:</label>
+          <select id="disciplina-filter"><option value="todos">Todos</option></select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="materia-filter">Matéria:</label>
+          <select id="materia-filter"><option value="todos">Todos</option></select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="assunto-filter">Assunto:</label>
+          <select id="assunto-filter"><option value="todos">Todos</option></select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="resultado-filter">Resultado:</label>
+          <select id="resultado-filter"><option value="todos">Todos</option></select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="data-filter">Data:</label>
+          <select id="data-filter"><option value="todos">Todos</option></select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="favoritos-filter">Favoritos:</label>
+          <select id="favoritos-filter">
+            <option value="todos">Todos</option>
+            <option value="sim">SIM</option>
+            <option value="nao">NÃO</option>
+          </select>
+          <div class="field-divider" aria-hidden="true"></div>
+          <label for="id-imagem-filter">Imagens:</label>
+          <select id="id-imagem-filter">
+            <option value="todos">Todos</option>
+            <option value="sim">SIM</option>
+            <option value="nao">NÃO</option>
+          </select>
+          <div class="menu-filter-actions">
+            <button class="menu-inline-action" id="apply-filters" type="button">Aplicar Filtros</button>
+            <button class="menu-inline-action" id="clear-filters" type="button">Limpar Filtros</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="menu-section" data-menu-section="locate">
+        <button class="menu-section-toggle" id="menu-locate-toggle" type="button" aria-expanded="false" aria-controls="menu-locate-panel">
+          <span>Localizar</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="menu-section-panel" id="menu-locate-panel" hidden>
+          <form id="locate-card-form">
+            <label for="id-cartao-filter">ID do cartão:</label>
+            <input id="id-cartao-filter" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-describedby="id-cartao-filter-help" placeholder="Ex.: 123 ou ID#123">
+            <small class="filter-help" id="id-cartao-filter-help">Informe 123 ou ID#123. Ao usar o ID, os outros filtros serão ignorados.</small>
+            <button class="menu-inline-action" id="locate-card-button" type="submit">Localizar</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="menu-section" data-menu-section="delete">
+        <button class="menu-section-toggle" id="menu-delete-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-panel">
+          <span>Excluir</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="menu-section-panel" id="menu-delete-panel" hidden>
+          <button class="menu-subitem" id="menu-delete-discipline-placeholder" type="button" disabled>
+            <span>Disciplina</span><small class="menu-subitem-status">Etapa 2</small>
+          </button>
+          <button class="menu-subitem menu-subitem-toggle" id="menu-delete-matter-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-matter-form">Matéria</button>
+          <form class="menu-delete-form" id="menu-delete-matter-form" hidden novalidate>
+            <label for="menu-delete-matter-discipline">Disciplina</label>
+            <select id="menu-delete-matter-discipline" required>
+              <option value="">Selecione uma disciplina</option>
+            </select>
+            <label for="menu-delete-matter-select">Matéria</label>
+            <select id="menu-delete-matter-select" required disabled>
+              <option value="">Selecione uma disciplina primeiro</option>
+            </select>
+            <small class="filter-help">Os cartões vinculados serão enviados para a lixeira. A matéria continuará cadastrada.</small>
+            <p class="filter-help" id="menu-delete-matter-summary" role="status" aria-live="polite" hidden></p>
+            <button class="menu-inline-action" id="delete-matter-cards-button" type="button" disabled>Deletar cartões da matéria</button>
+            <button class="menu-inline-action" id="clear-delete-matter-selection" type="button" disabled>Limpar seleção</button>
+          </form>
+          <button class="menu-subitem menu-subitem-toggle" id="menu-delete-card-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-card-form">Cartão por ID</button>
+          <form class="menu-delete-form" id="menu-delete-card-form" hidden novalidate>
+            <label for="menu-delete-card-id">ID do cartão</label>
+            <input id="menu-delete-card-id" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" placeholder="Ex.: 123 ou ID#123" aria-describedby="menu-delete-card-help">
+            <small class="filter-help" id="menu-delete-card-help">Localize o cartão para conferir frente, verso e imagens antes de confirmar a exclusão.</small>
+            <button class="menu-inline-action" id="locate-delete-card-button" type="submit">Localizar cartão</button>
+            <section class="delete-card-preview" id="delete-card-preview" role="region" aria-labelledby="delete-card-preview-title" hidden>
+              <h4 class="delete-card-preview-title" id="delete-card-preview-title" tabindex="-1"></h4>
+              <div class="delete-card-preview-faces">
+                <div class="delete-card-preview-face" role="group" aria-label="Frente do cartão">
+                  <div class="card-heading" id="delete-card-preview-front-heading"></div>
+                  <div class="delete-card-preview-content" id="delete-card-preview-front-content"></div>
+                  <div class="card-face-images" id="delete-card-preview-front-images" aria-label="Imagens da frente"></div>
+                </div>
+                <div class="delete-card-preview-face" role="group" aria-label="Verso do cartão">
+                  <div class="card-heading" id="delete-card-preview-back-heading"></div>
+                  <div class="delete-card-preview-content" id="delete-card-preview-back-content"></div>
+                  <div class="card-face-images" id="delete-card-preview-back-images" aria-label="Imagens do verso"></div>
+                </div>
+              </div>
+              <div class="delete-card-preview-actions">
+                <button class="menu-inline-action" id="cancel-delete-card-preview" type="button">Cancelar</button>
+                <button class="menu-inline-action" id="confirm-delete-card-preview" type="button" disabled>Mover para a lixeira</button>
+              </div>
+            </section>
+          </form>
+        </div>
+      </section>
+
+      <section class="menu-section" data-menu-section="trash">
+        <button class="menu-section-toggle" id="menu-trash-toggle" type="button" aria-expanded="false" aria-controls="menu-trash-panel">
+          <span>Lixeira</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="menu-section-panel" id="menu-trash-panel" hidden>
+          <p class="menu-coming-soon-note">As ações da lixeira serão implementadas posteriormente.</p>
+        </div>
+      </section>
+    </nav>
   </div>
 
   <div class="content no-review-session">
@@ -1643,8 +2260,8 @@
       <button id="edit-button">✎</button>
       <button id="manage-images-button" type="button" title="Gerenciar imagens do cartão" aria-label="Gerenciar imagens do cartão" aria-haspopup="dialog" aria-expanded="false" hidden>📷</button>
       <button id="favorite-button" type="button" title="Adicionar aos favoritos" aria-label="Adicionar aos favoritos" aria-pressed="false">☆</button>
-      <button id="card-images-button" type="button" title="Abrir imagens do cartão" aria-label="Abrir imagens do cartão" hidden>&#128444;</button>
       <button id="cancel-button">❌</button>
+      <button id="start-reviews-button" type="button">INICIAR REVISÕES</button>
       <button id="add-button">➕</button>
       <button id="counter-button">0</button>
       <button id="br-copy-button">br</button>
@@ -1656,7 +2273,7 @@
       <button id="ppp-copy-button">...</button>
       <button id="link-copy-button">🔗</button>
       <button id="data-button">Data</button> <!-- // 02-03-2025 --> 
-      <button id="excluir-button" type="button" title="Marcar para exclusão" aria-label="Marcar para exclusão" aria-pressed="false">🗑</button>
+      <button id="excluir-button" type="button" title="Mover cartão para a lixeira" aria-label="Mover cartão para a lixeira">🗑</button>
     </div>    
 
     <fieldset id="card-metadata-editor" class="card-classification-group card-metadata-editor" aria-label="Disciplina, matéria e assunto do cartão" hidden>
@@ -1769,12 +2386,12 @@
       <div class="image-viewer-dialog">
         <div class="image-viewer-header">
           <h2 class="image-viewer-title" id="image-viewer-title">Imagens do cartão</h2>
-          <button id="close-image-viewer" type="button" aria-label="Fechar visualizador">×</button>
+          <button id="close-image-viewer" type="button" aria-label="Fechar visualizador">✖</button>
         </div>
         <div class="image-viewer-stage">
-          <button id="previous-card-image" type="button" aria-label="Imagem anterior">‹</button>
+          <button id="previous-card-image" class="image-viewer-nav-button" type="button" aria-label="Imagem anterior" disabled>‹</button>
           <img id="card-image-viewer-image" alt="">
-          <button id="next-card-image" type="button" aria-label="Próxima imagem">›</button>
+          <button id="next-card-image" class="image-viewer-nav-button" type="button" aria-label="Próxima imagem" disabled>›</button>
         </div>
         <p id="image-viewer-caption" class="image-viewer-caption"></p>
         <div class="image-viewer-controls">
@@ -1853,7 +2470,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   const apiAccessGate = document.getElementById("api-access-gate");
   const apiAccessForm = document.getElementById("api-access-form");
   const apiLinkInput = document.getElementById("api-link-input");
-  const apiLinkVisibilityButton = document.getElementById("api-link-visibility");
   const apiAccessSubmitButton = document.getElementById("api-access-submit");
   const apiAccessStatus = document.getElementById("api-access-status");
   const apiAccessError = document.getElementById("api-access-error");
@@ -1907,6 +2523,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   let addCardOptions = { disciplinas: [], materias: [] };
+  let matterDeletionPreviewRequestId = 0;
+  let deleteCardPreviewRequestId = 0;
+  let deleteCardPreviewCard = null;
+  let deleteCardPreviewSessionId = "";
+  let deleteCardPreviewInReviewSession = false;
 
   function showAppNotification(message) {
     window.clearTimeout(appNotificationTimer);
@@ -1934,6 +2555,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       getFilterOptions: "filters",
       startReviewSession: "session",
       getReviewPage: "page",
+      getMatterDeletionPreview: "matterDeletionPreview",
+      getCardPreview: "cardPreview",
       getImageStorageStatus: "imageStorage",
       getCardImages: "cardImages",
       getCardImage: "image"
@@ -1949,13 +2572,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         cache: "no-store",
         redirect: "follow"
       };
-    } else if (["addCard", "saveCard", "recordCardResult", "uploadCardImage", "deleteCardImage"].includes(method)) {
+    } else if (["addCard", "addSupportDiscipline", "addSupportMatter", "saveCard", "recordCardResult", "attachImageByHash", "uploadCardImage", "deleteCardImage", "deleteCard", "deleteCardsByMatter"].includes(method)) {
       const postActions = {
         addCard: "add",
+        addSupportDiscipline: "addDiscipline",
+        addSupportMatter: "addMatter",
         saveCard: "update",
         recordCardResult: "result",
+        attachImageByHash: "attachImageByHash",
         uploadCardImage: "uploadImage",
-        deleteCardImage: "deleteImage"
+        deleteCardImage: "deleteImage",
+        deleteCard: "deleteCard",
+        deleteCardsByMatter: "deleteCardsByMatter"
       };
       const payload = {
         ...parameters,
@@ -2064,8 +2692,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       apiLinkInput.value = "";
       apiLinkInput.type = "password";
-      apiLinkVisibilityButton.textContent = "Mostrar";
-      apiLinkVisibilityButton.setAttribute("aria-pressed", "false");
       setApiAccessGateOpen(false);
       document.getElementById("menu-toggle").focus();
       return true;
@@ -2096,13 +2722,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       connectToApi(apiLinkInput.value, true);
     });
     apiLinkInput.addEventListener("input", clearApiAccessFeedback);
-    apiLinkVisibilityButton.addEventListener("click", () => {
-      const showLink = apiLinkInput.type === "password";
-      apiLinkInput.type = showLink ? "text" : "password";
-      apiLinkVisibilityButton.textContent = showLink ? "Ocultar" : "Mostrar";
-      apiLinkVisibilityButton.setAttribute("aria-pressed", String(showLink));
-      apiLinkInput.focus();
-    });
 
     let storedEndpoint = "";
     try {
@@ -2134,7 +2753,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       ? "addCard"
       : parameters.action === "result"
         ? "recordCardResult"
-        : "saveCard";
+        : parameters.action === "deleteCardsByMatter"
+          ? "deleteCardsByMatter"
+          : parameters.action === "deleteCard"
+            ? "deleteCard"
+            : "saveCard";
     const result = await callAppsScript(method, parameters);
     if (!result || result.success !== true) {
       throw new Error((result && result.error) || "O Apps Script não confirmou a gravação.");
@@ -2749,30 +3372,71 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  async function calculateImageHashSha256(file) {
+    if (!window.crypto || !window.crypto.subtle || typeof file.arrayBuffer !== "function") {
+      return "";
+    }
+    try {
+      const bytes = await file.arrayBuffer();
+      const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, "0"))
+        .join("");
+    } catch (error) {
+      console.warn("Não foi possível calcular o SHA-256 no navegador; a API fará a checagem ao receber o arquivo.", error);
+      return "";
+    }
+  }
+
   async function uploadPendingCardImages(manager, cardId, dataRevisao = getReviewDateAtClick()) {
     const uploaded = [];
     while (manager.pendingUploads.length > 0) {
       const item = manager.pendingUploads[0];
       const file = await prepareCardImage(item.file);
-      const imageData = await readImageAsBase64(file);
-      const response = await callAppsScript("uploadCardImage", {
-        id: cardId,
-        uploadId: item.uploadId,
-        name: file.name,
-        mimeType: file.type,
-        lado: item.side,
-        dataRevisao,
-        imageData
-      });
+      const hashSha256 = await calculateImageHashSha256(file);
+      let response = null;
+      if (hashSha256) {
+        response = await callAppsScript("attachImageByHash", {
+          id: cardId,
+          uploadId: item.uploadId,
+          hashSha256,
+          name: file.name,
+          mimeType: file.type,
+          lado: item.side,
+          dataRevisao
+        });
+        if (!response || response.success !== true || typeof response.found !== "boolean") {
+          throw new Error("A API não confirmou a busca de imagem pelo hash.");
+        }
+        if (!response.found) response = null;
+      }
+
+      let imageData = "";
+      if (!response) {
+        imageData = await readImageAsBase64(file);
+        response = await callAppsScript("uploadCardImage", {
+          id: cardId,
+          uploadId: item.uploadId,
+          name: file.name,
+          mimeType: file.type,
+          lado: item.side,
+          dataRevisao,
+          hashSha256,
+          imageData
+        });
+      }
       if (!response || response.success !== true || !response.image || !response.image.id) {
-        throw new Error("A API não confirmou o envio da imagem.");
+        throw new Error("A API não confirmou a associação da imagem ao cartão.");
       }
       applyCardImageTextResponse(cardId, response);
       manager.pendingUploads.shift();
       manager.completedOperations += 1;
       updateCardImageMetadataCache(cardId, response.image);
-      cacheCardImageData(response.image.id, "data:" + file.type + ";base64," + imageData);
-      if (manager.existingList) manager.existingImages.push(response.image);
+      if (imageData) {
+        cacheCardImageData(response.image.id, "data:" + file.type + ";base64," + imageData);
+      }
+      if (manager.existingList && !manager.existingImages.some(image => image.id === response.image.id)) {
+        manager.existingImages.push(response.image);
+      }
       uploaded.push(response.image);
       renderImageManager(manager);
     }
@@ -2807,7 +3471,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     return deleted;
   }
 
-  const cardImagesButton = document.getElementById("card-images-button");
   const imageViewer = document.getElementById("image-viewer");
   const imageViewerImage = document.getElementById("card-image-viewer-image");
   const imageViewerTitle = document.getElementById("image-viewer-title");
@@ -2815,6 +3478,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const imageViewerCounter = document.getElementById("image-viewer-counter");
   const previousImageButton = document.getElementById("previous-card-image");
   const nextImageButton = document.getElementById("next-card-image");
+  const closeImageViewerButton = document.getElementById("close-image-viewer");
   const frontCardImagesContainer = document.getElementById("front-card-images");
   const backCardImagesContainer = document.getElementById("back-card-images");
   const backCardField = document.getElementById("back-card-field");
@@ -2822,6 +3486,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   let imageViewerImages = [];
   let imageViewerIndex = 0;
   let imageViewerRequestVersion = 0;
+  let imageViewerReturnFocus = null;
+  const imageViewerPointers = new Map();
+  let imageViewerScale = 1;
+  let imageViewerOffsetX = 0;
+  let imageViewerOffsetY = 0;
+  let imageViewerPinchStartDistance = 0;
+  let imageViewerPinchStartScale = 1;
+  let imageViewerLastTap = null;
   let cardFaceImageRenderVersion = 0;
 
   function isCurrentCardFaceImageRender(cardId, requestVersion) {
@@ -2832,29 +3504,57 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   async function renderCardFaceImages(card, side, requestVersion) {
     const container = side === "FRENTE" ? frontCardImagesContainer : backCardImagesContainer;
+    container.classList.remove("has-face-image");
     container.replaceChildren();
 
     try {
       const images = await getCardImageMetadata(card.id);
       if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
 
-      cardImagesButton.hidden = images.length === 0;
       const faceImages = images.filter(image => image.lado === side);
+      const generalImages = images.filter(image => image.lado === "ANEXO");
+      if (side === "FRENTE" && faceImages.length === 0 && generalImages.length > 0) {
+        const generalImageTrigger = document.createElement("button");
+        generalImageTrigger.type = "button";
+        generalImageTrigger.className = "card-general-image-trigger";
+        generalImageTrigger.textContent = "📎 Anexos gerais (" + generalImages.length + ")";
+        generalImageTrigger.setAttribute(
+          "aria-label",
+          "Abrir " + generalImages.length + " anexos gerais do cartão"
+        );
+        generalImageTrigger.addEventListener(
+          "click",
+          () => openCardImageViewer(generalImages[0], generalImageTrigger)
+        );
+        container.appendChild(generalImageTrigger);
+      }
       let failedImages = 0;
 
       for (const image of faceImages) {
         if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+        const imageTrigger = document.createElement("button");
         const imageElement = document.createElement("img");
+        imageTrigger.type = "button";
+        imageTrigger.className = "card-face-image-trigger";
+        imageTrigger.setAttribute(
+          "aria-label",
+          "Visualizar " + (image.nome || "imagem da " + CARD_IMAGE_SIDE_LABELS[side].toLowerCase())
+        );
+        imageTrigger.addEventListener("click", () => openCardImageViewer(image, imageTrigger));
         imageElement.className = "card-face-image";
         imageElement.alt = image.nome || "Imagem da " + CARD_IMAGE_SIDE_LABELS[side].toLowerCase();
         imageElement.decoding = "async";
-        container.appendChild(imageElement);
+        imageTrigger.appendChild(imageElement);
+        container.appendChild(imageTrigger);
 
         try {
-          imageElement.src = await getCardImageDataUrl(card.id, image);
+          const imageDataUrl = await getCardImageDataUrl(card.id, image);
+          if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
+          imageElement.src = imageDataUrl;
+          container.classList.add("has-face-image");
         } catch (error) {
           if (!isCurrentCardFaceImageRender(card.id, requestVersion)) return;
-          imageElement.remove();
+          imageTrigger.remove();
           failedImages += 1;
           console.error("Erro ao carregar imagem do cartão:", error);
         }
@@ -2877,16 +3577,156 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
+  function applyImageViewerTransform() {
+    const imageBoxWidth = imageViewerImage.offsetWidth;
+    const imageBoxHeight = imageViewerImage.offsetHeight;
+    const fitScale = imageViewerImage.naturalWidth && imageViewerImage.naturalHeight
+      ? Math.min(
+          imageBoxWidth / imageViewerImage.naturalWidth,
+          imageBoxHeight / imageViewerImage.naturalHeight
+        )
+      : 0;
+    const renderedImageWidth = imageViewerImage.naturalWidth * fitScale;
+    const renderedImageHeight = imageViewerImage.naturalHeight * fitScale;
+    const maxOffsetX = Math.max(0, (renderedImageWidth * imageViewerScale - imageBoxWidth) / 2);
+    const maxOffsetY = Math.max(0, (renderedImageHeight * imageViewerScale - imageBoxHeight) / 2);
+
+    imageViewerOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, imageViewerOffsetX));
+    imageViewerOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, imageViewerOffsetY));
+    imageViewerImage.dataset.zoomed = String(imageViewerScale > 1);
+    imageViewerImage.style.transform =
+      `translate3d(${imageViewerOffsetX}px, ${imageViewerOffsetY}px, 0) scale(${imageViewerScale})`;
+  }
+
+  function resetImageViewerZoom() {
+    imageViewerPointers.clear();
+    imageViewerScale = 1;
+    imageViewerOffsetX = 0;
+    imageViewerOffsetY = 0;
+    imageViewerPinchStartDistance = 0;
+    imageViewerPinchStartScale = 1;
+    imageViewerLastTap = null;
+    applyImageViewerTransform();
+  }
+
+  function getImageViewerPointerDistance() {
+    const points = Array.from(imageViewerPointers.values());
+    if (points.length < 2) return 0;
+    return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+  }
+
+  function startImageViewerPointer(event) {
+    if (!imageViewerImage.getAttribute("src") ||
+        (event.pointerType === "mouse" && event.button !== 0)) return;
+    event.preventDefault();
+    imageViewerImage.setPointerCapture(event.pointerId);
+    imageViewerPointers.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+      startX: event.clientX,
+      startY: event.clientY,
+      startedAt: Date.now(),
+      moved: false
+    });
+
+    if (imageViewerPointers.size === 2) {
+      imageViewerPointers.forEach(pointer => { pointer.moved = true; });
+      imageViewerPinchStartDistance = getImageViewerPointerDistance();
+      imageViewerPinchStartScale = imageViewerScale;
+      imageViewerLastTap = null;
+    }
+  }
+
+  function moveImageViewerPointer(event) {
+    const pointer = imageViewerPointers.get(event.pointerId);
+    if (!pointer) return;
+    event.preventDefault();
+    const deltaX = event.clientX - pointer.x;
+    const deltaY = event.clientY - pointer.y;
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    if (Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) > 8) {
+      pointer.moved = true;
+    }
+
+    if (imageViewerPointers.size >= 2) {
+      const distance = getImageViewerPointerDistance();
+      if (imageViewerPinchStartDistance > 0) {
+        imageViewerScale = Math.max(
+          1,
+          Math.min(4, imageViewerPinchStartScale * distance / imageViewerPinchStartDistance)
+        );
+        applyImageViewerTransform();
+      }
+      return;
+    }
+
+    if (imageViewerScale > 1) {
+      imageViewerOffsetX += deltaX;
+      imageViewerOffsetY += deltaY;
+      applyImageViewerTransform();
+    }
+  }
+
+  function finishImageViewerPointer(event, allowTap) {
+    const pointer = imageViewerPointers.get(event.pointerId);
+    if (!pointer) return;
+    const wasTap = allowTap && !pointer.moved && Date.now() - pointer.startedAt < 350;
+    imageViewerPointers.delete(event.pointerId);
+
+    if (imageViewerPointers.size >= 2) {
+      imageViewerPinchStartDistance = getImageViewerPointerDistance();
+      imageViewerPinchStartScale = imageViewerScale;
+      return;
+    }
+
+    imageViewerPinchStartDistance = 0;
+    if (imageViewerPointers.size === 1) {
+      imageViewerPointers.forEach(remainingPointer => { remainingPointer.moved = true; });
+      return;
+    }
+
+    if (!wasTap) {
+      imageViewerLastTap = null;
+      return;
+    }
+
+    const now = Date.now();
+    const isDoubleTap = imageViewerLastTap &&
+      now - imageViewerLastTap.time < 350 &&
+      Math.hypot(event.clientX - imageViewerLastTap.x, event.clientY - imageViewerLastTap.y) < 32;
+    if (isDoubleTap) {
+      if (imageViewerScale > 1) {
+        resetImageViewerZoom();
+      } else {
+        imageViewerScale = 2.5;
+        imageViewerOffsetX = 0;
+        imageViewerOffsetY = 0;
+        imageViewerLastTap = null;
+        applyImageViewerTransform();
+      }
+      return;
+    }
+
+    imageViewerLastTap = { time: now, x: event.clientX, y: event.clientY };
+  }
+
   function closeCardImageViewer() {
+    const returnFocus = imageViewerReturnFocus;
     imageViewerRequestVersion += 1;
     imageViewer.hidden = true;
     imageViewerImage.removeAttribute("src");
     imageViewerImage.alt = "";
+    resetImageViewerZoom();
     imageViewerTitle.textContent = "Imagens do cartão";
     imageViewerCaption.textContent = "";
     imageViewerCounter.textContent = "";
     imageViewerImages = [];
     imageViewerCardId = "";
+    imageViewerReturnFocus = null;
+    if (returnFocus && returnFocus.isConnected && !returnFocus.closest("[hidden]")) {
+      returnFocus.focus();
+    }
   }
 
   async function renderCurrentCardImage() {
@@ -2894,6 +3734,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const image = imageViewerImages[imageViewerIndex];
     const requestVersion = ++imageViewerRequestVersion;
     const currentCardId = imageViewerCardId;
+    resetImageViewerZoom();
     imageViewerImage.removeAttribute("src");
     imageViewerImage.alt = image.nome;
     imageViewerCaption.textContent = "Carregando " + image.nome + "...";
@@ -2916,36 +3757,113 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  async function openCardImageViewer() {
-    if (data.length === 0) return;
-    const card = data[currentCardIndex];
+  async function openCardImageViewer(startImage = null, returnFocus = null, cardOverride = null) {
+    const card = cardOverride || (data.length > 0 ? data[currentCardIndex] : null);
+    if (!card) return;
+    const requestVersion = ++imageViewerRequestVersion;
     imageViewerCardId = String(card.id);
     imageViewerImages = [];
     imageViewerIndex = 0;
+    imageViewerReturnFocus = returnFocus || document.activeElement;
     imageViewer.hidden = false;
-    imageViewerTitle.textContent = "Imagens do cartão " + card.id;
+    imageViewerTitle.textContent = startImage && CARD_IMAGE_SIDE_LABELS[startImage.lado]
+      ? CARD_IMAGE_SIDE_LABELS[startImage.lado]
+      : "Imagens do cartão";
     imageViewerCaption.textContent = "Carregando anexos...";
     imageViewerCounter.textContent = "";
+    previousImageButton.disabled = true;
+    nextImageButton.disabled = true;
+    resetImageViewerZoom();
     imageViewerImage.removeAttribute("src");
+    closeImageViewerButton.focus();
 
     try {
-      imageViewerImages = await getCardImageMetadata(card.id);
-      if (imageViewer.hidden) return;
+      imageViewerImages = Array.isArray(card.images)
+        ? card.images.slice()
+        : await getCardImageMetadata(card.id);
+      if (requestVersion !== imageViewerRequestVersion || imageViewer.hidden) return;
       if (imageViewerImages.length === 0) {
         closeCardImageViewer();
         showAppNotification("Este cartão ainda não tem imagens anexadas.");
         return;
       }
+      if (startImage && startImage.id != null) {
+        const requestedIndex = imageViewerImages.findIndex(
+          image => String(image.id) === String(startImage.id)
+        );
+        if (requestedIndex >= 0) imageViewerIndex = requestedIndex;
+      }
       await renderCurrentCardImage();
     } catch (error) {
+      if (requestVersion !== imageViewerRequestVersion || imageViewer.hidden) return;
       closeCardImageViewer();
       const detail = error instanceof Error ? error.message : String(error);
       showAppNotification("Não foi possível carregar as imagens do cartão. " + detail);
     }
   }
 
-  cardImagesButton.addEventListener("click", openCardImageViewer);
-  document.getElementById("close-image-viewer").addEventListener("click", closeCardImageViewer);
+  async function renderDeleteCardPreviewImages(card, side, container, requestId) {
+    container.classList.remove("has-face-image");
+    container.replaceChildren();
+    const images = Array.isArray(card.images) ? card.images : [];
+    const faceImages = images.filter(image => image.lado === side);
+    const generalImages = images.filter(image => image.lado === "ANEXO");
+
+    for (const image of faceImages) {
+      if (requestId !== deleteCardPreviewRequestId) return;
+      const trigger = document.createElement("button");
+      const imageElement = document.createElement("img");
+      trigger.type = "button";
+      trigger.className = "card-face-image-trigger";
+      trigger.disabled = true;
+      trigger.setAttribute("aria-label", "Visualizar " + (image.nome || "imagem do cartão"));
+      imageElement.className = "card-face-image";
+      imageElement.alt = image.nome || "Imagem do cartão";
+      imageElement.decoding = "async";
+      trigger.appendChild(imageElement);
+      container.appendChild(trigger);
+
+      try {
+        imageElement.src = await getCardImageDataUrl(card.id, image);
+        if (requestId !== deleteCardPreviewRequestId) return;
+        trigger.disabled = false;
+        trigger.addEventListener("click", () => openCardImageViewer(image, trigger, card));
+        container.classList.add("has-face-image");
+      } catch (error) {
+        if (requestId !== deleteCardPreviewRequestId) return;
+        trigger.remove();
+        console.warn("Não foi possível carregar a imagem da prévia:", error);
+        const errorNote = document.createElement("p");
+        errorNote.className = "card-image-load-error";
+        errorNote.textContent = "Não foi possível carregar uma imagem desta face.";
+        container.appendChild(errorNote);
+      }
+    }
+
+    if (side === "FRENTE" && generalImages.length > 0) {
+      const generalImageTrigger = document.createElement("button");
+      generalImageTrigger.type = "button";
+      generalImageTrigger.className = "card-general-image-trigger";
+      generalImageTrigger.textContent = "📎 Anexos gerais (" + generalImages.length + ")";
+      generalImageTrigger.setAttribute(
+        "aria-label",
+        "Abrir " + generalImages.length + " anexos gerais do cartão"
+      );
+      generalImageTrigger.addEventListener(
+        "click",
+        () => openCardImageViewer(generalImages[0], generalImageTrigger, card)
+      );
+      container.appendChild(generalImageTrigger);
+    }
+  }
+
+  imageViewerImage.addEventListener("load", applyImageViewerTransform);
+  imageViewerImage.addEventListener("pointerdown", startImageViewerPointer);
+  imageViewerImage.addEventListener("pointermove", moveImageViewerPointer);
+  imageViewerImage.addEventListener("pointerup", event => finishImageViewerPointer(event, true));
+  imageViewerImage.addEventListener("pointercancel", event => finishImageViewerPointer(event, false));
+  imageViewerImage.addEventListener("lostpointercapture", event => finishImageViewerPointer(event, false));
+  closeImageViewerButton.addEventListener("click", closeCardImageViewer);
   imageViewer.addEventListener("click", event => {
     if (event.target === imageViewer) closeCardImageViewer();
   });
@@ -2971,10 +3889,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       renderCurrentCardImage();
     }
   });
+  window.addEventListener("resize", applyImageViewerTransform);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", applyImageViewerTransform);
+  }
 
   // AUXILIAR NO CONTADOR DE CARTÕES
   let isSavingFavorite = false;
-  let isSavingDeletionMarker = false;
+  let isDeletingCard = false;
   const reviewedResultCardIds = new Set();
   let pendingReviewResult = null;
   let isChangingReviewContext = false;
@@ -3070,7 +3992,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("add-button").style.removeProperty("flex");
     document.getElementById("flashcard").hidden = !isVisible;
     document.getElementById("review-footer").hidden = !isVisible;
-    cardImagesButton.hidden = !isVisible;
     manageImagesButton.hidden = !isVisible;
     if (!isVisible) {
       syncReviewResultStatus(null);
@@ -3134,8 +4055,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       .then(response => {
         const page = validateReviewPage(response);
         if (activeReviewSessionId !== sessionId) return false;
-        if (page.sessionId !== sessionId || page.total !== totalCards) {
+        if (page.sessionId !== sessionId || page.total > totalCards) {
           throw new Error("A API devolveu uma página de outra sessão de cartões.");
+        }
+
+        if (page.total < totalCards) {
+          totalCards = page.total;
+          remainingCards = Math.max(0, totalCards - currentCardIndex);
+          updateCardCounter();
         }
 
         data = data.concat(page.cards.map(card => ({ ...card, resultado: card.resultado ?? "" })));
@@ -3279,8 +4206,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         throw new Error("A resposta inicial da API está incompleta. Atualize a implantação do Apps Script.");
       }
 
-      addCardOptions = bootstrap.addCardOptions;
-      populateAddCardDisciplineOptions();
+      updateCardFormOptionsFromApi(bootstrap.addCardOptions);
       populateFilters(bootstrap.filters, filters);
     } finally {
       setReviewContextChanging(false);
@@ -3329,6 +4255,299 @@ document.addEventListener("DOMContentLoaded", async function () {
       option.textContent = normalizeFilterOptionLabel(matter);
       matterSelect.appendChild(option);
     });
+  }
+
+  function populateNewMatterDisciplineOptions() {
+    const disciplineSelect = document.getElementById("menu-new-matter-discipline");
+    const previousSelection = disciplineSelect.value;
+    disciplineSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = addCardOptions.disciplinas.length
+      ? "Selecione uma disciplina"
+      : "Cadastre uma disciplina primeiro";
+    disciplineSelect.appendChild(placeholder);
+
+    sortedUniqueFilterValues(addCardOptions.disciplinas).forEach(discipline => {
+      const option = document.createElement("option");
+      option.value = discipline;
+      option.textContent = normalizeFilterOptionLabel(discipline);
+      disciplineSelect.appendChild(option);
+    });
+
+    const matchingOption = Array.from(disciplineSelect.options).find(option =>
+      option.value && option.value.toLocaleLowerCase("pt-BR") === previousSelection.toLocaleLowerCase("pt-BR")
+    );
+    if (matchingOption) disciplineSelect.value = matchingOption.value;
+  }
+
+  function updateCardFormOptionsFromApi(options) {
+    if (!options || !Array.isArray(options.disciplinas) || !Array.isArray(options.materias)) {
+      throw new Error("A API não devolveu as opções atualizadas. Publique a versão atual do Apps Script.");
+    }
+
+    addCardOptions = options;
+    populateAddCardDisciplineOptions();
+    populateNewMatterDisciplineOptions();
+    populateDeleteSupportOptions();
+  }
+
+  function deleteCatalogNamesMatch(first, second) {
+    return normalizeFilterOptionLabel(first).toLocaleLowerCase("pt-BR") ===
+      normalizeFilterOptionLabel(second).toLocaleLowerCase("pt-BR");
+  }
+
+  function populateDeleteDisciplineOptions(selectedValue = "") {
+    const select = document.getElementById("menu-delete-matter-discipline");
+    if (!select) return "";
+
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = addCardOptions.disciplinas.length
+      ? "Selecione uma disciplina"
+      : "Nenhuma disciplina cadastrada";
+    select.appendChild(placeholder);
+
+    sortedUniqueFilterValues(addCardOptions.disciplinas).forEach(discipline => {
+      const option = document.createElement("option");
+      option.value = discipline;
+      option.textContent = normalizeFilterOptionLabel(discipline);
+      select.appendChild(option);
+    });
+
+    const matchingOption = Array.from(select.options).find(option =>
+      option.value && deleteCatalogNamesMatch(option.value, selectedValue)
+    );
+    if (matchingOption) select.value = matchingOption.value;
+    return select.value;
+  }
+
+  function populateDeleteMatterOptions(selectedMatter = null) {
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    const select = document.getElementById("menu-delete-matter-select");
+    if (!disciplineSelect || !select) return;
+
+    const previousMatter = selectedMatter == null ? select.value : String(selectedMatter);
+    const selectedDiscipline = disciplineSelect.value;
+    const matters = selectedDiscipline
+      ? addCardOptions.materias
+        .filter(item => item && item.disciplina && item.materia &&
+          deleteCatalogNamesMatch(item.disciplina, selectedDiscipline))
+        .slice()
+        .sort((first, second) => filterCollator.compare(first.materia, second.materia))
+      : [];
+
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = !selectedDiscipline
+      ? "Selecione uma disciplina primeiro"
+      : matters.length
+        ? "Selecione uma matéria"
+        : "Nenhuma matéria cadastrada para esta disciplina";
+    select.appendChild(placeholder);
+    select.disabled = !selectedDiscipline;
+
+    matters.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.materia;
+      option.textContent = normalizeFilterOptionLabel(item.materia);
+      select.appendChild(option);
+    });
+
+    const matchingOption = Array.from(select.options).find(option =>
+      option.value && deleteCatalogNamesMatch(option.value, previousMatter)
+    );
+    if (matchingOption) select.value = matchingOption.value;
+
+    if (select.value) {
+      refreshMatterDeletionPreview();
+    } else {
+      matterDeletionPreviewRequestId += 1;
+      resetMatterDeletionPreview();
+    }
+  }
+
+  function populateDeleteSupportOptions() {
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    const matterSelect = document.getElementById("menu-delete-matter-select");
+    if (!disciplineSelect || !matterSelect) return;
+
+    const previousDiscipline = disciplineSelect.value;
+    const previousMatter = matterSelect.value;
+    populateDeleteDisciplineOptions(previousDiscipline);
+    const disciplineWasPreserved = deleteCatalogNamesMatch(
+      disciplineSelect.value,
+      previousDiscipline
+    );
+    populateDeleteMatterOptions(disciplineWasPreserved ? previousMatter : "");
+  }
+
+  function setMatterDeletionSummary(summary, message) {
+    const text = String(message == null ? "" : message);
+    summary.textContent = text;
+    summary.hidden = text.trim() === "";
+  }
+
+  function resetMatterDeletionPreview(message = "") {
+    const summary = document.getElementById("menu-delete-matter-summary");
+    const deleteButton = document.getElementById("delete-matter-cards-button");
+    const clearSelectionButton = document.getElementById("clear-delete-matter-selection");
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    const select = document.getElementById("menu-delete-matter-select");
+    if (!summary || !deleteButton) return;
+    setMatterDeletionSummary(summary, message);
+    deleteButton.disabled = true;
+    deleteButton.dataset.expectedCardCount = "";
+    if (clearSelectionButton) {
+      clearSelectionButton.disabled = !(disciplineSelect && disciplineSelect.value) &&
+        !(select && select.value);
+    }
+  }
+
+  function parseDeleteMatterSelection() {
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    const select = document.getElementById("menu-delete-matter-select");
+    if (!disciplineSelect || !select || !disciplineSelect.value || !select.value) return null;
+    const pair = { disciplina: disciplineSelect.value, materia: select.value };
+    const exists = addCardOptions.materias.some(item => item &&
+      deleteCatalogNamesMatch(item.disciplina, pair.disciplina) &&
+      deleteCatalogNamesMatch(item.materia, pair.materia)
+    );
+    return exists ? pair : null;
+  }
+
+  function isCurrentMatterDeletionPreview(pair, requestId) {
+    if (requestId !== matterDeletionPreviewRequestId) return false;
+    const currentPair = parseDeleteMatterSelection();
+    return Boolean(currentPair &&
+      deleteCatalogNamesMatch(currentPair.disciplina, pair.disciplina) &&
+      deleteCatalogNamesMatch(currentPair.materia, pair.materia)
+    );
+  }
+
+  async function refreshMatterDeletionPreview() {
+    const select = document.getElementById("menu-delete-matter-select");
+    const summary = document.getElementById("menu-delete-matter-summary");
+    const deleteButton = document.getElementById("delete-matter-cards-button");
+    const clearSelectionButton = document.getElementById("clear-delete-matter-selection");
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    const pair = parseDeleteMatterSelection();
+    const requestId = ++matterDeletionPreviewRequestId;
+
+    if (!pair) {
+      resetMatterDeletionPreview();
+      return;
+    }
+
+    if (clearSelectionButton) {
+      clearSelectionButton.disabled = !(disciplineSelect && disciplineSelect.value) && !select.value;
+    }
+    deleteButton.disabled = true;
+    setMatterDeletionSummary(summary, "Consultando os cartões vinculados…");
+    try {
+      const preview = await callAppsScript("getMatterDeletionPreview", pair);
+      if (!isCurrentMatterDeletionPreview(pair, requestId)) return;
+      if (!preview || preview.success !== true || !Number.isSafeInteger(preview.cardCount) || preview.cardCount < 0) {
+        throw new Error("A API retornou uma prévia inválida para a matéria.");
+      }
+
+      const message = preview.cardCount === 1
+        ? "1 cartão ativo vinculado a esta matéria."
+        : `${preview.cardCount} cartões ativos vinculados a esta matéria.`;
+      setMatterDeletionSummary(summary, message);
+      deleteButton.dataset.expectedCardCount = String(preview.cardCount);
+      deleteButton.disabled = preview.cardCount === 0 || isDeletingCard || isChangingReviewContext;
+    } catch (error) {
+      if (!isCurrentMatterDeletionPreview(pair, requestId)) return;
+      const detail = error instanceof Error ? error.message : String(error);
+      setMatterDeletionSummary(summary, `Não foi possível consultar os cartões. ${detail}`);
+      deleteButton.disabled = true;
+    }
+  }
+
+  function clearDeleteCardPreview(invalidateRequest = true) {
+    if (invalidateRequest) deleteCardPreviewRequestId += 1;
+    deleteCardPreviewCard = null;
+    deleteCardPreviewSessionId = "";
+    deleteCardPreviewInReviewSession = false;
+
+    const preview = document.getElementById("delete-card-preview");
+    const confirmButton = document.getElementById("confirm-delete-card-preview");
+    const locateButton = document.getElementById("locate-delete-card-button");
+    if (preview) preview.hidden = true;
+    if (confirmButton) {
+      confirmButton.disabled = true;
+      confirmButton.textContent = "Mover para a lixeira";
+    }
+    if (locateButton && !isDeletingCard) locateButton.disabled = false;
+
+    [
+      "delete-card-preview-title",
+      "delete-card-preview-front-heading",
+      "delete-card-preview-front-content",
+      "delete-card-preview-back-heading",
+      "delete-card-preview-back-content"
+    ].forEach(id => document.getElementById(id).replaceChildren());
+    ["delete-card-preview-front-images", "delete-card-preview-back-images"].forEach(id => {
+      const container = document.getElementById(id);
+      container.classList.remove("has-face-image");
+      container.replaceChildren();
+    });
+  }
+
+  async function displayDeleteCardPreview(card, requestId, sessionId, inReviewSession) {
+    if (requestId !== deleteCardPreviewRequestId) return;
+
+    deleteCardPreviewCard = card;
+    deleteCardPreviewSessionId = sessionId;
+    deleteCardPreviewInReviewSession = inReviewSession === true;
+    const confirmButton = document.getElementById("confirm-delete-card-preview");
+    confirmButton.disabled = true;
+    confirmButton.textContent = "Preparando prévia…";
+    document.getElementById("delete-card-preview-title").textContent =
+      "Prévia do cartão ID#" + String(card.id);
+    document.getElementById("delete-card-preview-front-heading")
+      .replaceChildren(createCardHeading("FRENTE", card));
+    document.getElementById("delete-card-preview-back-heading")
+      .replaceChildren(createCardHeading("VERSO", card));
+    document.getElementById("delete-card-preview-front-content").innerHTML =
+      String(card.frente == null ? "" : card.frente);
+    document.getElementById("delete-card-preview-back-content").innerHTML =
+      String(card.tras == null ? "" : card.tras);
+    document.getElementById("delete-card-preview").hidden = false;
+    document.getElementById("delete-card-preview-title").focus({ preventScroll: true });
+    const prefersReducedMotion = typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById("delete-card-preview").scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "nearest"
+    });
+
+    try {
+      await Promise.all([
+        renderDeleteCardPreviewImages(
+          card,
+          "FRENTE",
+          document.getElementById("delete-card-preview-front-images"),
+          requestId
+        ),
+        renderDeleteCardPreviewImages(
+          card,
+          "VERSO",
+          document.getElementById("delete-card-preview-back-images"),
+          requestId
+        )
+      ]);
+    } catch (error) {
+      console.warn("Não foi possível renderizar todas as imagens da prévia:", error);
+    }
+
+    if (requestId !== deleteCardPreviewRequestId) return;
+    confirmButton.textContent = "Mover para a lixeira";
+    confirmButton.disabled = false;
   }
 
   function getReviewDateAtClick() {
@@ -3453,6 +4672,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         Array.from(imageFilter.options).some(option => option.value === String(selected.idImagem))) {
       imageFilter.value = String(selected.idImagem);
     }
+    syncMenuSelectionHighlights();
   }
 
   const filterCollator = new Intl.Collator("pt-BR", {
@@ -3571,9 +4791,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const value = input.value.trim();
     if (!value) return null;
 
-    const match = value.match(/^(?:QID)?(\d+)$/i);
+    const match = value.match(/^(?:ID#)?(\d+)$/i);
     if (!match) {
-      showAppNotification("Informe o ID como número ou no formato QID123.");
+      showAppNotification("Informe o ID como número ou no formato ID#123.");
       input.focus();
       return undefined;
     }
@@ -3585,7 +4805,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       return undefined;
     }
 
-    input.value = "QID" + id;
+    input.value = "ID#" + id;
     return String(id);
   }
 
@@ -3605,6 +4825,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     } else if (changedFilter === "resultado") {
       document.getElementById("data-filter").value = "todos";
     }
+    syncMenuSelectionHighlights();
 
     const requestId = ++filterOptionsRequestId;
     const selections = getSelectedReviewFilters();
@@ -3620,6 +4841,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const options = await callAppsScript("getFilterOptions", selections);
       if (requestId !== filterOptionsRequestId) return;
       populateFilters(options, getSelectedReviewFilters());
+      syncMenuSelectionHighlights();
     } catch (error) {
       if (requestId !== filterOptionsRequestId) return;
       console.error("Erro ao atualizar as opções dos filtros:", error);
@@ -3679,8 +4901,7 @@ async function applyFilters(options = {}) {
 
 
   // Monta o cabeçalho no cliente usando as colunas B, C e D do mesmo cartão.
-  function renderCardHeading(elementId, side, card) {
-    const heading = document.getElementById(elementId);
+  function createCardHeading(side, card) {
     const container = document.createElement("span");
     const label = document.createElement("span");
     const idLabel = document.createElement("span");
@@ -3693,7 +4914,7 @@ async function applyFilters(options = {}) {
     container.className = "card-heading";
     label.className = "card-heading-label";
     idLabel.className = "card-heading-id";
-    idLabel.textContent = "QID" + String(card.id);
+    idLabel.textContent = "ID#" + String(card.id);
     sideLabel.className = "card-heading-side";
     sideLabel.textContent = side;
     label.append(idLabel, document.createTextNode(" - "), sideLabel);
@@ -3706,7 +4927,12 @@ async function applyFilters(options = {}) {
     });
 
     container.append(label, dataLines);
-    heading.replaceChildren(container);
+    return container;
+  }
+
+  function renderCardHeading(elementId, side, card) {
+    const heading = document.getElementById(elementId);
+    heading.replaceChildren(createCardHeading(side, card));
   }
 
   function isFavoriteValue(value) {
@@ -3725,20 +4951,6 @@ async function applyFilters(options = {}) {
     favoriteButton.title = isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos";
   }
 
-  function isMarkedForDeletion(value) {
-    const normalized = String(value == null ? "" : value).trim().normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "").toUpperCase();
-    return ["SIM", "TRUE", "YES", "1", "EXCLUIR"].includes(normalized);
-  }
-
-  function updateDeletionButton(card) {
-    const isMarked = isMarkedForDeletion(card.marcar_excluir);
-    excluirButton.classList.toggle("active", isMarked);
-    excluirButton.setAttribute("aria-pressed", String(isMarked));
-    excluirButton.setAttribute("aria-label", isMarked ? "Remover marcação de exclusão" : "Marcar para exclusão");
-    excluirButton.title = isMarked ? "Remover marcação de exclusão" : "Marcar para exclusão";
-  }
-
   function updateResultCounters(card) {
     const correctButton = document.querySelector('[data-resultado="ACERTEI"]');
     const incorrectButton = document.querySelector('[data-resultado="ERREI"]');
@@ -3747,7 +4959,7 @@ async function applyFilters(options = {}) {
   }
 
   function updateResultButtonStates(card) {
-    document.querySelectorAll("[data-resultado],#excluir-button").forEach(button => {
+    document.querySelectorAll("[data-resultado]").forEach(button => {
       button.classList.remove("active");
     });
 
@@ -3767,7 +4979,6 @@ async function applyFilters(options = {}) {
       button.setAttribute("aria-pressed", String(isSelected));
     });
 
-    updateDeletionButton(card);
   }
 
   function setAnswerVisibility(isVisible) {
@@ -3789,12 +5000,33 @@ async function applyFilters(options = {}) {
     }
   }
 
+  function scrollToBackFlashcard() {
+    const backFlashcard = document.getElementById("back-flashcard");
+    if (!backFlashcard || backFlashcard.hidden) return;
+
+    const appHeader = document.querySelector(".header");
+    const headerBottom = appHeader
+      ? Math.ceil(appHeader.getBoundingClientRect().bottom)
+      : 0;
+    const statusBottom = reviewResultStatus && !reviewResultStatus.hidden
+      ? Math.ceil(reviewResultStatus.getBoundingClientRect().bottom)
+      : 0;
+    const topOffset = Math.max(headerBottom, statusBottom) + 16;
+    const targetTop = window.scrollY + backFlashcard.getBoundingClientRect().top - topOffset;
+    const prefersReducedMotion = typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: prefersReducedMotion ? "auto" : "smooth"
+    });
+  }
+
   function renderCard() {
     if (data.length === 0) return;
 
     const card = data[currentCardIndex];
     syncReviewResultStatus(card);
-    cardImagesButton.hidden = false;
     const imageRenderVersion = ++cardFaceImageRenderVersion;
     frontCardImagesContainer.replaceChildren();
     backCardImagesContainer.replaceChildren();
@@ -3881,38 +5113,90 @@ dataButton.addEventListener("click", async () => {
 
 
 
-// ALTERNAR MARCADOR DE EXCLUSÃO NA PLANILHA
+// MOVER O CARTÃO E SEUS ANEXOS PARA AS LIXEIRAS
 const excluirButton = document.getElementById("excluir-button");
 
-excluirButton.addEventListener("click", async () => {
-    if (data.length === 0 || isSavingDeletionMarker || isChangingReviewContext) return;
+async function removeDeletedCardFromReviewSession(cardId) {
+  const deletedIndex = data.findIndex(item => String(item.id) === String(cardId));
+  const deletedDisplayedCard = deletedIndex === currentCardIndex;
+  if (deletedIndex >= 0) {
+    data.splice(deletedIndex, 1);
+    if (deletedIndex < currentCardIndex) currentCardIndex -= 1;
+  }
+  totalCards = Math.max(0, totalCards - 1);
+  remainingCards = Math.max(0, totalCards - currentCardIndex);
 
-    const card = data[currentCardIndex];
-    const nextMarkedState = !isMarkedForDeletion(card.marcar_excluir);
-    const marcarExcluir = nextMarkedState ? "SIM" : "NÃO";
-    const dataRevisao = getReviewDateAtClick();
-    isSavingDeletionMarker = true;
-    excluirButton.disabled = true;
+  let nextPageError = null;
+  while (currentCardIndex >= data.length && hasMoreReviewPages) {
     try {
-        const savedCard = await sendApiMutation({
-          ...cardMutationReference(card),
-          marcarExcluir,
-          dataRevisao
-        });
-        applyCardReviewDateMutation(card, savedCard);
-        card.marcar_excluir = marcarExcluir;
-        updateDeletionButton(card);
-        showAppNotification(nextMarkedState
-          ? "Cartão marcado para exclusão."
-          : "Marcação de exclusão removida.");
+      if (!(await loadNextReviewPage())) break;
     } catch (error) {
-        console.error("Erro ao atualizar a marcação de exclusão:", error);
-        const detail = error instanceof Error ? error.message : String(error);
-        showAppNotification(`Não foi possível atualizar a marcação de exclusão. ${detail}`);
-    } finally {
-        isSavingDeletionMarker = false;
-        excluirButton.disabled = false;
+      nextPageError = error;
+      break;
     }
+  }
+
+  if (data.length > 0) {
+    if (currentCardIndex >= data.length) currentCardIndex = data.length - 1;
+    remainingCards = Math.max(0, totalCards - currentCardIndex);
+    updateCardCounter();
+    if (deletedDisplayedCard) renderCard();
+    maybePrefetchReviewPage();
+  } else {
+    setReviewSessionPage({
+      success: true,
+      sessionId: activeReviewSessionId,
+      cards: [],
+      total: 0,
+      hasMore: false,
+      nextCursor: null
+    }, { notifyEmpty: false });
+  }
+
+  return nextPageError;
+}
+
+excluirButton.addEventListener("click", async () => {
+  if (data.length === 0 || isDeletingCard || isChangingReviewContext) return;
+
+  const card = data[currentCardIndex];
+  const cardId = String(card.id);
+  const hasImages = String(card.id_imagem == null ? "" : card.id_imagem).trim().toUpperCase() === "SIM" ||
+    (Array.isArray(card.images) && card.images.length > 0);
+  const confirmation = hasImages
+    ? `Mover o cartão ID#${cardId} e seus anexos para as lixeiras?`
+    : `Mover o cartão ID#${cardId} para a lixeira?`;
+  if (!window.confirm(confirmation)) return;
+
+  isDeletingCard = true;
+  excluirButton.disabled = true;
+  setReviewContextChanging(true);
+  try {
+    if (!(await commitPendingReviewResult())) return;
+
+    const savedCard = await sendApiMutation({
+      action: "deleteCard",
+      ...cardMutationReference(card),
+      dataRevisao: getReviewDateAtClick()
+    });
+    if (String(savedCard.id) !== cardId) {
+      throw new Error("A API confirmou um ID_CARTAO diferente do cartão selecionado.");
+    }
+
+    const nextPageError = await removeDeletedCardFromReviewSession(cardId);
+
+    showAppNotification(nextPageError
+      ? `Cartão ID#${cardId} movido para a lixeira. Aplique os filtros para continuar.`
+      : `Cartão ID#${cardId} movido para a lixeira.`);
+  } catch (error) {
+    console.error("Erro ao mover o cartão para a lixeira:", error);
+    const detail = error instanceof Error ? error.message : String(error);
+    showAppNotification(`Não foi possível mover o cartão ID#${cardId} para a lixeira. ${detail}`);
+  } finally {
+    isDeletingCard = false;
+    setReviewContextChanging(false);
+    excluirButton.disabled = false;
+  }
 });
 
 
@@ -3941,6 +5225,7 @@ async function clearFilters() {
     document.getElementById("favoritos-filter").value = "todos";
     document.getElementById("id-imagem-filter").value = "todos";
     document.getElementById("id-cartao-filter").value = "";
+    syncMenuSelectionHighlights();
     filterOptionsRequestId += 1;
     ["materia-filter", "assunto-filter", "resultado-filter", "data-filter"].forEach(id => {
       document.getElementById(id).disabled = false;
@@ -4009,30 +5294,75 @@ async function clearFilters() {
 
 
 
+  function syncMenuSelectionHighlights() {
+    document.querySelectorAll("#menu-filters-panel select").forEach(select => {
+      const hasSelection = select.value !== "" && select.value !== "todos";
+      select.classList.toggle("menu-selection-active", hasSelection);
+    });
+
+    document.querySelectorAll("#menu-delete-panel select, #menu-delete-panel input").forEach(input => {
+      input.classList.toggle("menu-selection-active", Boolean(input.value.trim()));
+    });
+
+    const cardIdInput = document.getElementById("id-cartao-filter");
+    cardIdInput.classList.toggle("menu-selection-active", Boolean(cardIdInput.value.trim()));
+  }
+
+  function setMenuSectionExpanded(sectionName) {
+    document.querySelectorAll("#menu-navigation .menu-section").forEach(section => {
+      const isExpanded = section.dataset.menuSection === sectionName;
+      const trigger = section.querySelector(".menu-section-toggle");
+      const panel = document.getElementById(trigger.getAttribute("aria-controls"));
+      trigger.setAttribute("aria-expanded", String(isExpanded));
+      panel.hidden = !isExpanded;
+    });
+
+    if (sectionName === "filters") {
+      document.getElementById("id-cartao-filter").value = "";
+      syncMenuSelectionHighlights();
+    }
+  }
+
+  function toggleMenuSection(sectionName) {
+    const currentTrigger = document.querySelector(
+      `#menu-navigation [data-menu-section="${sectionName}"] .menu-section-toggle`
+    );
+    const isCurrentlyExpanded = currentTrigger.getAttribute("aria-expanded") === "true";
+    setMenuSectionExpanded(isCurrentlyExpanded ? null : sectionName);
+  }
+
   function toggleSideMenu() {
     const sideMenu = document.getElementById("side-menu");
     const isOpen = !sideMenu.classList.contains("open");
     const menuToggle = document.getElementById("menu-toggle");
-    sideMenu.classList.toggle("open", isOpen);
-    sideMenu.inert = !isOpen;
-    sideMenu.setAttribute("aria-hidden", String(!isOpen));
-    document.body.classList.toggle("filters-menu-open", isOpen);
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-    if (isOpen) {
-      document.getElementById("close-menu").focus();
-    } else {
-      menuToggle.focus();
+    if (!isOpen) {
+      closeSideMenu();
+      return;
     }
+
+    setMenuSectionExpanded(null);
+    sideMenu.classList.add("open");
+    sideMenu.inert = false;
+    sideMenu.setAttribute("aria-hidden", "false");
+    document.body.classList.add("filters-menu-open");
+    menuToggle.setAttribute("aria-expanded", "true");
+    menuToggle.setAttribute("aria-label", "Fechar menu");
+    menuToggle.title = "Fechar menu";
+    document.getElementById("close-menu").focus();
   }
 
   function closeSideMenu() {
     const sideMenu = document.getElementById("side-menu");
+    clearDeleteCardPreview();
+    setMenuSectionExpanded(null);
     sideMenu.classList.remove("open");
     sideMenu.inert = true;
     sideMenu.setAttribute("aria-hidden", "true");
     document.body.classList.remove("filters-menu-open");
     const menuToggle = document.getElementById("menu-toggle");
     menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-label", "Abrir menu");
+    menuToggle.title = "Abrir menu";
     menuToggle.focus();
   }
 
@@ -4064,17 +5394,475 @@ async function clearFilters() {
     refreshDependentFilterOptions("resultado");
   });
 
-  document.getElementById("menu-toggle").addEventListener("click", async () => {
-    if (!await closeImageManagerForNavigation()) return;
-    toggleSideMenu();
+  document.getElementById("menu-filters-panel").addEventListener("change", syncMenuSelectionHighlights);
+  document.getElementById("id-cartao-filter").addEventListener("input", syncMenuSelectionHighlights);
+
+  document.querySelectorAll("#menu-navigation .menu-section-toggle").forEach(button => {
+    button.addEventListener("click", () => {
+      toggleMenuSection(button.closest(".menu-section").dataset.menuSection);
+    });
   });
-  document.getElementById("home-button").addEventListener("click", () => {
+
+  document.getElementById("menu-home-button").addEventListener("click", () => {
     returnToHome().catch(error => {
       console.error("Erro ao voltar ao início:", error);
       showAppNotification("Não foi possível voltar ao início. Tente novamente.");
     });
   });
+
+  document.getElementById("menu-new-card").addEventListener("click", () => {
+    closeSideMenu();
+    document.getElementById("add-button").click();
+  });
+
+  const newDisciplineToggle = document.getElementById("menu-new-discipline-toggle");
+  const newMatterToggle = document.getElementById("menu-new-matter-toggle");
+  const newDisciplineForm = document.getElementById("menu-new-discipline-form");
+  const newMatterForm = document.getElementById("menu-new-matter-form");
+  const newDisciplineNameInput = document.getElementById("menu-new-discipline-name");
+  const newDisciplineMatterInput = document.getElementById("menu-new-discipline-matter");
+  const newDisciplineImageLabelInput = document.getElementById("menu-new-discipline-image-label");
+  const newMatterDisciplineSelect = document.getElementById("menu-new-matter-discipline");
+  const newMatterNameInput = document.getElementById("menu-new-matter-name");
+  const newMatterImageLabelInput = document.getElementById("menu-new-matter-image-label");
+  const deleteMatterToggle = document.getElementById("menu-delete-matter-toggle");
+  const deleteCardToggle = document.getElementById("menu-delete-card-toggle");
+  const deleteMatterForm = document.getElementById("menu-delete-matter-form");
+  const deleteCardForm = document.getElementById("menu-delete-card-form");
+
+  function toggleDeleteForm(formName) {
+    const formEntries = [
+      { name: "matter", toggle: deleteMatterToggle, form: deleteMatterForm },
+      { name: "card", toggle: deleteCardToggle, form: deleteCardForm }
+    ];
+    const currentlyOpen = formEntries.find(entry => !entry.form.hidden);
+    const nextOpen = currentlyOpen && currentlyOpen.name === formName ? "" : formName;
+
+    formEntries.forEach(entry => {
+      const isOpen = entry.name === nextOpen;
+      entry.toggle.setAttribute("aria-expanded", String(isOpen));
+      entry.form.hidden = !isOpen;
+    });
+
+    if (nextOpen !== "card") clearDeleteCardPreview();
+    if (nextOpen === "matter") {
+      populateDeleteSupportOptions();
+      document.getElementById("menu-delete-matter-discipline").focus();
+    } else if (nextOpen === "card") {
+      document.getElementById("menu-delete-card-id").focus();
+    }
+  }
+
+  function toggleNewCatalogForm(formName) {
+    const formEntries = [
+      { name: "discipline", toggle: newDisciplineToggle, form: newDisciplineForm },
+      { name: "matter", toggle: newMatterToggle, form: newMatterForm }
+    ];
+    const currentlyOpen = formEntries.find(entry => !entry.form.hidden);
+    const nextOpen = currentlyOpen && currentlyOpen.name === formName ? "" : formName;
+
+    formEntries.forEach(entry => {
+      const isOpen = entry.name === nextOpen;
+      entry.toggle.setAttribute("aria-expanded", String(isOpen));
+      entry.form.hidden = !isOpen;
+    });
+
+    if (nextOpen === "discipline") {
+      newDisciplineNameInput.focus();
+    } else if (nextOpen === "matter") {
+      populateNewMatterDisciplineOptions();
+      newMatterDisciplineSelect.focus();
+    }
+  }
+
+  function uppercaseCatalogInput(input, maxCharacters = 0) {
+    const selectionStart = input.selectionStart;
+    let value = input.value.toLocaleUpperCase("pt-BR");
+    if (maxCharacters > 0) value = Array.from(value).slice(0, maxCharacters).join("");
+    if (value === input.value) return;
+    input.value = value;
+    if (selectionStart != null) {
+      const caretPosition = Math.min(selectionStart, value.length);
+      input.setSelectionRange(caretPosition, caretPosition);
+    }
+  }
+
+  newDisciplineToggle.addEventListener("click", () => toggleNewCatalogForm("discipline"));
+  newMatterToggle.addEventListener("click", () => toggleNewCatalogForm("matter"));
+  newDisciplineNameInput.addEventListener("input", () => uppercaseCatalogInput(newDisciplineNameInput));
+  newDisciplineMatterInput.addEventListener("input", () => uppercaseCatalogInput(newDisciplineMatterInput));
+  newDisciplineImageLabelInput.addEventListener("input", () => uppercaseCatalogInput(newDisciplineImageLabelInput, 5));
+  newMatterNameInput.addEventListener("input", () => uppercaseCatalogInput(newMatterNameInput));
+  newMatterImageLabelInput.addEventListener("input", () => uppercaseCatalogInput(newMatterImageLabelInput, 5));
+
+  newDisciplineForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const discipline = newDisciplineNameInput.value.trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
+    const matter = newDisciplineMatterInput.value.trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
+    const imageLabel = newDisciplineImageLabelInput.value.trim().toLocaleUpperCase("pt-BR");
+
+    if (!discipline) {
+      showAppNotification("Informe o nome da disciplina.");
+      newDisciplineNameInput.focus();
+      return;
+    }
+    if (!matter) {
+      showAppNotification("Informe a matéria inicial da disciplina.");
+      newDisciplineMatterInput.focus();
+      return;
+    }
+    if (!imageLabel) {
+      showAppNotification("Informe o rótulo de imagem da matéria.");
+      newDisciplineImageLabelInput.focus();
+      return;
+    }
+    if (Array.from(imageLabel).length > 5) {
+      showAppNotification("O rótulo de imagem deve ter no máximo 5 caracteres.");
+      newDisciplineImageLabelInput.focus();
+      return;
+    }
+
+    newDisciplineNameInput.disabled = true;
+    newDisciplineMatterInput.disabled = true;
+    newDisciplineImageLabelInput.disabled = true;
+    newDisciplineToggle.disabled = true;
+    const saveButton = document.getElementById("save-new-discipline");
+    saveButton.disabled = true;
+
+    try {
+      const result = await callAppsScript("addSupportDiscipline", {
+        disciplina: discipline,
+        materia: matter,
+        rotuloImagem: imageLabel
+      });
+      updateCardFormOptionsFromApi(result.addCardOptions);
+      newDisciplineForm.reset();
+      showAppNotification("Disciplina " + discipline + " e matéria " + matter + " adicionadas com sucesso.");
+    } catch (error) {
+      console.error("Erro ao gravar a disciplina:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível gravar a disciplina. " + detail);
+    } finally {
+      newDisciplineNameInput.disabled = false;
+      newDisciplineMatterInput.disabled = false;
+      newDisciplineImageLabelInput.disabled = false;
+      newDisciplineToggle.disabled = false;
+      saveButton.disabled = false;
+    }
+  });
+
+  newMatterForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const discipline = newMatterDisciplineSelect.value.trim();
+    const matter = newMatterNameInput.value.trim().replace(/\s+/g, " ").toLocaleUpperCase("pt-BR");
+    const imageLabel = newMatterImageLabelInput.value.trim().toLocaleUpperCase("pt-BR");
+
+    if (!discipline) {
+      showAppNotification("Selecione a disciplina à qual a matéria será vinculada.");
+      newMatterDisciplineSelect.focus();
+      return;
+    }
+    if (!matter) {
+      showAppNotification("Informe o nome da matéria.");
+      newMatterNameInput.focus();
+      return;
+    }
+    if (!imageLabel) {
+      showAppNotification("Informe o rótulo de imagem da matéria.");
+      newMatterImageLabelInput.focus();
+      return;
+    }
+    if (Array.from(imageLabel).length > 5) {
+      showAppNotification("O rótulo de imagem deve ter no máximo 5 caracteres.");
+      newMatterImageLabelInput.focus();
+      return;
+    }
+
+    newMatterDisciplineSelect.disabled = true;
+    newMatterNameInput.disabled = true;
+    newMatterImageLabelInput.disabled = true;
+    newMatterToggle.disabled = true;
+    const saveButton = document.getElementById("save-new-matter");
+    saveButton.disabled = true;
+
+    try {
+      const result = await callAppsScript("addSupportMatter", {
+        disciplina: discipline,
+        materia: matter,
+        rotuloImagem: imageLabel
+      });
+      updateCardFormOptionsFromApi(result.addCardOptions);
+      newMatterNameInput.value = "";
+      newMatterImageLabelInput.value = "";
+      showAppNotification("Matéria " + matter + " adicionada à disciplina " + discipline + ".");
+    } catch (error) {
+      console.error("Erro ao gravar a matéria:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível gravar a matéria. " + detail);
+    } finally {
+      newMatterDisciplineSelect.disabled = false;
+      newMatterNameInput.disabled = false;
+      newMatterImageLabelInput.disabled = false;
+      newMatterToggle.disabled = false;
+      saveButton.disabled = false;
+    }
+  });
+
+  deleteMatterToggle.addEventListener("click", () => toggleDeleteForm("matter"));
+  deleteCardToggle.addEventListener("click", () => toggleDeleteForm("card"));
+  document.getElementById("clear-delete-matter-selection").addEventListener("click", () => {
+    const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
+    matterDeletionPreviewRequestId += 1;
+    disciplineSelect.value = "";
+    populateDeleteMatterOptions("");
+    syncMenuSelectionHighlights();
+    disciplineSelect.focus();
+  });
+  document.getElementById("menu-delete-matter-discipline").addEventListener("change", () => {
+    populateDeleteMatterOptions("");
+  });
+  document.getElementById("menu-delete-matter-select").addEventListener("change", () => {
+    syncMenuSelectionHighlights();
+    refreshMatterDeletionPreview();
+  });
+  document.getElementById("menu-delete-card-id").addEventListener("input", () => {
+    clearDeleteCardPreview();
+    document.getElementById("locate-delete-card-button").disabled = false;
+    syncMenuSelectionHighlights();
+  });
+
+  document.getElementById("delete-matter-cards-button").addEventListener("click", async event => {
+    const deleteButton = event.currentTarget;
+    const pair = parseDeleteMatterSelection();
+    if (!pair) {
+      showAppNotification("Selecione a matéria que deseja excluir.");
+      return;
+    }
+    if (isEditing) {
+      showAppNotification("Finalize ou cancele a edição antes de excluir cartões.");
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext) return;
+
+    let preview;
+    try {
+      preview = await callAppsScript("getMatterDeletionPreview", pair);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível consultar os cartões da matéria. ${detail}`);
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext) return;
+    if (!preview || preview.success !== true || !Number.isSafeInteger(preview.cardCount)) {
+      showAppNotification("A API não retornou uma quantidade válida de cartões.");
+      return;
+    }
+    if (preview.cardCount === 0) {
+      await refreshMatterDeletionPreview();
+      showAppNotification("Não há cartões ativos vinculados a essa matéria.");
+      return;
+    }
+
+    const cardLabel = preview.cardCount === 1 ? "1 cartão" : `${preview.cardCount} cartões`;
+    const confirmation =
+      `Mover ${cardLabel} da matéria “${pair.materia}” (${pair.disciplina}) para a lixeira? ` +
+      "Os anexos também serão arquivados quando não estiverem compartilhados. A matéria continuará cadastrada.";
+    if (!window.confirm(confirmation)) return;
+
+    deleteButton.disabled = true;
+    isDeletingCard = true;
+    setReviewContextChanging(true);
+    let deletionResult = null;
+    try {
+      if (!(await commitPendingReviewResult())) return;
+      deletionResult = await sendApiMutation({
+        action: "deleteCardsByMatter",
+        disciplina: pair.disciplina,
+        materia: pair.materia,
+        expectedCardCount: preview.cardCount,
+        dataRevisao: getReviewDateAtClick()
+      });
+      if (!Number.isSafeInteger(deletionResult.deletedCards) || deletionResult.deletedCards !== preview.cardCount) {
+        deletionResult = null;
+        throw new Error("A API confirmou uma quantidade diferente da prévia. Atualize a consulta antes de tentar novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir os cartões da matéria:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível excluir os cartões da matéria. ${detail}`);
+    } finally {
+      isDeletingCard = false;
+      setReviewContextChanging(false);
+      deleteButton.disabled = false;
+    }
+
+    if (!deletionResult) {
+      await refreshMatterDeletionPreview();
+      return;
+    }
+
+    await clearFilters();
+    await refreshMatterDeletionPreview();
+    const cardsMovedMessage = deletionResult.deletedCards === 1
+      ? `1 cartão da matéria “${pair.materia}” foi movido para a lixeira.`
+      : `${deletionResult.deletedCards} cartões da matéria “${pair.materia}” foram movidos para a lixeira.`;
+    const imagesArchivedMessage = deletionResult.imagesArchived === 1
+      ? " 1 vínculo de imagem também foi arquivado."
+      : deletionResult.imagesArchived > 1
+        ? ` ${deletionResult.imagesArchived} vínculos de imagem também foram arquivados.`
+        : "";
+    showAppNotification(`${cardsMovedMessage}${imagesArchivedMessage} A matéria permanece cadastrada.`);
+  });
+
+  document.getElementById("menu-delete-card-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (isEditing) {
+      showAppNotification("Finalize ou cancele a edição antes de excluir um cartão.");
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext) return;
+
+    const input = document.getElementById("menu-delete-card-id");
+    const match = input.value.trim().match(/^(?:ID#)?(\d+)$/i);
+    const cardId = match ? String(Number(match[1])) : "";
+    if (!cardId || !Number.isSafeInteger(Number(cardId)) || Number(cardId) < 1) {
+      showAppNotification("Informe o ID como número inteiro positivo ou no formato ID#123.");
+      input.focus();
+      return;
+    }
+
+    input.value = "ID#" + cardId;
+    clearDeleteCardPreview();
+    const requestId = deleteCardPreviewRequestId;
+    const sessionId = activeReviewSessionId;
+    const locateButton = document.getElementById("locate-delete-card-button");
+    locateButton.disabled = true;
+    try {
+      const response = await callAppsScript("getCardPreview", { id: cardId, sessionId });
+      if (requestId !== deleteCardPreviewRequestId) return;
+      if (!response || response.success !== true || !response.card ||
+          String(response.card.id) !== cardId ||
+          !Array.isArray(response.card.images) ||
+          typeof response.inReviewSession !== "boolean") {
+        throw new Error("A API não devolveu uma prévia válida do cartão. Publique a versão atual do Apps Script.");
+      }
+      await displayDeleteCardPreview(response.card, requestId, sessionId, response.inReviewSession);
+    } catch (error) {
+      if (requestId !== deleteCardPreviewRequestId) return;
+      console.error("Erro ao localizar o cartão para exclusão:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível localizar o cartão ID#" + cardId + ". " + detail);
+    } finally {
+      if (requestId === deleteCardPreviewRequestId) locateButton.disabled = false;
+    }
+  });
+
+  document.getElementById("cancel-delete-card-preview").addEventListener("click", () => {
+    clearDeleteCardPreview();
+    document.getElementById("menu-delete-card-id").focus();
+  });
+
+  document.getElementById("confirm-delete-card-preview").addEventListener("click", async event => {
+    const confirmButton = event.currentTarget;
+    const card = deleteCardPreviewCard;
+    if (!card) return;
+    if (isEditing) {
+      showAppNotification("Finalize ou cancele a edição antes de excluir um cartão.");
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext) return;
+
+    const cardId = String(card.id);
+    const hasImages = card.id_imagem === "SIM" || card.images.length > 0;
+    const confirmation = hasImages
+      ? "Mover o cartão ID#" + cardId + " e seus anexos para as lixeiras?"
+      : "Mover o cartão ID#" + cardId + " para a lixeira?";
+    if (!window.confirm(confirmation)) return;
+
+    const input = document.getElementById("menu-delete-card-id");
+    const cancelButton = document.getElementById("cancel-delete-card-preview");
+    const locateButton = document.getElementById("locate-delete-card-button");
+    isDeletingCard = true;
+    setReviewContextChanging(true);
+    confirmButton.disabled = true;
+    cancelButton.disabled = true;
+    locateButton.disabled = true;
+    input.disabled = true;
+    try {
+      if (!(await commitPendingReviewResult())) return;
+
+      const result = await sendApiMutation({
+        action: "deleteCard",
+        ...cardMutationReference(card),
+        dataRevisao: getReviewDateAtClick()
+      });
+      if (String(result.id) !== cardId) {
+        throw new Error("A API confirmou um ID_CARTAO diferente do cartão selecionado.");
+      }
+
+      const belongsToCurrentSession =
+        activeReviewSessionId === deleteCardPreviewSessionId &&
+        deleteCardPreviewInReviewSession;
+      const isLoadedInCurrentSession = data.some(item => String(item.id) === cardId);
+      let nextPageError = null;
+      if (belongsToCurrentSession || isLoadedInCurrentSession) {
+        nextPageError = await removeDeletedCardFromReviewSession(cardId);
+      }
+
+      clearDeleteCardPreview();
+      input.value = "";
+      syncMenuSelectionHighlights();
+      showAppNotification(nextPageError
+        ? "Cartão ID#" + cardId + " movido para a lixeira. Aplique os filtros para continuar."
+        : "Cartão ID#" + cardId + " movido para a lixeira.");
+    } catch (error) {
+      console.error("Erro ao mover o cartão localizado para a lixeira:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification("Não foi possível mover o cartão ID#" + cardId + " para a lixeira. " + detail);
+    } finally {
+      isDeletingCard = false;
+      setReviewContextChanging(false);
+      confirmButton.disabled = !deleteCardPreviewCard;
+      cancelButton.disabled = false;
+      locateButton.disabled = false;
+      input.disabled = false;
+    }
+  });
+
+  document.getElementById("menu-toggle").addEventListener("click", async () => {
+    if (!await closeImageManagerForNavigation()) return;
+    toggleSideMenu();
+  });
+  document.getElementById("start-reviews-button").addEventListener("click", async () => {
+    if (!await closeImageManagerForNavigation()) return;
+    const sideMenu = document.getElementById("side-menu");
+    if (!sideMenu.classList.contains("open")) toggleSideMenu();
+    setMenuSectionExpanded("filters");
+  });
   document.getElementById("close-menu").addEventListener("click", closeSideMenu);
+
+  async function applyMenuSelection(options = {}) {
+    const cardIdInput = document.getElementById("id-cartao-filter");
+    if (options.requireCardId && !cardIdInput.value.trim()) {
+      showAppNotification("Informe o ID do cartão para localizar.");
+      cardIdInput.focus();
+      return;
+    }
+
+    try {
+      if (await applyFilters()) closeSideMenu();
+    } catch (error) {
+      console.error("Erro ao aplicar a seleção do menu:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível aplicar a seleção. ${detail}`);
+    }
+  }
+
+  document.getElementById("locate-card-form").addEventListener("submit", event => {
+    event.preventDefault();
+    applyMenuSelection({ requireCardId: true });
+  });
+
   document.getElementById("apply-filters").addEventListener("click", async () => {
     try {
       if (await applyFilters()) closeSideMenu();
@@ -4089,6 +5877,7 @@ async function clearFilters() {
   document.getElementById("mostrar-btn").addEventListener("click", () => {
     if (data.length === 0) return;
     setAnswerVisibility(true);
+    requestAnimationFrame(scrollToBackFlashcard);
   });
 
   document.getElementById("ocultar-btn").addEventListener("click", () => {
@@ -4540,7 +6329,7 @@ async function toggleEditMode() {
       return;
     }
     if (!isEditableCardPairAllowed(currentCard, newDiscipline, newMatter)) {
-      showAppNotification("Selecione um par de disciplina e matéria cadastrado na aba bd_apoio_memoFULL.");
+      showAppNotification("Selecione um par de disciplina e matéria cadastrado na aba bd_memofull_apoio.");
       return;
     }
 
