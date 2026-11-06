@@ -407,6 +407,7 @@
      height: 96px;
      min-height: 96px;
      box-sizing: border-box;
+     padding: 10px;
      overflow-y: hidden;
      resize: none;
       border-radius: var(--radius-field);
@@ -1263,8 +1264,14 @@
     #result-buttons[hidden],
     #ocultar-btn[hidden],
     #show-answer-actions[hidden],
-    #hide-answer-actions[hidden] {
+    #hide-answer-actions[hidden],
+    #restore-trash-card-button[hidden] {
       display: none;
+    }
+
+    #restore-trash-card-button {
+      background-color: var(--color-action-background);
+      color: var(--color-text-primary);
     }
 
     .buttons-container-header {
@@ -1276,6 +1283,10 @@
       max-width: var(--review-card-width);
       margin: 0 auto;
       overflow: visible;
+    }
+
+    body.trash-session-open .buttons-container-header {
+      display: none !important;
     }
 
 
@@ -1745,6 +1756,10 @@
       content: "";
     }
 
+    #menu-trash-toggle::after {
+      display: none;
+    }
+
     .menu-section-toggle[aria-expanded="true"] {
       background-color: var(--color-panel-background);
       color: var(--color-accent);
@@ -1889,7 +1904,8 @@
       margin: 4px 0 0;
     }
 
-    #menu-delete-matter-summary {
+    #menu-delete-matter-summary,
+    #menu-delete-discipline-summary {
       margin: 12px 0;
       padding: 10px 16px;
       border: 1px solid var(--color-notification-border);
@@ -1902,7 +1918,8 @@
       text-align: center;
     }
 
-    #menu-delete-matter-summary[hidden] {
+    #menu-delete-matter-summary[hidden],
+    #menu-delete-discipline-summary[hidden] {
       display: none;
     }
 
@@ -2238,9 +2255,17 @@
           <span>Excluir</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
         </button>
         <div class="menu-section-panel" id="menu-delete-panel" hidden>
-          <button class="menu-subitem" id="menu-delete-discipline-placeholder" type="button" disabled>
-            <span>Disciplina</span><small class="menu-subitem-status">Etapa 2</small>
-          </button>
+          <button class="menu-subitem menu-subitem-toggle" id="menu-delete-discipline-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-discipline-form">Disciplina</button>
+          <form class="menu-delete-form" id="menu-delete-discipline-form" hidden novalidate>
+            <label for="menu-delete-discipline-select">Disciplina</label>
+            <select id="menu-delete-discipline-select" required>
+              <option value="">Selecione uma disciplina</option>
+            </select>
+            <small class="filter-help">Todas as matérias e todos os cartões vinculados serão enviados às respectivas lixeiras. Arquivos de imagem compartilhados com cartões ativos permanecem na pasta principal.</small>
+            <p class="filter-help" id="menu-delete-discipline-summary" role="status" aria-live="polite" hidden></p>
+            <button class="menu-inline-action" id="delete-discipline-button" type="button" disabled>Deletar disciplina</button>
+            <button class="menu-inline-action" id="clear-delete-discipline-selection" type="button" disabled>Limpar Disciplina</button>
+          </form>
           <button class="menu-subitem menu-subitem-toggle" id="menu-delete-matter-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-matter-form">Matéria</button>
           <form class="menu-delete-form" id="menu-delete-matter-form" hidden novalidate>
             <label for="menu-delete-matter-discipline">Disciplina</label>
@@ -2251,9 +2276,9 @@
             <select id="menu-delete-matter-select" required disabled>
               <option value="">Selecione uma disciplina primeiro</option>
             </select>
-            <small class="filter-help">Os cartões vinculados serão enviados para a lixeira. A matéria continuará cadastrada.</small>
+            <small class="filter-help">Os cartões vinculados e o cadastro da matéria serão enviados às respectivas lixeiras. Imagens compartilhadas permanecem ativas.</small>
             <p class="filter-help" id="menu-delete-matter-summary" role="status" aria-live="polite" hidden></p>
-            <button class="menu-inline-action" id="delete-matter-cards-button" type="button" disabled>Deletar cartões da matéria</button>
+            <button class="menu-inline-action" id="delete-matter-cards-button" type="button" disabled>Deletar cartões e matéria</button>
             <button class="menu-inline-action" id="clear-delete-matter-selection" type="button" disabled>Limpar seleção</button>
           </form>
           <button class="menu-subitem menu-subitem-toggle" id="menu-delete-card-toggle" type="button" aria-expanded="false" aria-controls="menu-delete-card-form">Cartão por ID</button>
@@ -2286,12 +2311,9 @@
       </section>
 
       <section class="menu-section" data-menu-section="trash">
-        <button class="menu-section-toggle" id="menu-trash-toggle" type="button" aria-expanded="false" aria-controls="menu-trash-panel">
-          <span>Lixeira</span><span class="menu-section-chevron" aria-hidden="true">⌄</span>
+        <button class="menu-section-toggle" id="menu-trash-toggle" type="button">
+          <span>Lixeira</span>
         </button>
-        <div class="menu-section-panel" id="menu-trash-panel" hidden>
-          <p class="menu-coming-soon-note">As ações da lixeira serão implementadas posteriormente.</p>
-        </div>
       </section>
     </nav>
   </div>
@@ -2453,6 +2475,7 @@
     </div>
     <div class="buttons-container" id="show-answer-actions" hidden>
       <button id="mostrar-btn" hidden>MOSTRAR VERSO</button>
+      <button id="restore-trash-card-button" type="button" hidden>RESTAURAR</button>
     </div>
     <div class="buttons-container" id="hide-answer-actions" hidden>
       <button id="ocultar-btn" hidden>OCULTAR VERSO</button>
@@ -2480,6 +2503,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   let data = [];
   let currentCardIndex = 0;
   let totalCards = 0;
+  let isTrashSessionActive = false;
+  let isRestoringTrashCard = false;
+  let trashSessionRevision = 0;
   let activeReviewSessionId = "";
   let nextReviewCursor = null;
   let hasMoreReviewPages = false;
@@ -2567,6 +2593,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   let addCardOptions = { disciplinas: [], materias: [] };
   let matterDeletionPreviewRequestId = 0;
+  let disciplineDeletionPreviewRequestId = 0;
   let deleteCardPreviewRequestId = 0;
   let deleteCardPreviewCard = null;
   let deleteCardPreviewSessionId = "";
@@ -2598,7 +2625,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       getFilterOptions: "filters",
       startReviewSession: "session",
       getReviewPage: "page",
+      startTrashSession: "trashSession",
+      getTrashPage: "trashPage",
       getMatterDeletionPreview: "matterDeletionPreview",
+      getDisciplineDeletionPreview: "disciplineDeletionPreview",
       getCardPreview: "cardPreview",
       getImageStorageStatus: "imageStorage",
       getCardImages: "cardImages",
@@ -2615,7 +2645,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         cache: "no-store",
         redirect: "follow"
       };
-    } else if (["addCard", "addSupportDiscipline", "addSupportMatter", "saveCard", "recordCardResult", "attachImageByHash", "uploadCardImage", "deleteCardImage", "deleteCard", "deleteCardsByMatter"].includes(method)) {
+    } else if (["addCard", "addSupportDiscipline", "addSupportMatter", "saveCard", "recordCardResult", "attachImageByHash", "uploadCardImage", "deleteCardImage", "deleteCard", "restoreCard", "deleteCardsByMatter", "deleteCardsByDiscipline"].includes(method)) {
       const postActions = {
         addCard: "add",
         addSupportDiscipline: "addDiscipline",
@@ -2626,7 +2656,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         uploadCardImage: "uploadImage",
         deleteCardImage: "deleteImage",
         deleteCard: "deleteCard",
-        deleteCardsByMatter: "deleteCardsByMatter"
+        restoreCard: "restoreCard",
+        deleteCardsByMatter: "deleteCardsByMatter",
+        deleteCardsByDiscipline: "deleteCardsByDiscipline"
       };
       const payload = {
         ...parameters,
@@ -2796,11 +2828,13 @@ document.addEventListener("DOMContentLoaded", async function () {
       ? "addCard"
       : parameters.action === "result"
         ? "recordCardResult"
-        : parameters.action === "deleteCardsByMatter"
-          ? "deleteCardsByMatter"
-          : parameters.action === "deleteCard"
-            ? "deleteCard"
-            : "saveCard";
+        : parameters.action === "deleteCardsByDiscipline"
+          ? "deleteCardsByDiscipline"
+          : parameters.action === "deleteCardsByMatter"
+            ? "deleteCardsByMatter"
+            : parameters.action === "deleteCard"
+              ? "deleteCard"
+              : "saveCard";
     const result = await callAppsScript(method, parameters);
     if (!result || result.success !== true) {
       throw new Error((result && result.error) || "O Apps Script não confirmou a gravação.");
@@ -4015,7 +4049,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function setReviewContextChanging(isChanging) {
     isChangingReviewContext = isChanging;
-    if (data.length > 0) {
+    const restoreButton = document.getElementById("restore-trash-card-button");
+    if (restoreButton) {
+      restoreButton.disabled = !isTrashSessionActive || isChanging || isRestoringTrashCard || data.length === 0;
+    }
+    if (data.length > 0 && !isTrashSessionActive) {
       updateResultButtonStates(data[currentCardIndex]);
     } else if (isChanging) {
       document.querySelectorAll("[data-resultado]").forEach(button => {
@@ -4052,6 +4090,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function setReviewSessionPage(page, options = {}) {
     resetReviewSession();
+    isTrashSessionActive = options.trashSession === true;
+    trashSessionRevision += 1;
     data = page.cards.map(card => ({ ...card, resultado: card.resultado ?? "" }));
     currentCardIndex = 0;
     totalCards = page.total;
@@ -4060,16 +4100,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     nextReviewCursor = page.nextCursor;
     hasMoreReviewPages = page.hasMore;
     nextReviewPageRequest = null;
+    document.body.classList.toggle("trash-session-open", isTrashSessionActive && data.length > 0);
 
     setReviewSurfaceVisible(data.length > 0);
     updateCardCounter();
     setAnswerVisibility(false);
     if (data.length > 0) {
-      favoriteButton.style.display = "inline-block";
-      document.getElementById("edit-button").style.display = "inline-block";
-      document.getElementById("counter-button").style.display = "inline-block";
-      document.getElementById("data-button").style.display = "inline-block";
-      document.getElementById("excluir-button").style.display = "inline-block";
+      if (isTrashSessionActive) {
+        favoriteButton.style.display = "none";
+        document.getElementById("edit-button").style.display = "none";
+        document.getElementById("counter-button").style.display = "none";
+        document.getElementById("data-button").style.display = "none";
+        document.getElementById("excluir-button").style.display = "none";
+        document.getElementById("manage-images-button").hidden = true;
+      } else {
+        favoriteButton.style.display = "inline-block";
+        document.getElementById("edit-button").style.display = "inline-block";
+        document.getElementById("counter-button").style.display = "inline-block";
+        document.getElementById("data-button").style.display = "inline-block";
+        document.getElementById("excluir-button").style.display = "inline-block";
+      }
       document.getElementById("navigation-buttons").hidden = false;
       renderCard();
     } else {
@@ -4082,8 +4132,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       ["cabecalho-frente", "front-content", "front-card-images", "cabecalho-verso", "back-content", "back-card-images"].forEach(elementId => {
         document.getElementById(elementId).replaceChildren();
       });
+      document.body.classList.remove("trash-session-open");
       if (options.notifyEmpty !== false) {
-        showAppNotification("Nenhum cartão encontrado com os filtros aplicados.");
+        showAppNotification(options.emptyMessage || "Nenhum cartão encontrado com os filtros aplicados.");
       }
     }
   }
@@ -4094,10 +4145,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const sessionId = activeReviewSessionId;
     const cursor = nextReviewCursor;
-    const request = callAppsScript("getReviewPage", { sessionId, cursor })
+    const trashPageRequest = isTrashSessionActive;
+    const trashRevision = trashSessionRevision;
+    const request = callAppsScript(
+      trashPageRequest ? "getTrashPage" : "getReviewPage",
+      { sessionId, cursor }
+    )
       .then(response => {
         const page = validateReviewPage(response);
-        if (activeReviewSessionId !== sessionId) return false;
+        if (activeReviewSessionId !== sessionId ||
+            isTrashSessionActive !== trashPageRequest ||
+            (trashPageRequest && trashSessionRevision !== trashRevision)) return false;
         if (page.sessionId !== sessionId || page.total > totalCards) {
           throw new Error("A API devolveu uma página de outra sessão de cartões.");
         }
@@ -4118,6 +4176,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     nextReviewPageRequest = request;
     return request;
+  }
+
+  async function loadNextPageUntilCardsAreAvailable() {
+    const initialLength = data.length;
+    do {
+      if (!hasMoreReviewPages || !nextReviewCursor) break;
+      await loadNextReviewPage();
+      if (data.length > initialLength) return true;
+    } while (isTrashSessionActive && hasMoreReviewPages);
+    return data.length > initialLength;
   }
 
   function maybePrefetchReviewPage() {
@@ -4416,16 +4484,145 @@ document.addEventListener("DOMContentLoaded", async function () {
   function populateDeleteSupportOptions() {
     const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
     const matterSelect = document.getElementById("menu-delete-matter-select");
-    if (!disciplineSelect || !matterSelect) return;
+    const archiveDisciplineSelect = document.getElementById("menu-delete-discipline-select");
+    if (!disciplineSelect || !matterSelect || !archiveDisciplineSelect) return;
 
     const previousDiscipline = disciplineSelect.value;
     const previousMatter = matterSelect.value;
+    const previousArchiveDiscipline = archiveDisciplineSelect.value;
     populateDeleteDisciplineOptions(previousDiscipline);
     const disciplineWasPreserved = deleteCatalogNamesMatch(
       disciplineSelect.value,
       previousDiscipline
     );
     populateDeleteMatterOptions(disciplineWasPreserved ? previousMatter : "");
+    populateDeleteDisciplineArchiveOptions(previousArchiveDiscipline);
+  }
+
+  function populateDeleteDisciplineArchiveOptions(selectedValue = null) {
+    const select = document.getElementById("menu-delete-discipline-select");
+    if (!select) return;
+
+    const previousSelection = selectedValue == null ? select.value : String(selectedValue);
+    select.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = addCardOptions.disciplinas.length
+      ? "Selecione uma disciplina"
+      : "Nenhuma disciplina cadastrada";
+    select.appendChild(placeholder);
+
+    sortedUniqueFilterValues(addCardOptions.disciplinas).forEach(discipline => {
+      const option = document.createElement("option");
+      option.value = discipline;
+      option.textContent = normalizeFilterOptionLabel(discipline);
+      select.appendChild(option);
+    });
+
+    const matchingOption = Array.from(select.options).find(option =>
+      option.value && deleteCatalogNamesMatch(option.value, previousSelection)
+    );
+    if (matchingOption) select.value = matchingOption.value;
+
+    if (select.value) {
+      refreshDisciplineDeletionPreview();
+    } else {
+      disciplineDeletionPreviewRequestId += 1;
+      resetDisciplineDeletionPreview();
+    }
+  }
+
+  function setDisciplineDeletionSummary(message) {
+    const summary = document.getElementById("menu-delete-discipline-summary");
+    if (!summary) return;
+    const text = String(message == null ? "" : message);
+    summary.textContent = text;
+    summary.hidden = text.trim() === "";
+  }
+
+  function resetDisciplineDeletionPreview(message = "") {
+    const deleteButton = document.getElementById("delete-discipline-button");
+    const clearSelectionButton = document.getElementById("clear-delete-discipline-selection");
+    const disciplineSelect = document.getElementById("menu-delete-discipline-select");
+    setDisciplineDeletionSummary(message);
+    if (deleteButton) {
+      deleteButton.disabled = true;
+      deleteButton.dataset.expectedMatterCount = "";
+      deleteButton.dataset.expectedSupportRowCount = "";
+      deleteButton.dataset.expectedCardCount = "";
+    }
+    if (clearSelectionButton) {
+      clearSelectionButton.disabled = !(disciplineSelect && disciplineSelect.value);
+    }
+  }
+
+  function parseDeleteDisciplineSelection() {
+    const select = document.getElementById("menu-delete-discipline-select");
+    if (!select || !select.value) return "";
+    const discipline = select.value;
+    const exists = addCardOptions.disciplinas.some(item =>
+      deleteCatalogNamesMatch(item, discipline)
+    );
+    return exists ? discipline : "";
+  }
+
+  function isCurrentDisciplineDeletionPreview(discipline, requestId) {
+    return requestId === disciplineDeletionPreviewRequestId &&
+      deleteCatalogNamesMatch(parseDeleteDisciplineSelection(), discipline);
+  }
+
+  async function refreshDisciplineDeletionPreview() {
+    const discipline = parseDeleteDisciplineSelection();
+    const deleteButton = document.getElementById("delete-discipline-button");
+    const clearSelectionButton = document.getElementById("clear-delete-discipline-selection");
+    const requestId = ++disciplineDeletionPreviewRequestId;
+    if (!discipline || !deleteButton) {
+      resetDisciplineDeletionPreview();
+      return;
+    }
+
+    deleteButton.disabled = true;
+    if (clearSelectionButton) clearSelectionButton.disabled = false;
+    setDisciplineDeletionSummary("Consultando matérias, cartões e imagens vinculados…");
+    try {
+      const preview = await callAppsScript("getDisciplineDeletionPreview", { disciplina: discipline });
+      if (!isCurrentDisciplineDeletionPreview(discipline, requestId)) return;
+      if (!preview || preview.success !== true ||
+          !deleteCatalogNamesMatch(preview.disciplina, discipline) ||
+          !Number.isSafeInteger(preview.matterCount) || preview.matterCount < 0 ||
+          !Number.isSafeInteger(preview.supportRowCount) || preview.supportRowCount < 1 ||
+          !Number.isSafeInteger(preview.cardCount) || preview.cardCount < 0 ||
+          !Number.isSafeInteger(preview.imageCount) || preview.imageCount < 0 ||
+          !Number.isSafeInteger(preview.uniqueImageFileCount) || preview.uniqueImageFileCount < 0) {
+        throw new Error("A API retornou uma prévia inválida para a disciplina.");
+      }
+
+      const matterLabel = preview.matterCount === 1
+        ? "1 matéria cadastrada"
+        : `${preview.matterCount} matérias cadastradas`;
+      const cardLabel = preview.cardCount === 1
+        ? "1 cartão ativo"
+        : `${preview.cardCount} cartões ativos`;
+      const imageLabel = preview.uniqueImageFileCount === 1
+        ? "1 arquivo de imagem vinculado"
+        : `${preview.uniqueImageFileCount} arquivos de imagem vinculados`;
+      const extraSupportRows = preview.supportRowCount - preview.matterCount;
+      const supportNote = extraSupportRows === 1
+        ? " Também será enviada para a lixeira 1 linha de apoio sem matéria preenchida."
+        : extraSupportRows > 1
+          ? ` Também serão enviadas para a lixeira ${extraSupportRows} linhas de apoio sem matéria preenchida.`
+          : "";
+      setDisciplineDeletionSummary(`${matterLabel}, ${cardLabel} e ${imageLabel}.${supportNote}`);
+      deleteButton.dataset.expectedMatterCount = String(preview.matterCount);
+      deleteButton.dataset.expectedSupportRowCount = String(preview.supportRowCount);
+      deleteButton.dataset.expectedCardCount = String(preview.cardCount);
+      deleteButton.disabled = isDeletingCard || isChangingReviewContext;
+    } catch (error) {
+      if (!isCurrentDisciplineDeletionPreview(discipline, requestId)) return;
+      const detail = error instanceof Error ? error.message : String(error);
+      setDisciplineDeletionSummary(`Não foi possível consultar a disciplina. ${detail}`);
+      deleteButton.disabled = true;
+    }
   }
 
   function setMatterDeletionSummary(summary, message) {
@@ -4442,6 +4639,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const select = document.getElementById("menu-delete-matter-select");
     if (!summary || !deleteButton) return;
     setMatterDeletionSummary(summary, message);
+    deleteButton.textContent = "Deletar cartões e matéria";
     deleteButton.disabled = true;
     deleteButton.dataset.expectedCardCount = "";
     if (clearSelectionButton) {
@@ -4497,12 +4695,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         throw new Error("A API retornou uma prévia inválida para a matéria.");
       }
 
-      const message = preview.cardCount === 1
-        ? "1 cartão ativo vinculado a esta matéria."
-        : `${preview.cardCount} cartões ativos vinculados a esta matéria.`;
+      const message = preview.cardCount === 0
+        ? "Nenhum cartão ativo. O cadastro da matéria será movido para a lixeira."
+        : preview.cardCount === 1
+          ? "1 cartão ativo. Ao deletá-lo, o cadastro da matéria também será movido para a lixeira."
+          : `${preview.cardCount} cartões ativos. Ao deletá-los, o cadastro da matéria também será movido para a lixeira.`;
       setMatterDeletionSummary(summary, message);
       deleteButton.dataset.expectedCardCount = String(preview.cardCount);
-      deleteButton.disabled = preview.cardCount === 0 || isDeletingCard || isChangingReviewContext;
+      deleteButton.textContent = preview.cardCount === 0
+        ? "Remover matéria do catálogo"
+        : "Deletar cartões e matéria";
+      deleteButton.disabled = isDeletingCard || isChangingReviewContext;
     } catch (error) {
       if (!isCurrentMatterDeletionPreview(pair, requestId)) return;
       const detail = error instanceof Error ? error.message : String(error);
@@ -4941,6 +5144,136 @@ async function applyFilters(options = {}) {
   }
 }
 
+async function openTrashSession() {
+  if (isChangingReviewContext) return false;
+  setReviewContextChanging(true);
+  try {
+    if (!(await commitPendingReviewResult())) return false;
+    const page = validateReviewPage(await callAppsScript("startTrashSession"));
+    setReviewSessionPage(page, { trashSession: true, notifyEmpty: false });
+    if (page.total === 0) {
+      showAppNotification("A lixeira não contém cartões.");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return true;
+  } finally {
+    setReviewContextChanging(false);
+  }
+}
+
+async function restoreCurrentTrashCard() {
+  if (!isTrashSessionActive || isRestoringTrashCard || isChangingReviewContext || data.length === 0) return;
+
+  const card = data[currentCardIndex];
+  if (!card) return;
+
+  const cardId = String(card.id);
+  let restoreCommitted = false;
+  let trashSessionRefreshed = false;
+  let notificationMessage = "";
+  let pageLoadError = null;
+  isRestoringTrashCard = true;
+  setReviewContextChanging(true);
+
+  try {
+    if (nextReviewPageRequest) {
+      try {
+        await nextReviewPageRequest;
+      } catch (error) {
+        console.warn("Não foi possível terminar o pré-carregamento da lixeira antes da restauração:", error);
+      }
+    }
+
+    const restoreResult = await callAppsScript("restoreCard", {
+      id: cardId,
+      dataRevisao: getReviewDateAtClick()
+    });
+    if (!restoreResult || restoreResult.success !== true || String(restoreResult.id) !== cardId) {
+      throw new Error("A API não confirmou a restauração do cartão.");
+    }
+    restoreCommitted = true;
+
+    const restoredIndex = data.findIndex(item => String(item.id) === cardId);
+    if (restoredIndex >= 0) {
+      data.splice(restoredIndex, 1);
+      if (restoredIndex < currentCardIndex) currentCardIndex -= 1;
+      totalCards = Math.max(0, totalCards - 1);
+    }
+    if (Number.isSafeInteger(restoreResult.remainingTrashCards) && restoreResult.remainingTrashCards >= 0) {
+      totalCards = Math.min(totalCards, restoreResult.remainingTrashCards);
+    }
+
+    if (currentCardIndex >= data.length && hasMoreReviewPages) {
+      try {
+        await loadNextPageUntilCardsAreAvailable();
+      } catch (error) {
+        pageLoadError = error;
+        console.error("Cartão restaurado, mas não foi possível carregar os próximos cartões da lixeira:", error);
+      }
+    }
+
+    if (data.length === 0 && !pageLoadError) {
+      try {
+        const refreshedTrashPage = validateReviewPage(await callAppsScript("startTrashSession"));
+        setReviewSessionPage(refreshedTrashPage, { trashSession: true, notifyEmpty: false });
+        trashSessionRefreshed = true;
+      } catch (error) {
+        pageLoadError = error;
+        console.error("Cartão restaurado, mas não foi possível atualizar a sessão da lixeira:", error);
+      }
+    }
+
+    if (data.length === 0) {
+      const sessionId = activeReviewSessionId;
+      setReviewSessionPage({
+        sessionId,
+        cards: [],
+        total: 0,
+        hasMore: false,
+        nextCursor: null
+      }, { trashSession: true, notifyEmpty: false });
+    } else {
+      if (currentCardIndex >= data.length) currentCardIndex = data.length - 1;
+      if (!trashSessionRefreshed) {
+        remainingCards = Math.max(0, totalCards - currentCardIndex);
+        updateCardCounter();
+        renderCard();
+      }
+    }
+
+    notificationMessage = restoreResult.alreadyRestored
+      ? `O cartão ID#${cardId} já estava ativo e foi removido da Lixeira.`
+      : `Cartão ID#${cardId} restaurado.`;
+    if (data.length === 0) {
+      notificationMessage += pageLoadError
+        ? " Não foi possível carregar os próximos cartões; abra a Lixeira novamente."
+        : " A Lixeira está vazia.";
+    } else if (pageLoadError) {
+      notificationMessage += " Não foi possível carregar o próximo cartão; abra a Lixeira novamente se necessário.";
+    }
+  } catch (error) {
+    console.error("Erro ao restaurar o cartão:", error);
+    const detail = error instanceof Error ? error.message : String(error);
+    notificationMessage = restoreCommitted
+      ? `Cartão ID#${cardId} restaurado, mas a tela não foi atualizada por completo. ${detail}`
+      : `Não foi possível restaurar o cartão ID#${cardId}. ${detail}`;
+  } finally {
+    isRestoringTrashCard = false;
+    setReviewContextChanging(false);
+  }
+
+  if (restoreCommitted) {
+    try {
+      await fetchFilters(getSelectedReviewFilters());
+    } catch (error) {
+      console.error("Cartão restaurado, mas não foi possível atualizar as opções dos filtros:", error);
+      notificationMessage += " As opções dos filtros não foram atualizadas; abra o menu Filtros novamente.";
+    }
+  }
+
+  showAppNotification(notificationMessage);
+}
+
 
 
   // Monta o cabeçalho no cliente usando as colunas B, C e D do mesmo cartão.
@@ -5026,18 +5359,19 @@ async function applyFilters(options = {}) {
 
   function setAnswerVisibility(isVisible) {
     const hasCard = data.length > 0;
-    const showAnswer = hasCard && isVisible;
+    const showAnswer = hasCard && (isTrashSessionActive || isVisible);
     const answerDisplay = showAnswer ? "block" : "none";
     document.getElementById("back-flashcard").hidden = !showAnswer;
     backCardField.style.display = showAnswer ? "block" : "none";
     document.getElementById("back-content").style.display = answerDisplay;
     document.getElementById("cabecalho-verso").style.display = answerDisplay;
     backCardImagesContainer.style.display = showAnswer ? "" : "none";
-    document.getElementById("result-buttons").hidden = !showAnswer;
-    document.getElementById("show-answer-actions").hidden = !hasCard || showAnswer;
-    document.getElementById("hide-answer-actions").hidden = !showAnswer;
-    document.getElementById("mostrar-btn").hidden = !hasCard || showAnswer;
-    document.getElementById("ocultar-btn").hidden = !showAnswer;
+    document.getElementById("result-buttons").hidden = isTrashSessionActive || !showAnswer;
+    document.getElementById("show-answer-actions").hidden = !hasCard || (showAnswer && !isTrashSessionActive);
+    document.getElementById("hide-answer-actions").hidden = !showAnswer || isTrashSessionActive;
+    document.getElementById("mostrar-btn").hidden = isTrashSessionActive || !hasCard || showAnswer;
+    document.getElementById("restore-trash-card-button").hidden = !isTrashSessionActive || !hasCard;
+    document.getElementById("ocultar-btn").hidden = isTrashSessionActive || !showAnswer;
     if (showAnswer) {
       renderCardFaceImages(data[currentCardIndex], "VERSO", cardFaceImageRenderVersion);
     }
@@ -5069,25 +5403,30 @@ async function applyFilters(options = {}) {
     if (data.length === 0) return;
 
     const card = data[currentCardIndex];
-    syncReviewResultStatus(card);
+    syncReviewResultStatus(isTrashSessionActive ? null : card);
     const imageRenderVersion = ++cardFaceImageRenderVersion;
     frontCardImagesContainer.replaceChildren();
     backCardImagesContainer.replaceChildren();
     if (!imageViewer.hidden) closeCardImageViewer();
-    updateFavoriteButton(card);
-    updateResultCounters(card);
+    if (!isTrashSessionActive) {
+      updateFavoriteButton(card);
+      updateResultCounters(card);
+    }
     document.getElementById("front-content").innerHTML = card.frente;
     document.getElementById("back-content").innerHTML = card.tras;
-    setAnswerVisibility(false);
+    setAnswerVisibility(isTrashSessionActive);
     renderCardHeading("cabecalho-frente", "FRENTE", card);
     renderCardHeading("cabecalho-verso", "VERSO", card);
     renderCardFaceImages(card, "FRENTE", imageRenderVersion);
 
 
-    updateReviewDateButton(card);
-
-
+    if (!isTrashSessionActive) {
+      updateReviewDateButton(card);
       updateResultButtonStates(card);
+    } else {
+      document.getElementById("restore-trash-card-button").disabled =
+        isChangingReviewContext || isRestoringTrashCard;
+    }
 
       maybePrefetchReviewPage();
 }
@@ -5295,6 +5634,9 @@ async function clearFilters() {
     }
 
     // Limpa os dados e reseta o índice dos cartões
+    isTrashSessionActive = false;
+    trashSessionRevision += 1;
+    document.body.classList.remove("trash-session-open");
     data = [];
     currentCardIndex = 0;
     totalCards = 0;
@@ -5353,6 +5695,7 @@ async function clearFilters() {
 
   function setMenuSectionExpanded(sectionName) {
     document.querySelectorAll("#menu-navigation .menu-section").forEach(section => {
+      if (section.dataset.menuSection === "trash") return;
       const isExpanded = section.dataset.menuSection === sectionName;
       const trigger = section.querySelector(".menu-section-toggle");
       const panel = document.getElementById(trigger.getAttribute("aria-controls"));
@@ -5442,7 +5785,20 @@ async function clearFilters() {
 
   document.querySelectorAll("#menu-navigation .menu-section-toggle").forEach(button => {
     button.addEventListener("click", () => {
-      toggleMenuSection(button.closest(".menu-section").dataset.menuSection);
+      const sectionName = button.closest(".menu-section").dataset.menuSection;
+      if (sectionName === "trash") {
+        openTrashSession()
+          .then(opened => {
+            if (opened) closeSideMenu();
+          })
+          .catch(error => {
+            console.error("Erro ao carregar a lixeira:", error);
+            const detail = error instanceof Error ? error.message : String(error);
+            showAppNotification(`Não foi possível carregar os cartões da lixeira. ${detail}`);
+          });
+        return;
+      }
+      toggleMenuSection(sectionName);
     });
   });
 
@@ -5468,13 +5824,16 @@ async function clearFilters() {
   const newMatterDisciplineSelect = document.getElementById("menu-new-matter-discipline");
   const newMatterNameInput = document.getElementById("menu-new-matter-name");
   const newMatterImageLabelInput = document.getElementById("menu-new-matter-image-label");
+  const deleteDisciplineToggle = document.getElementById("menu-delete-discipline-toggle");
   const deleteMatterToggle = document.getElementById("menu-delete-matter-toggle");
   const deleteCardToggle = document.getElementById("menu-delete-card-toggle");
+  const deleteDisciplineForm = document.getElementById("menu-delete-discipline-form");
   const deleteMatterForm = document.getElementById("menu-delete-matter-form");
   const deleteCardForm = document.getElementById("menu-delete-card-form");
 
   function toggleDeleteForm(formName) {
     const formEntries = [
+      { name: "discipline", toggle: deleteDisciplineToggle, form: deleteDisciplineForm },
       { name: "matter", toggle: deleteMatterToggle, form: deleteMatterForm },
       { name: "card", toggle: deleteCardToggle, form: deleteCardForm }
     ];
@@ -5488,7 +5847,10 @@ async function clearFilters() {
     });
 
     if (nextOpen !== "card") clearDeleteCardPreview();
-    if (nextOpen === "matter") {
+    if (nextOpen === "discipline") {
+      populateDeleteDisciplineArchiveOptions();
+      document.getElementById("menu-delete-discipline-select").focus();
+    } else if (nextOpen === "matter") {
       populateDeleteSupportOptions();
       document.getElementById("menu-delete-matter-discipline").focus();
     } else if (nextOpen === "card") {
@@ -5651,8 +6013,21 @@ async function clearFilters() {
     }
   });
 
+  deleteDisciplineToggle.addEventListener("click", () => toggleDeleteForm("discipline"));
   deleteMatterToggle.addEventListener("click", () => toggleDeleteForm("matter"));
   deleteCardToggle.addEventListener("click", () => toggleDeleteForm("card"));
+  document.getElementById("menu-delete-discipline-select").addEventListener("change", () => {
+    syncMenuSelectionHighlights();
+    refreshDisciplineDeletionPreview();
+  });
+  document.getElementById("clear-delete-discipline-selection").addEventListener("click", () => {
+    const disciplineSelect = document.getElementById("menu-delete-discipline-select");
+    disciplineDeletionPreviewRequestId += 1;
+    disciplineSelect.value = "";
+    resetDisciplineDeletionPreview();
+    syncMenuSelectionHighlights();
+    disciplineSelect.focus();
+  });
   document.getElementById("clear-delete-matter-selection").addEventListener("click", () => {
     const disciplineSelect = document.getElementById("menu-delete-matter-discipline");
     matterDeletionPreviewRequestId += 1;
@@ -5672,6 +6047,124 @@ async function clearFilters() {
     clearDeleteCardPreview();
     document.getElementById("locate-delete-card-button").disabled = false;
     syncMenuSelectionHighlights();
+  });
+
+  document.getElementById("delete-discipline-button").addEventListener("click", async event => {
+    const deleteButton = event.currentTarget;
+    const discipline = parseDeleteDisciplineSelection();
+    if (!discipline) {
+      showAppNotification("Selecione a disciplina que deseja excluir.");
+      return;
+    }
+    if (isEditing) {
+      showAppNotification("Finalize ou cancele a edição antes de excluir uma disciplina.");
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext) return;
+
+    let preview;
+    try {
+      preview = await callAppsScript("getDisciplineDeletionPreview", { disciplina: discipline });
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível consultar a disciplina. ${detail}`);
+      return;
+    }
+    if (isDeletingCard || isChangingReviewContext ||
+        !deleteCatalogNamesMatch(parseDeleteDisciplineSelection(), discipline)) return;
+    if (!preview || preview.success !== true ||
+        !deleteCatalogNamesMatch(preview.disciplina, discipline) ||
+        !Number.isSafeInteger(preview.matterCount) || preview.matterCount < 0 ||
+        !Number.isSafeInteger(preview.supportRowCount) || preview.supportRowCount < 1 ||
+        !Number.isSafeInteger(preview.cardCount) || preview.cardCount < 0 ||
+        !Number.isSafeInteger(preview.imageCount) || preview.imageCount < 0 ||
+        !Number.isSafeInteger(preview.uniqueImageFileCount) || preview.uniqueImageFileCount < 0) {
+      showAppNotification("A API não retornou uma prévia válida da disciplina.");
+      return;
+    }
+
+    const matterLabel = preview.matterCount === 0
+      ? "nenhuma matéria cadastrada"
+      : preview.matterCount === 1
+        ? "1 matéria"
+        : `${preview.matterCount} matérias`;
+    const cardLabel = preview.cardCount === 0
+      ? "nenhum cartão ativo"
+      : preview.cardCount === 1
+        ? "1 cartão ativo"
+        : `${preview.cardCount} cartões ativos`;
+    const extraSupportCount = preview.supportRowCount - preview.matterCount;
+    const supportRowNote = extraSupportCount === 1
+      ? " Também será enviada para a lixeira 1 linha de apoio sem matéria preenchida."
+      : extraSupportCount > 1
+        ? ` Também serão enviadas para a lixeira ${extraSupportCount} linhas de apoio sem matéria preenchida.`
+        : "";
+    const confirmation = `Deletar a disciplina “${discipline}”? A ação abrangerá ${matterLabel} e ${cardLabel}. ` +
+      "Os cartões, cadastros e vínculos de imagem serão enviados às respectivas lixeiras. " +
+      "Arquivos de imagem compartilhados com cartões ativos fora da disciplina permanecerão na pasta principal." +
+      supportRowNote;
+    if (!window.confirm(confirmation)) return;
+
+    deleteButton.disabled = true;
+    isDeletingCard = true;
+    setReviewContextChanging(true);
+    let deletionResult = null;
+    try {
+      if (!(await commitPendingReviewResult())) return;
+      deletionResult = await sendApiMutation({
+        action: "deleteCardsByDiscipline",
+        disciplina: discipline,
+        expectedMatterCount: preview.matterCount,
+        expectedSupportRowCount: preview.supportRowCount,
+        expectedCardCount: preview.cardCount,
+        dataRevisao: getReviewDateAtClick()
+      });
+      if (!Number.isSafeInteger(deletionResult.deletedMatters) ||
+          deletionResult.deletedMatters !== preview.matterCount ||
+          !Number.isSafeInteger(deletionResult.archivedSupportRows) ||
+          deletionResult.archivedSupportRows !== preview.supportRowCount ||
+          !Number.isSafeInteger(deletionResult.deletedCards) ||
+          deletionResult.deletedCards !== preview.cardCount ||
+          deletionResult.disciplineArchived !== true ||
+          !deletionResult.addCardOptions ||
+          !Array.isArray(deletionResult.addCardOptions.disciplinas) ||
+          !Array.isArray(deletionResult.addCardOptions.materias)) {
+        deletionResult = null;
+        throw new Error("A API não confirmou a exclusão das matérias, dos cartões e da disciplina. Atualize a consulta antes de tentar novamente.");
+      }
+      updateCardFormOptionsFromApi(deletionResult.addCardOptions);
+    } catch (error) {
+      console.error("Erro ao deletar disciplina:", error);
+      const detail = error instanceof Error ? error.message : String(error);
+      showAppNotification(`Não foi possível deletar a disciplina. ${detail}`);
+    } finally {
+      isDeletingCard = false;
+      setReviewContextChanging(false);
+      deleteButton.disabled = true;
+    }
+
+    if (!deletionResult) {
+      await refreshDisciplineDeletionPreview();
+      return;
+    }
+
+    await clearFilters();
+    await refreshDisciplineDeletionPreview();
+    const mattersArchivedMessage = deletionResult.deletedMatters === 1
+      ? "1 matéria foi enviada para a lixeira de apoio"
+      : `${deletionResult.deletedMatters} matérias foram enviadas para a lixeira de apoio`;
+    const cardsArchivedMessage = deletionResult.deletedCards === 1
+      ? "1 cartão foi enviado para a lixeira de cartões"
+      : `${deletionResult.deletedCards} cartões foram enviados para a lixeira de cartões`;
+    const imageArchiveMessage = deletionResult.imagesArchived === 1
+      ? " 1 vínculo de imagem também foi enviado para a lixeira."
+      : deletionResult.imagesArchived > 1
+        ? ` ${deletionResult.imagesArchived} vínculos de imagem também foram enviados para a lixeira.`
+        : "";
+    const movedFilesMessage = deletionResult.imagesMoved > 0
+      ? ` ${deletionResult.imagesMoved} arquivo(s) de imagem sem outros vínculos foram movidos para a pasta de imagens-lixeira.`
+      : "";
+    showAppNotification(`Disciplina deletada. ${mattersArchivedMessage}; ${cardsArchivedMessage}.${imageArchiveMessage}${movedFilesMessage}`);
   });
 
   document.getElementById("delete-matter-cards-button").addEventListener("click", async event => {
@@ -5700,17 +6193,14 @@ async function clearFilters() {
       showAppNotification("A API não retornou uma quantidade válida de cartões.");
       return;
     }
-    if (preview.cardCount === 0) {
-      await refreshMatterDeletionPreview();
-      showAppNotification("Não há cartões ativos vinculados a essa matéria.");
-      return;
-    }
-
     const cardLabel = preview.cardCount === 1 ? "1 cartão" : `${preview.cardCount} cartões`;
-    const confirmation =
-      `Mover ${cardLabel} da matéria “${pair.materia}” (${pair.disciplina}) para a lixeira? ` +
-      "Os anexos também serão arquivados quando não estiverem compartilhados. A matéria continuará cadastrada.";
+    const confirmation = preview.cardCount === 0
+      ? `A matéria “${pair.materia}” (${pair.disciplina}) não tem cartões ativos. Remover seu cadastro da base e movê-lo para a lixeira de apoio?`
+      : `Mover ${cardLabel} da matéria “${pair.materia}” (${pair.disciplina}) para a lixeira e também mover seu cadastro para a lixeira de apoio? ` +
+        "Os anexos sem compartilhamento serão enviados para a lixeira.";
     if (!window.confirm(confirmation)) return;
+
+
 
     deleteButton.disabled = true;
     isDeletingCard = true;
@@ -5725,18 +6215,24 @@ async function clearFilters() {
         expectedCardCount: preview.cardCount,
         dataRevisao: getReviewDateAtClick()
       });
-      if (!Number.isSafeInteger(deletionResult.deletedCards) || deletionResult.deletedCards !== preview.cardCount) {
+      if (!Number.isSafeInteger(deletionResult.deletedCards) ||
+          deletionResult.deletedCards !== preview.cardCount ||
+          deletionResult.matterArchived !== true ||
+          !deletionResult.addCardOptions ||
+          !Array.isArray(deletionResult.addCardOptions.disciplinas) ||
+          !Array.isArray(deletionResult.addCardOptions.materias)) {
         deletionResult = null;
-        throw new Error("A API confirmou uma quantidade diferente da prévia. Atualize a consulta antes de tentar novamente.");
+        throw new Error("A API não confirmou a exclusão dos cartões e do cadastro da matéria. Atualize a consulta antes de tentar novamente.");
       }
+      updateCardFormOptionsFromApi(deletionResult.addCardOptions);
     } catch (error) {
-      console.error("Erro ao excluir os cartões da matéria:", error);
+      console.error("Erro ao deletar cartões e matéria:", error);
       const detail = error instanceof Error ? error.message : String(error);
-      showAppNotification(`Não foi possível excluir os cartões da matéria. ${detail}`);
+      showAppNotification(`Não foi possível deletar os cartões e a matéria. ${detail}`);
     } finally {
       isDeletingCard = false;
       setReviewContextChanging(false);
-      deleteButton.disabled = false;
+      deleteButton.disabled = true;
     }
 
     if (!deletionResult) {
@@ -5746,15 +6242,17 @@ async function clearFilters() {
 
     await clearFilters();
     await refreshMatterDeletionPreview();
-    const cardsMovedMessage = deletionResult.deletedCards === 1
-      ? `1 cartão da matéria “${pair.materia}” foi movido para a lixeira.`
-      : `${deletionResult.deletedCards} cartões da matéria “${pair.materia}” foram movidos para a lixeira.`;
+    const cardsMovedMessage = deletionResult.deletedCards === 0
+      ? "Não havia cartões ativos para mover."
+      : deletionResult.deletedCards === 1
+        ? `1 cartão da matéria “${pair.materia}” foi movido para a lixeira.`
+        : `${deletionResult.deletedCards} cartões da matéria “${pair.materia}” foram movidos para a lixeira.`;
     const imagesArchivedMessage = deletionResult.imagesArchived === 1
-      ? " 1 vínculo de imagem também foi arquivado."
+      ? " 1 vínculo de imagem também foi enviado para a lixeira."
       : deletionResult.imagesArchived > 1
-        ? ` ${deletionResult.imagesArchived} vínculos de imagem também foram arquivados.`
+        ? ` ${deletionResult.imagesArchived} vínculos de imagem também foram enviados para a lixeira.`
         : "";
-    showAppNotification(`${cardsMovedMessage}${imagesArchivedMessage} A matéria permanece cadastrada.`);
+    showAppNotification(`${cardsMovedMessage}${imagesArchivedMessage} O cadastro da matéria foi movido para a lixeira de apoio.`);
   });
 
   document.getElementById("menu-delete-card-form").addEventListener("submit", async event => {
@@ -5923,6 +6421,8 @@ async function clearFilters() {
     requestAnimationFrame(scrollToBackFlashcard);
   });
 
+  document.getElementById("restore-trash-card-button").addEventListener("click", restoreCurrentTrashCard);
+
   document.getElementById("ocultar-btn").addEventListener("click", () => {
     setAnswerVisibility(false);
   });
@@ -5941,7 +6441,11 @@ async function clearFilters() {
         let nextIndex = currentCardIndex + 1;
         if (nextIndex >= data.length && hasMoreReviewPages) {
           try {
-            await loadNextReviewPage();
+            if (isTrashSessionActive) {
+              await loadNextPageUntilCardsAreAvailable();
+            } else {
+              await loadNextReviewPage();
+            }
           } catch (error) {
             console.error("Erro ao carregar a próxima página de cartões:", error);
             const detail = error instanceof Error ? error.message : String(error);
