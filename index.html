@@ -308,6 +308,7 @@
       grid-column: 1 / -1;
       width: 100%;
       min-width: 0;
+      font-size: 16px;
     }
 
     .content.no-review-session .buttons-container-header #start-reviews-button {
@@ -2177,6 +2178,7 @@
               <small class="filter-help" id="menu-new-discipline-image-label-help">Obrigatório; máximo de 5 caracteres.</small>
             </div>
             <button class="menu-inline-action" id="save-new-discipline" type="submit">Gravar</button>
+            <button class="menu-inline-action" id="clear-new-discipline-fields" type="button">Limpar Campos</button>
           </form>
           <button class="menu-subitem menu-subitem-toggle" id="menu-new-matter-toggle" type="button" aria-expanded="false" aria-controls="menu-new-matter-form">Matéria</button>
           <form class="menu-new-catalog-form" id="menu-new-matter-form" hidden novalidate>
@@ -2192,6 +2194,7 @@
               <small class="filter-help" id="menu-new-matter-image-label-help">Obrigatório; máximo de 5 caracteres.</small>
             </div>
             <button class="menu-inline-action" id="save-new-matter" type="submit">Gravar</button>
+            <button class="menu-inline-action" id="clear-new-matter-fields" type="button">Limpar Campos</button>
           </form>
         </div>
       </section>
@@ -2327,7 +2330,7 @@
       <button id="favorite-button" type="button" title="Adicionar aos favoritos" aria-label="Adicionar aos favoritos" aria-pressed="false">☆</button>
       <button id="cancel-button">❌</button>
       <button id="start-reviews-button" type="button">INICIAR REVISÕES</button>
-      <button id="add-button">➕</button>
+      <button id="add-button">NOVO CARTÃO</button>
       <button id="counter-button">0</button>
       <button id="br-copy-button">br</button>
             <button id="bold-button">𝐁</button>
@@ -4070,7 +4073,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   function setReviewSurfaceVisible(isVisible) {
     const content = document.querySelector(".content");
     content.classList.toggle("no-review-session", !isVisible);
-    document.getElementById("add-button").style.removeProperty("flex");
+    const addButton = document.getElementById("add-button");
+    addButton.style.removeProperty("flex");
+    addButton.textContent = isVisible ? "➕" : "NOVO CARTÃO";
     document.getElementById("flashcard").hidden = !isVisible;
     document.getElementById("review-footer").hidden = !isVisible;
     manageImagesButton.hidden = !isVisible;
@@ -5821,9 +5826,11 @@ async function clearFilters() {
   const newDisciplineNameInput = document.getElementById("menu-new-discipline-name");
   const newDisciplineMatterInput = document.getElementById("menu-new-discipline-matter");
   const newDisciplineImageLabelInput = document.getElementById("menu-new-discipline-image-label");
+  const clearNewDisciplineFieldsButton = document.getElementById("clear-new-discipline-fields");
   const newMatterDisciplineSelect = document.getElementById("menu-new-matter-discipline");
   const newMatterNameInput = document.getElementById("menu-new-matter-name");
   const newMatterImageLabelInput = document.getElementById("menu-new-matter-image-label");
+  const clearNewMatterFieldsButton = document.getElementById("clear-new-matter-fields");
   const deleteDisciplineToggle = document.getElementById("menu-delete-discipline-toggle");
   const deleteMatterToggle = document.getElementById("menu-delete-matter-toggle");
   const deleteCardToggle = document.getElementById("menu-delete-card-toggle");
@@ -5899,6 +5906,20 @@ async function clearFilters() {
   newDisciplineImageLabelInput.addEventListener("input", () => uppercaseCatalogInput(newDisciplineImageLabelInput, 5));
   newMatterNameInput.addEventListener("input", () => uppercaseCatalogInput(newMatterNameInput));
   newMatterImageLabelInput.addEventListener("input", () => uppercaseCatalogInput(newMatterImageLabelInput, 5));
+  clearNewDisciplineFieldsButton.addEventListener("click", () => {
+    newDisciplineForm.reset();
+    newDisciplineNameInput.value = "";
+    newDisciplineMatterInput.value = "";
+    newDisciplineImageLabelInput.value = "";
+    newDisciplineNameInput.focus();
+  });
+  clearNewMatterFieldsButton.addEventListener("click", () => {
+    newMatterForm.reset();
+    newMatterDisciplineSelect.value = "";
+    newMatterNameInput.value = "";
+    newMatterImageLabelInput.value = "";
+    newMatterDisciplineSelect.focus();
+  });
 
   newDisciplineForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -5933,6 +5954,7 @@ async function clearFilters() {
     newDisciplineToggle.disabled = true;
     const saveButton = document.getElementById("save-new-discipline");
     saveButton.disabled = true;
+    clearNewDisciplineFieldsButton.disabled = true;
 
     try {
       const result = await callAppsScript("addSupportDiscipline", {
@@ -5953,6 +5975,7 @@ async function clearFilters() {
       newDisciplineImageLabelInput.disabled = false;
       newDisciplineToggle.disabled = false;
       saveButton.disabled = false;
+      clearNewDisciplineFieldsButton.disabled = false;
     }
   });
 
@@ -5989,6 +6012,7 @@ async function clearFilters() {
     newMatterToggle.disabled = true;
     const saveButton = document.getElementById("save-new-matter");
     saveButton.disabled = true;
+    clearNewMatterFieldsButton.disabled = true;
 
     try {
       const result = await callAppsScript("addSupportMatter", {
@@ -6010,6 +6034,7 @@ async function clearFilters() {
       newMatterImageLabelInput.disabled = false;
       newMatterToggle.disabled = false;
       saveButton.disabled = false;
+      clearNewMatterFieldsButton.disabled = false;
     }
   });
 
